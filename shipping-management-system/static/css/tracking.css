@@ -1,0 +1,4 @@
+/* Tracking view styles */
+.map-wrap { height: 400px; background: #e9eef6; border-radius:6px; }
+.event-list { list-style:none; padding:0; }
+.event-list li { padding:8px 0; border-bottom:1px solid #eee; }

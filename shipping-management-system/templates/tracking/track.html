@@ -1,0 +1,1850 @@
+{% extends "base.html" %}
+{% set need_maps = True %}
+
+{% block title %}Tracking {{ package.tracking_code }} — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — TRACKING DETAIL PAGE
+   Bound to base.html tokens. Dense content sits inside a paper wrapper
+   so the base background slideshow doesn't compete with readability.
+   ========================================================================= */
+
+/* ---------- Status palette (semantic only — not in base tokens) ---------- */
+:root {
+    --status-transit:     #6da5c2;
+    --status-transit-bg:  #eef4f8;
+    --status-success:     #7cb58c;
+    --status-success-bg:  #eff6f1;
+    --status-warning:     #a06420;
+    --status-warning-bg:  #faf3e8;
+    --status-neutral:     #52504b;
+    --status-neutral-bg:  #f0ede7;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --status-transit-bg:  #14222c;
+        --status-success-bg:  #16261a;
+        --status-warning-bg:  #2a2214;
+        --status-neutral-bg:  #26231f;
+    }
+}
+
+/* =========================================================================
+   PAGE WRAPPER — paper panel so dense content stays legible over slideshow
+   ========================================================================= */
+.track-page {
+    position: relative;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: clamp(24px, 3vw, 44px) clamp(18px, 3vw, 36px) clamp(40px, 5vw, 64px);
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-md);
+    color: var(--text);
+}
+
+.track-page h1, .track-page h2, .track-page h3,
+.track-page h4, .track-page h5, .track-page h6 {
+    color: var(--text-strong);
+    letter-spacing: -0.015em;
+    font-weight: 700;
+}
+.track-page code {
+    background: var(--primary-50);
+    color: var(--primary-700);
+    padding: .35rem .6rem;
+    border-radius: var(--r-sm);
+    border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
+    font-weight: 700;
+    font-size: .95em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .01em;
+}
+@supports not (border-color: color-mix(in srgb, red 50%, blue)) {
+    .track-page code { border-color: var(--border-strong); }
+}
+
+/* =========================================================================
+   PAGE HEADER
+   ========================================================================= */
+.track-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 26px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+}
+
+.track-header .breadcrumb-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .82rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+.track-header .breadcrumb-row a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color var(--dur) var(--ease);
+}
+.track-header .breadcrumb-row a:hover { color: var(--primary); }
+.track-header .breadcrumb-row i { font-size: .65rem; opacity: .55; }
+
+.track-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(1.3rem, 2.4vw, 1.65rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+.track-title .label {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: .95rem;
+    letter-spacing: 0;
+}
+
+.btn-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border);
+    background: var(--bg-elev);
+    border-radius: var(--r-sm);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+}
+.btn-copy:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.track-subtitle {
+    margin-top: 8px;
+    font-size: .92rem;
+    color: var(--muted);
+    max-width: 560px;
+}
+
+/* ---------- Share buttons ---------- */
+.share-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.share-buttons .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--border);
+    background: var(--bg-elev);
+    border-radius: var(--r-sm);
+    color: var(--muted);
+    cursor: pointer;
+    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.share-buttons .btn:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* =========================================================================
+   STATUS SUMMARY CARDS
+   ========================================================================= */
+.status-card {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    height: 100%;
+    overflow: hidden;
+    transition: border-color var(--dur) var(--ease);
+}
+.status-card::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--border);
+    transition: background var(--dur) var(--ease);
+}
+.status-card:hover {
+    border-color: var(--border-strong);
+}
+.status-card:hover::before { background: var(--primary); }
+
+.status-card .rounded-circle {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    padding: 0 !important;
+    border-radius: var(--r-md);
+    background: var(--primary-50);
+    color: var(--primary);
+    border: 0;
+}
+.status-card .rounded-circle i {
+    font-size: 1.25rem !important;
+    color: inherit !important;
+}
+
+.status-card h6 {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted) !important;
+    margin-bottom: 4px;
+}
+.status-card h5 {
+    font-size: 1.02rem;
+    font-weight: 800;
+    color: var(--text-strong);
+    line-height: 1.25;
+    margin: 0;
+}
+.status-card h5 small,
+.status-card .text-muted {
+    font-size: .78rem;
+    color: var(--muted) !important;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    display: block;
+    margin-top: 3px;
+}
+
+#liveEta {
+    color: var(--primary) !important;
+    font-weight: 600;
+}
+
+/* =========================================================================
+   BADGES
+   ========================================================================= */
+.track-page .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: var(--r-md);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    line-height: 1.2;
+}
+.track-page .badge.bg-success   { background: var(--status-success-bg); color: var(--status-success); border-color: color-mix(in srgb, var(--status-success) 25%, transparent); }
+.track-page .badge.bg-warning   { background: var(--status-warning-bg); color: var(--status-warning); border-color: color-mix(in srgb, var(--status-warning) 25%, transparent); }
+.track-page .badge.bg-info      { background: var(--status-transit-bg); color: var(--status-transit); border-color: color-mix(in srgb, var(--status-transit) 25%, transparent); }
+.track-page .badge.bg-primary   { background: var(--status-transit-bg); color: var(--status-transit); border-color: color-mix(in srgb, var(--status-transit) 25%, transparent); }
+.track-page .badge.bg-secondary { background: var(--status-neutral-bg); color: var(--status-neutral); border-color: color-mix(in srgb, var(--status-neutral) 20%, transparent); }
+.track-page .badge.bg-danger    { background: var(--primary-50); color: var(--primary); border-color: color-mix(in srgb, var(--primary) 25%, transparent); }
+
+@supports not (border-color: color-mix(in srgb, red 50%, blue)) {
+    .track-page .badge { border-color: var(--border); }
+}
+
+/* =========================================================================
+   HOLD ALERT
+   ========================================================================= */
+.hold-alert {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 20px 22px;
+    margin: 22px 0;
+    background: var(--status-warning-bg);
+    border: 1px solid color-mix(in srgb, var(--status-warning) 25%, transparent);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--r-md);
+}
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+    .hold-alert { background: var(--bg-soft); border-color: var(--border); }
+}
+.hold-alert .flex-shrink-0 i {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--bg-elev);
+    color: var(--primary) !important;
+    font-size: 1.1rem !important;
+    box-shadow: var(--sh-sm);
+}
+.hold-alert h5 {
+    margin: 0 0 6px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-strong);
+}
+.hold-alert p {
+    margin: 0;
+    font-size: .9rem;
+    color: var(--text);
+}
+.hold-alert p + p { margin-top: 4px; }
+.hold-alert .text-warning { color: var(--status-warning) !important; }
+
+/* =========================================================================
+   CARDS
+   ========================================================================= */
+.track-page .card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: none;
+    overflow: hidden;
+    transition: border-color var(--dur) var(--ease);
+}
+.track-page .card:hover {
+    border-color: var(--border-strong);
+}
+.track-page .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    background: var(--bg-elev);
+    border-bottom: 1px solid var(--border);
+}
+.track-page .card-header h5 {
+    margin: 0;
+    font-size: .92rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--text-strong);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+}
+.track-page .card-header h5 i,
+.track-page .card-header i {
+    color: var(--primary);
+    margin: 0;
+}
+.track-page .card-body { padding: 20px; }
+.track-page .card-footer { padding: 14px 20px; border-top: 1px solid var(--border); background: transparent; }
+
+/* =========================================================================
+   MAP
+   ========================================================================= */
+.tracking-map {
+    height: 420px;
+    width: 100%;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+}
+@media (max-width: 992px) { .tracking-map { height: 360px; } }
+@media (max-width: 576px) { .tracking-map { height: 300px; } }
+
+/* =========================================================================
+   TIMELINE
+   ========================================================================= */
+.timeline {
+    position: relative;
+    padding: 8px 0 0;
+}
+.timeline-item {
+    position: relative;
+    padding-left: 40px;
+    padding-bottom: 22px;
+}
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-item::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    top: 20px;
+    bottom: -4px;
+    width: 1px;
+    background: var(--border);
+}
+.timeline-item:last-child::before { display: none; }
+
+.timeline-dot {
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--bg-elev);
+    border: 2px solid var(--border-strong);
+    z-index: 2;
+}
+.timeline-dot.completed { background: var(--status-success); border-color: var(--status-success); }
+.timeline-dot.current {
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+}
+.timeline-dot.hold { background: var(--status-warning); border-color: var(--status-warning); }
+.timeline-dot.delivered { background: var(--status-transit); border-color: var(--status-transit); }
+
+.timeline-content {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+.timeline-content:hover {
+    background: var(--bg-elev);
+    border-color: var(--border-strong);
+}
+.timeline-content h6 {
+    margin: 0;
+    font-size: .92rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    letter-spacing: -0.01em;
+}
+.timeline-content small,
+.timeline-content .text-muted {
+    font-size: .78rem;
+    color: var(--muted) !important;
+    font-weight: 500;
+}
+.timeline-content p {
+    margin: 6px 0 0;
+    font-size: .85rem;
+    color: var(--muted);
+}
+.timeline-content p:first-of-type { margin-top: 6px; }
+
+/* =========================================================================
+   DETAIL TABLE
+   ========================================================================= */
+.track-page .table {
+    color: var(--text);
+    margin: 0;
+}
+.track-page .table tr { border-color: var(--border); }
+.track-page .table th {
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: .7rem;
+    letter-spacing: .06em;
+    border-top: 0;
+    padding: 10px 0;
+    vertical-align: middle;
+    width: 45%;
+}
+.track-page .table td {
+    font-weight: 600;
+    color: var(--text-strong);
+    border-color: var(--border);
+    padding: 10px 0;
+    vertical-align: middle;
+    text-align: right;
+}
+.track-page .table tr:last-child th,
+.track-page .table tr:last-child td { border-bottom: 0; }
+
+/* =========================================================================
+   SHIPPING PARTIES
+   ========================================================================= */
+.party-block + .party-block {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border);
+}
+.party-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+.party-label i { color: var(--primary); }
+.party-name {
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    margin-bottom: 6px;
+}
+.party-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: .84rem;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 3px;
+}
+.party-detail i {
+    color: var(--border-strong);
+    width: 14px;
+    text-align: center;
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+.party-detail a { color: var(--primary); text-decoration: none; font-weight: 600; }
+.party-detail a:hover { text-decoration: underline; }
+
+/* =========================================================================
+   QR / SHARE
+   ========================================================================= */
+.qr-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+.qr-code {
+    padding: 12px;
+    background: #fff;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border);
+    transition: border-color var(--dur) var(--ease);
+}
+.qr-code:hover {
+    border-color: var(--border-strong);
+}
+.qr-code img { display: block; width: 150px; height: 150px; }
+.qr-caption {
+    font-size: .82rem;
+    color: var(--muted);
+    text-align: center;
+    margin: 0;
+}
+
+.input-group {
+    display: flex;
+    width: 100%;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-sm);
+    overflow: hidden;
+    background: var(--bg-soft);
+}
+.input-group .form-control {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 10px 14px;
+    border: 0;
+    background: transparent;
+    font-size: .8rem;
+    color: var(--text);
+    outline: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    border-radius: 0;
+}
+.input-group .form-control:focus { box-shadow: none; border: 0; }
+.input-group .btn {
+    flex: 0 0 auto;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 0;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--dur) var(--ease);
+}
+.input-group .btn:hover { background: var(--primary-700); }
+
+/* =========================================================================
+   SUPPORT CARD
+   ========================================================================= */
+.support-card {
+    background: var(--primary) !important;
+    color: #fff;
+    border: 0 !important;
+    border-radius: var(--r-lg);
+    padding: 26px 22px;
+    text-align: center;
+}
+.support-card .support-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .14);
+    color: #fff;
+    font-size: 1.2rem;
+    margin-bottom: 14px;
+}
+.support-card h5 {
+    color: #fff !important;
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+.support-card p {
+    color: rgba(255, 255, 255, .85) !important;
+    font-size: .88rem;
+    margin-bottom: 20px;
+}
+.support-card .d-grid { display: grid; gap: 8px; }
+.support-card .btn-light,
+.support-card .btn-outline-light {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 16px;
+    border-radius: var(--r-sm);
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    transition: all var(--dur) var(--ease);
+    border: 1px solid transparent;
+}
+.support-card .btn-light {
+    background: #fff;
+    color: var(--primary-700);
+    border-color: #fff;
+}
+.support-card .btn-light:hover {
+    background: rgba(255, 255, 255, .92);
+    color: var(--primary-700);
+}
+.support-card .btn-outline-light {
+    background: transparent;
+    color: #fff;
+    border-color: rgba(255, 255, 255, .35);
+}
+.support-card .btn-outline-light:hover {
+    background: rgba(255, 255, 255, .1);
+    border-color: #fff;
+    color: #fff;
+}
+
+/* =========================================================================
+   EMPTY STATE
+   ========================================================================= */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+}
+.empty-state i {
+    color: var(--border-strong) !important;
+    font-size: 1.75rem;
+    margin-bottom: 12px;
+}
+.empty-state p { margin: 0; font-size: .9rem; }
+
+/* =========================================================================
+   NOTIFICATIONS
+   ========================================================================= */
+.tracking-notification {
+    position: fixed;
+    top: 84px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    min-width: 280px;
+    max-width: calc(100vw - 48px);
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--r-sm);
+    box-shadow: var(--sh-md);
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--text);
+    animation: trSlideInRight 200ms var(--ease);
+}
+.tracking-notification i { font-size: 1.1rem; color: var(--primary); flex-shrink: 0; }
+.tracking-notification.success { border-left-color: var(--status-success); }
+.tracking-notification.success i { color: var(--status-success); }
+.tracking-notification.warning { border-left-color: var(--status-warning); }
+.tracking-notification.warning i { color: var(--status-warning); }
+.tracking-notification.error   { border-left-color: var(--primary); }
+.tracking-notification.error   i { color: var(--primary); }
+.tracking-notification.info    { border-left-color: var(--status-transit); }
+.tracking-notification.info    i { color: var(--status-transit); }
+.tracking-notification.fade-out { animation: trFadeOutRight 200ms var(--ease) forwards; }
+
+@media (max-width: 576px) {
+    .tracking-notification {
+        left: 16px; right: 16px;
+        top: 72px;
+        min-width: auto;
+    }
+}
+
+/* =========================================================================
+   MODAL
+   ========================================================================= */
+.track-page .modal-content {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-lg);
+    overflow: hidden;
+}
+.track-page .modal-header {
+    background: var(--status-success);
+    color: #fff;
+    border-bottom: 0;
+    padding: 18px 22px;
+}
+.track-page .modal-header .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #fff;
+}
+.track-page .modal-header .btn-close { filter: brightness(0) invert(1); }
+.track-page .modal-body { padding: 26px 22px; color: var(--text); }
+.track-page .modal-body .success-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--status-success-bg);
+    color: var(--status-success);
+    font-size: 2rem;
+    margin-bottom: 16px;
+}
+.track-page .modal-body h4 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--text-strong);
+}
+.track-page .modal-body .delivery-info {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 14px 16px;
+    text-align: left;
+    font-size: .88rem;
+    margin-top: 18px;
+}
+.track-page .modal-body .delivery-info strong { color: var(--text-strong); }
+.track-page .modal-body .delivery-info p { margin: 0 0 6px; }
+.track-page .modal-body .delivery-info p:last-child { margin-bottom: 0; }
+.track-page .modal .btn-success {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border: 0;
+    border-radius: var(--r-sm);
+    background: var(--status-success);
+    color: #fff;
+    font-weight: 700;
+    font-size: .82rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color var(--dur) var(--ease);
+}
+.track-page .modal .btn-success:hover {
+    background: #315f3e;
+}
+
+/* =========================================================================
+   ANIMATIONS
+   ========================================================================= */
+@keyframes trSlideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes trFadeOutRight {
+    to { opacity: 0; transform: translateX(20px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+@media (max-width: 992px) {
+    .share-buttons { justify-content: flex-start; }
+}
+
+@media (max-width: 768px) {
+    .timeline-item { padding-left: 36px; }
+    .timeline-dot { width: 14px; height: 14px; left: 5px; }
+    .track-page .card-body { padding: 16px; }
+    .track-page .card-header { padding: 14px 16px; }
+    .status-card { padding: 16px; }
+    .status-card .rounded-circle { width: 44px; height: 44px; }
+    .status-card .rounded-circle i { font-size: 1.05rem !important; }
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .share-buttons, .btn, .qr-code, .tracking-map,
+    .support-card, .input-group, .modal, .tracking-notification,
+    .back-to-top, .navbar, footer { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .track-page {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        background: #fff !important;
+    }
+    .track-page .card,
+    .status-card,
+    .timeline-content,
+    .hold-alert { background: #fff !important; border: 1px solid #ddd !important; box-shadow: none !important; }
+    .timeline-dot { border: 2px solid #000; background: #000 !important; }
+    .track-page .badge { border: 1px solid #000; color: #000; background: transparent !important; }
+    .track-page .table th { color: #000; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="track-page"
+     data-tracking-code="{{ package.tracking_code }}"
+     data-package-status="{{ package.status }}"
+     data-created-at="{% if package.created_at %}{{ package.created_at|format_dt('%Y-%m-%dT%H:%M:%S') }}Z{% endif %}"
+     data-estimated-delivery="{% if package.estimated_delivery %}{{ package.estimated_delivery|format_dt('%Y-%m-%dT%H:%M:%S') }}Z{% endif %}"
+     data-hold-start="{% if active_hold and active_hold.hold_start %}{{ active_hold.hold_start|format_dt('%Y-%m-%dT%H:%M:%S') }}Z{% endif %}">
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="track-header">
+        <div>
+            <h1 class="track-title">
+                <span class="label">Tracking Package</span>
+                <code>{{ package.tracking_code }}</code>
+                <button class="btn-copy" type="button" onclick="copyTrackingCode()"
+                        data-bs-toggle="tooltip" title="Copy tracking number" aria-label="Copy tracking number">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </h1>
+            <p class="track-subtitle">
+                Live status, location updates and delivery estimates for this shipment.
+            </p>
+        </div>
+
+        <div class="share-buttons" role="group" aria-label="Share tracking details">
+            <button class="btn" type="button" onclick="shareTracking('email')"
+                    data-bs-toggle="tooltip" title="Share via email" aria-label="Share via email">
+                <i class="fas fa-envelope"></i>
+            </button>
+            <button class="btn" type="button" onclick="printTracking()"
+                    data-bs-toggle="tooltip" title="Print this page" aria-label="Print this page">
+                <i class="fas fa-print"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ==================== STATUS SUMMARY ==================== -->
+    <section class="row g-3 mb-4" aria-label="Shipment summary">
+        <div class="col-sm-6 col-lg-3">
+            <div class="status-card">
+                <div class="rounded-circle"><i class="fas fa-circle-info"></i></div>
+                <div class="flex-grow-1">
+                    <h6>Current status</h6>
+                    <h5 id="statusBadge">
+                        {% if package.status == 'in_transit' %}
+                            <span class="badge bg-success">In transit</span>
+                        {% elif package.status == 'on_hold' %}
+                            <span class="badge bg-warning">On hold</span>
+                        {% elif package.status == 'delivered' %}
+                            <span class="badge bg-info">Delivered</span>
+                        {% elif package.status == 'pending' %}
+                            <span class="badge bg-secondary">Pending</span>
+                        {% elif package.status == 'cancelled' %}
+                            <span class="badge bg-danger">Cancelled</span>
+                        {% elif package.status == 'shipped' %}
+                            <span class="badge bg-primary">Shipped</span>
+                        {% elif package.status == 'out_for_delivery' %}
+                            <span class="badge bg-warning">Out for delivery</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ package.status|replace('_', ' ')|title }}</span>
+                        {% endif %}
+                    </h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="status-card">
+                <div class="rounded-circle"><i class="fas fa-calendar-check"></i></div>
+                <div class="flex-grow-1">
+                    <h6>Estimated delivery</h6>
+                    <h5 id="estimatedDelivery">
+                        {% if package.estimated_delivery %}
+                            <span class="local-time"
+                                  data-iso="{{ package.estimated_delivery|format_dt('%Y-%m-%dT%H:%M:%S') }}Z"
+                                  data-format="date">
+                                {{ package.estimated_delivery|format_dt("%b %d, %Y") }}
+                            </span>
+                        {% else %}
+                            To be confirmed
+                        {% endif %}
+                        <small id="deliveryCountdown"></small>
+                        <small id="liveEta">Updating ETA…</small>
+                    </h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="status-card">
+                <div class="rounded-circle"><i class="fas fa-truck-fast"></i></div>
+                <div class="flex-grow-1">
+                    <h6>Service</h6>
+                    <h5>
+                        {{ package.shipping_method|title }}
+                        <small>{{ package.shipping_type|title }}</small>
+                    </h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="status-card">
+                <div class="rounded-circle"><i class="fas fa-clock-rotate-left"></i></div>
+                <div class="flex-grow-1">
+                    <h6>Last update</h6>
+                    <h5 id="lastUpdate">
+                        {% if location_history %}
+                            <span class="local-time"
+                                  data-iso="{{ location_history[0].created_at|format_dt('%Y-%m-%dT%H:%M:%S') }}Z"
+                                  data-format="time">
+                                {{ location_history[0].created_at|format_dt("%H:%M") }}
+                            </span>
+                        {% else %}
+                            No updates yet
+                        {% endif %}
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== HOLD ALERT ==================== -->
+    {% if package.status == 'on_hold' %}
+    <div class="hold-alert" id="holdAlert" role="alert">
+        <div class="flex-shrink-0">
+            <i class="fas fa-pause"></i>
+        </div>
+        <div class="flex-grow-1">
+            <h5>Shipment temporarily on hold</h5>
+            <p id="holdReason">
+                {% if active_hold %}
+                    <strong>Reason:</strong> {{ active_hold.reason }}
+                {% else %}
+                    Our team is reviewing this shipment. You'll be notified as soon as it's moving again.
+                {% endif %}
+            </p>
+            <p class="small mb-0">
+                <i class="fas fa-clock me-1"></i>
+                <span id="holdDuration">Calculating duration…</span>
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ==================== MAIN GRID ==================== -->
+    <div class="row g-4">
+
+        <!-- LEFT: MAP + TIMELINE -->
+        <div class="col-lg-8">
+
+            
+            <!-- Timeline -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock-rotate-left"></i> Tracking history</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline" id="timeline">
+                        {% if location_history %}
+                            {% for history in location_history|sort(attribute='created_at', reverse=true) %}
+                            <div class="timeline-item">
+                                <div class="timeline-dot
+                                    {% if loop.first %}current{% endif %}
+                                    {% if history.status == 'delivered' %}delivered{% endif %}
+                                    {% if history.status == 'on_hold' %}hold{% endif %}
+                                    {% if not loop.first and loop.index > 1 %}completed{% endif %}">
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                                        <h6>{{ history.location_name or 'Network update' }}</h6>
+                                        <small>
+                                            <span class="local-time"
+                                                  data-iso="{{ history.created_at|format_dt('%Y-%m-%dT%H:%M:%S') }}Z"
+                                                  data-format="short">
+                                                {{ history.created_at|format_dt("%b %d, %H:%M") }}
+                                            </span>
+                                        </small>
+                                    </div>
+                                    <p>
+                                        Status:
+                                        <span class="badge bg-{{ 'success' if history.status == 'in_transit'
+                                                                    else 'warning' if history.status == 'on_hold'
+                                                                    else 'info' if history.status == 'delivered'
+                                                                    else 'primary' if history.status == 'shipped'
+                                                                    else 'secondary' }}">
+                                            {{ history.status|replace('_', ' ')|title }}
+                                        </span>
+                                    </p>
+                                    {% if history.status == 'on_hold' and loop.first %}
+                                        <p class="mb-0" style="color: var(--status-warning);">
+                                            <i class="fas fa-circle-info me-1"></i>
+                                            Shipment is currently on hold.
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-hourglass-half"></i>
+                                <p>No tracking events yet. Updates will appear here as your shipment moves.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: SIDEBAR -->
+        <div class="col-lg-4">
+
+            <!-- Package details -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-box-open"></i> Package details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <th>Weight</th>
+                            <td>{{ package.weight }} kg</td>
+                        </tr>
+                        <tr>
+                            <th>Dimensions</th>
+                            <td>{{ package.dimensions or 'Not specified' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Package type</th>
+                            <td><span class="badge bg-info">{{ package.package_type|title }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Service level</th>
+                            <td><span class="badge bg-primary">{{ package.shipping_type|title }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Declared value</th>
+                            <td>${{ "%.2f"|format(package.declared_value) if package.declared_value else '0.00' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Insurance</th>
+                            <td>
+                                {% if package.declared_value and package.declared_value > 100 %}
+                                    <span class="badge bg-success">Insured</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Not insured</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Shipping information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-address-book"></i> Shipping information</h5>
+                </div>
+                <div class="card-body">
+
+                    <div class="party-block">
+                        <div class="party-label"><i class="fas fa-arrow-up-from-bracket"></i> Sender</div>
+                        <div class="party-name">{{ package.sender_name }}</div>
+                        <div class="party-detail">
+                            <i class="fas fa-location-dot"></i>
+                            <span>{{ package.sender_address }}</span>
+                        </div>
+                        <div class="party-detail">
+                            <i class="fas fa-phone"></i>
+                            <span>{{ package.sender_phone }}</span>
+                        </div>
+                        <div class="party-detail">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:{{ package.sender_email }}">{{ package.sender_email }}</a>
+                        </div>
+                    </div>
+
+                    <div class="party-block">
+                        <div class="party-label"><i class="fas fa-flag-checkered"></i> Recipient</div>
+                        <div class="party-name">{{ package.recipient_name }}</div>
+                        <div class="party-detail">
+                            <i class="fas fa-location-dot"></i>
+                            <span>{{ package.recipient_address }}</span>
+                        </div>
+                        <div class="party-detail">
+                            <i class="fas fa-phone"></i>
+                            <span>{{ package.recipient_phone }}</span>
+                        </div>
+                        <div class="party-detail">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:{{ package.recipient_email }}">{{ package.recipient_email }}</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- QR / Share -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-qrcode"></i> Share tracking</h5>
+                </div>
+                <div class="card-body">
+                    <div class="qr-wrap">
+                        <div class="qr-code">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ url_for('track_package', tracking_code=package.tracking_code, _external=True)|urlencode }}"
+                                 alt="QR code linking to tracking page">
+                        </div>
+                        <p class="qr-caption">Scan to open the live tracking page on any device.</p>
+
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                   id="trackingLink"
+                                   value="{{ url_for('track_package', tracking_code=package.tracking_code, _external=True) }}"
+                                   readonly aria-label="Tracking link">
+                            <button class="btn" type="button" onclick="copyTrackingLink()"
+                                    data-bs-toggle="tooltip" title="Copy link"
+                                    aria-label="Copy tracking link">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support -->
+            <div class="card support-card">
+                <div class="support-icon"><i class="fas fa-headset"></i></div>
+                <h5>Need help with this shipment?</h5>
+                <p>Our support team is available 24/7 to answer questions about your delivery.</p>
+                <div class="d-grid">
+                    <a href="tel:+18007363673" class="btn-light">
+                        <i class="fas fa-phone"></i> +1 800 SEND-EXPRESS
+                    </a>
+                    <a href="mailto:support@Globalshippments.com" class="btn-outline-light">
+                        <i class="fas fa-envelope"></i> Email support
+                    </a>
+                    <button type="button" class="btn-outline-light" onclick="startLiveChat()">
+                        <i class="fas fa-comment-dots"></i> Start live chat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DELIVERY CONFIRMATION MODAL ==================== -->
+<div class="modal fade" id="deliveryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-circle-check"></i> Shipment delivered
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="success-mark">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h4>Your shipment has been delivered</h4>
+                <p class="text-muted mb-0">
+                    Delivered on
+                    <span class="local-time"
+                          data-iso="{% if package.updated_at %}{{ package.updated_at|format_dt('%Y-%m-%dT%H:%M:%S') }}Z{% endif %}"
+                          data-format="full">
+                        {{ package.updated_at|format_dt("%B %d, %Y at %H:%M") }}
+                    </span>
+                </p>
+
+                <div class="delivery-info">
+                    <p><strong>Received by:</strong> {{ package.recipient_name }}</p>
+                    <p><strong>Location:</strong> {{ package.destination_address }}</p>
+                </div>
+
+                <div class="mt-4">
+                    <button class="btn-success" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print receipt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Google Maps is included in base.html -->
+
+<script>
+(function() {
+    'use strict';
+
+    /* ==================== Configuration ==================== */
+    const CONFIG = {
+        updateInterval: 30000,
+        maxTimelineEntries: 10,
+        notificationDuration: 3000
+    };
+
+    /* ==================== State ==================== */
+    const State = {
+        trackingCode:      document.querySelector('.track-page')?.dataset.trackingCode,
+        packageStatus:     document.querySelector('.track-page')?.dataset.packageStatus,
+        createdAt:         document.querySelector('.track-page')?.dataset.createdAt,
+        estimatedDelivery: document.querySelector('.track-page')?.dataset.estimatedDelivery,
+        holdStart:         document.querySelector('.track-page')?.dataset.holdStart,
+
+        map: null,
+        marker: null,
+        popup: null,
+        socket: null,
+        updateInterval: null,
+        countdownInterval: null,
+        holdInterval: null,
+
+        currentLocation: null,
+        isConnected: false
+    };
+
+    /* ==================== Utilities ==================== */
+    const Utils = {
+        formatTime(seconds) {
+            if (!seconds || isNaN(seconds)) return 'calculating…';
+            const s = parseInt(seconds, 10);
+            if (s <= 0) return 'arriving shortly';
+            const hours = Math.floor(s / 3600);
+            const minutes = Math.floor((s % 3600) / 60);
+            const parts = [];
+            if (hours > 0) parts.push(hours + 'h');
+            if (minutes > 0) parts.push(minutes + 'm');
+            if (parts.length === 0) parts.push('<1m');
+            return parts.join(' ');
+        },
+
+        formatDate(dateString, format = 'full') {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return 'Invalid date';
+            if (format === 'full') {
+                return date.toLocaleString('en-US', {
+                    month: 'long', day: 'numeric', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            }
+            if (format === 'time') {
+                return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            }
+            return date.toLocaleDateString();
+        },
+
+        showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `tracking-notification ${type}`;
+            const icon = {
+                success: 'circle-check',
+                error:   'circle-exclamation',
+                warning: 'triangle-exclamation',
+                info:    'circle-info'
+            }[type] || 'circle-info';
+
+            notification.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, CONFIG.notificationDuration);
+        },
+
+        initTooltips() {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+                    new bootstrap.Tooltip(el);
+                });
+            }
+        },
+
+        debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+    };
+
+    /* ==================== Map ==================== */
+    const MapFunctions = {
+        init() {
+            if (typeof google === 'undefined' || !google.maps) {
+                console.warn('Google Maps not available');
+                return;
+            }
+            const el = document.getElementById('trackingMap');
+            if (!el) return;
+
+            const initialLocation = this.getInitialLocation();
+            State.map = new google.maps.Map(el, {
+                center: { lat: initialLocation[1], lng: initialLocation[0] },
+                zoom: 10,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: true
+            });
+
+            this.setupMarker(initialLocation);
+            this.setupRoute();
+        },
+
+        getInitialLocation() {
+            return [
+                {{ package.current_location_lng or package.pickup_lng or -74.5 }},
+                {{ package.current_location_lat or package.pickup_lat or 40 }}
+            ];
+        },
+
+        setupMarker(location) {
+            State.marker = new google.maps.Marker({
+                position: { lat: location[1], lng: location[0] },
+                map: State.map,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: '#a51e2b',
+                    fillOpacity: 1,
+                    strokeWeight: 3,
+                    strokeColor: '#ffffff'
+                },
+                animation: google.maps.Animation.DROP
+            });
+
+            State.popup = new google.maps.InfoWindow({
+                content: '<strong>Current shipment location</strong>'
+            });
+
+            State.marker.addListener('click', () => {
+                State.popup.open(State.map, State.marker);
+            });
+        },
+
+        setupRoute() {
+            const geocoder = new google.maps.Geocoder();
+
+            function geocodeAddress(address) {
+                return new Promise((resolve, reject) => {
+                    if (!address) return reject('no address');
+                    geocoder.geocode({ address }, (results, status) => {
+                        if (status === 'OK' && results[0]) {
+                            const loc = results[0].geometry.location;
+                            resolve({ lat: loc.lat(), lng: loc.lng() });
+                        } else {
+                            reject(status || 'zero_results');
+                        }
+                    });
+                });
+            }
+
+            const pickupLat = {{ package.pickup_lat|default(None)|tojson }};
+            const pickupLng = {{ package.pickup_lng|default(None)|tojson }};
+            const currentLat = {{ package.current_location_lat|default(None)|tojson }};
+            const currentLng = {{ package.current_location_lng|default(None)|tojson }};
+            const destLat = {{ package.destination_lat|default(None)|tojson }};
+            const destLng = {{ package.destination_lng|default(None)|tojson }};
+            const pickupAddress = {{ package.pickup_address|tojson }};
+            const destAddress = {{ package.destination_address|tojson }};
+
+            const pickupPromise = (pickupLat != null && pickupLng != null)
+                ? Promise.resolve({ lat: parseFloat(pickupLat), lng: parseFloat(pickupLng) })
+                : geocodeAddress(pickupAddress).catch(() => ({ lat: 40, lng: -74.5 }));
+
+            const destPromise = (destLat != null && destLng != null)
+                ? Promise.resolve({ lat: parseFloat(destLat), lng: parseFloat(destLng) })
+                : geocodeAddress(destAddress).catch(() => ({ lat: 40.7, lng: -74.0 }));
+
+            const currentPromise = (currentLat != null && currentLng != null)
+                ? Promise.resolve({ lat: parseFloat(currentLat), lng: parseFloat(currentLng) })
+                : pickupPromise;
+
+            Promise.all([pickupPromise, currentPromise, destPromise])
+                .then(([pickupCoord, currentCoord, destCoord]) => {
+                    new google.maps.Marker({
+                        position: pickupCoord, map: State.map,
+                        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 8, fillColor: '#9a948a',
+                                fillOpacity: 1, strokeWeight: 2, strokeColor: '#ffffff' },
+                        title: 'Pickup'
+                    });
+
+                    new google.maps.Marker({
+                        position: destCoord, map: State.map,
+                        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 8, fillColor: '#3d7a4e',
+                                fillOpacity: 1, strokeWeight: 2, strokeColor: '#ffffff' },
+                        title: 'Destination'
+                    });
+
+                    const routeCoords = [pickupCoord, currentCoord, destCoord];
+
+                    new google.maps.Polyline({
+                        path: routeCoords, geodesic: true,
+                        strokeColor: '#a51e2b', strokeOpacity: .7, strokeWeight: 3,
+                        map: State.map
+                    });
+
+                    const bounds = new google.maps.LatLngBounds();
+                    routeCoords.forEach(c => bounds.extend(c));
+                    State.map.fitBounds(bounds);
+                })
+                .catch(err => console.warn('Route setup failed', err));
+        },
+
+        updateLocation(lat, lng, locationName) {
+            if (State.marker && State.map) {
+                const pos = { lat: parseFloat(lat), lng: parseFloat(lng) };
+                State.marker.setPosition(pos);
+                State.popup.setContent(`<strong>${locationName || 'Current location'}</strong>`);
+                State.map.panTo(pos);
+                State.map.setZoom(12);
+                const el = document.getElementById('lastUpdate');
+                if (el) el.textContent = 'Just now';
+            }
+        },
+
+        cleanup() { State.map = null; }
+    };
+
+    /* ==================== WebSocket ==================== */
+    const WebSocketFunctions = {
+        connect() {
+            if (typeof io === 'undefined') {
+                console.warn('Socket.IO not loaded');
+                return;
+            }
+
+            let failedAttempts = 0;
+
+            State.socket = io({
+                reconnectionAttempts: 10,
+                reconnectionDelay: 2000,
+                timeout: 10000
+            });
+
+            State.socket.on('connect', () => {
+                failedAttempts = 0;
+                State.isConnected = true;
+                State.socket.emit('subscribe', { tracking_code: State.trackingCode });
+                Utils.showNotification('Live tracking connected', 'success');
+            });
+
+            State.socket.on('connect_error', () => {
+                failedAttempts += 1;
+                if (failedAttempts === 3) {
+                    Utils.showNotification(
+                        'Live updates unavailable — falling back to periodic refresh.',
+                        'info'
+                    );
+                }
+            });
+
+            State.socket.on('location_update', (data) => {
+                if (data.tracking_code !== State.trackingCode) return;
+                MapFunctions.updateLocation(data.lat, data.lng, data.location_name);
+                UIFunctions.addTimelineEntry(data);
+                if (typeof data.eta_seconds !== 'undefined') {
+                    UIFunctions.updateLiveEta(data.eta_seconds, data.remaining_km);
+                }
+            });
+
+            State.socket.on('status_update', (data) => {
+                if (data.tracking_code !== State.trackingCode) return;
+                UIFunctions.updateStatus(data.status, data.reason);
+            });
+
+            State.socket.on('disconnect', (reason) => {
+                State.isConnected = false;
+                if (reason !== 'io client disconnect') {
+                    Utils.showNotification('Live connection lost — switching to periodic refresh.', 'warning');
+                }
+            });
+        },
+
+        disconnect() {
+            if (State.socket) State.socket.disconnect();
+        }
+    };
+
+    /* ==================== UI ==================== */
+    const UIFunctions = {
+        updateStatus(status, reason) {
+            State.packageStatus = status;
+
+            const statusBadge = document.getElementById('statusBadge');
+            if (statusBadge) {
+                const badgeConfig = {
+                    in_transit:       { cls: 'success',   text: 'In transit' },
+                    on_hold:          { cls: 'warning',   text: 'On hold' },
+                    delivered:        { cls: 'info',      text: 'Delivered' },
+                    pending:          { cls: 'secondary', text: 'Pending' },
+                    shipped:          { cls: 'primary',   text: 'Shipped' },
+                    out_for_delivery: { cls: 'warning',   text: 'Out for delivery' },
+                    cancelled:        { cls: 'danger',    text: 'Cancelled' }
+                };
+                const cfg = badgeConfig[status] || {
+                    cls: 'secondary',
+                    text: status.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())
+                };
+                statusBadge.innerHTML = `<span class="badge bg-${cfg.cls}">${cfg.text}</span>`;
+            }
+
+            const holdAlert = document.getElementById('holdAlert');
+            if (status === 'on_hold') {
+                if (!holdAlert) {
+                    const newAlert = this.createHoldAlert(reason);
+                    const anchor = document.querySelector('.track-header');
+                    if (anchor && anchor.nextSibling) anchor.parentNode.insertBefore(newAlert, anchor.nextSibling);
+                } else {
+                    holdAlert.style.display = 'flex';
+                    const reasonEl = document.getElementById('holdReason');
+                    if (reasonEl) reasonEl.innerHTML = `<strong>Reason:</strong> ${reason || 'Under review by our operations team.'}`;
+                    this.updateHoldDuration(State.holdStart);
+                }
+            } else if (holdAlert) {
+                holdAlert.style.display = 'none';
+            }
+
+            if (status === 'delivered') {
+                setTimeout(() => this.showDeliveryModal(), 800);
+            }
+        },
+
+        createHoldAlert(reason) {
+            const div = document.createElement('div');
+            div.className = 'hold-alert';
+            div.id = 'holdAlert';
+            div.setAttribute('role', 'alert');
+            div.innerHTML = `
+                <div class="flex-shrink-0"><i class="fas fa-pause"></i></div>
+                <div class="flex-grow-1">
+                    <h5>Shipment temporarily on hold</h5>
+                    <p id="holdReason"><strong>Reason:</strong> ${reason || 'Under review by our operations team.'}</p>
+                    <p class="small mb-0">
+                        <i class="fas fa-clock me-1"></i>
+                        <span id="holdDuration">Calculating duration…</span>
+                    </p>
+                </div>
+            `;
+            return div;
+        },
+
+        addTimelineEntry(data) {
+            const timeline = document.getElementById('timeline');
+            if (!timeline) return;
+
+            const empty = timeline.querySelector('.empty-state');
+            if (empty) empty.remove();
+
+            const entry = document.createElement('div');
+            entry.className = 'timeline-item';
+            entry.style.opacity = '0';
+
+            const statusClass = {
+                in_transit:       'success',
+                on_hold:          'warning',
+                delivered:        'info',
+                shipped:          'primary',
+                out_for_delivery: 'warning'
+            }[data.status] || 'secondary';
+
+            entry.innerHTML = `
+                <div class="timeline-dot current"></div>
+                <div class="timeline-content">
+                    <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                        <h6>${data.location_name || 'Network update'}</h6>
+                        <small>Just now</small>
+                    </div>
+                    <p class="mb-0">
+                        Status:
+                        <span class="badge bg-${statusClass}">
+                            ${data.status.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                        </span>
+                    </p>
+                </div>
+            `;
+
+            timeline.insertBefore(entry, timeline.firstChild);
+
+            requestAnimationFrame(() => {
+                entry.style.transition = 'opacity 300ms ease';
+                entry.style.opacity = '1';
+            });
+
+            const dots = timeline.querySelectorAll('.timeline-dot');
+            if (dots.length > 1) {
+                dots[1].classList.remove('current');
+                dots[1].classList.add('completed');
+            }
+
+            if (timeline.querySelectorAll('.timeline-item').length > CONFIG.maxTimelineEntries) {
+                const last = timeline.lastElementChild;
+                if (last && last.classList.contains('timeline-item')) {
+                    last.style.transition = 'opacity 300ms ease';
+                    last.style.opacity = '0';
+                    setTimeout(() => last.remove(), 300);
+                }
+            }
+        },
+
+        updateLiveEta(etaSeconds, remainingKm) {
+            const el = document.getElementById('liveEta');
+            if (!el) return;
+            const etaText = Utils.formatTime(etaSeconds);
+            const kmText = (typeof remainingKm !== 'undefined' && remainingKm !== null) ? ` · ${remainingKm} km away` : '';
+            el.textContent = `ETA ${etaText}${kmText}`;
+        },
+
+        startCountdown() {
+            const el = document.getElementById('deliveryCountdown');
+            if (!el || !State.estimatedDelivery) return;
+
+            const target = new Date(State.estimatedDelivery).getTime();
+
+            function update() {
+                const now = Date.now();
+                const distance = target - now;
+
+                if (distance < 0) {
+                    el.textContent = 'Delivery window passed';
+                    if (State.countdownInterval) clearInterval(State.countdownInterval);
+                    return;
+                }
+
+                const days = Math.floor(distance / 86400000);
+                const hours = Math.floor((distance % 86400000) / 3600000);
+                const minutes = Math.floor((distance % 3600000) / 60000);
+
+                if (days > 0) el.textContent = `${days}d ${hours}h remaining`;
+                else if (hours > 0) el.textContent = `${hours}h ${minutes}m remaining`;
+                else el.textContent = `${minutes}m remaining`;
+            }
+
+            update();
+            State.countdownInterval = setInterval(update, 60000);
+        },
+
+        updateHoldDuration(holdStart) {
+            const el = document.getElementById('holdDuration');
+            if (!el || !holdStart) return;
+            const start = new Date(holdStart).getTime();
+
+            function update() {
+                const duration = Date.now() - start;
+                const hours = Math.floor(duration / 3600000);
+                const minutes = Math.floor((duration % 3600000) / 60000);
+                el.textContent = `On hold for ${hours}h ${minutes}m`;
+            }
+
+            update();
+            State.holdInterval = setInterval(update, 60000);
+        },
+
+        showDeliveryModal() {
+            const modalEl = document.getElementById('deliveryModal');
+            if (modalEl && typeof bootstrap !== 'undefined') {
+                new bootstrap.Modal(modalEl).show();
+            }
+        }
+    };
+
+    /* ==================== API ==================== */
+    const APIFunctions = {
+        async fetchTrackingData() {
+            try {
+                const base = "{{ url_for('api_track_package', tracking_code='') }}";
+                const response = await fetch(base + State.trackingCode);
+                const data = await response.json();
+
+                if (data.current_location) {
+                    MapFunctions.updateLocation(
+                        data.current_location.lat,
+                        data.current_location.lng,
+                        data.current_location.location_name
+                    );
+                }
+
+                if (data.status && data.status !== State.packageStatus) {
+                    State.packageStatus = data.status;
+                    UIFunctions.updateStatus(data.status, data.hold_reason);
+                }
+
+                if (data.on_hold) UIFunctions.updateHoldDuration(data.hold_start);
+            } catch (err) {
+                console.error('Tracking fetch failed:', err);
+                if (!navigator.onLine) Utils.showNotification('You are offline', 'warning');
+            }
+        },
+
+        async refreshLocation() {
+            Utils.showNotification('Refreshing location…', 'info');
+            await this.fetchTrackingData();
+        }
+    };
+
+    /* ==================== Event handlers ==================== */
+    const EventHandlers = {
+        handleOnline() {
+            Utils.showNotification('Connection restored', 'success');
+            APIFunctions.fetchTrackingData();
+        },
+        handleOffline() {
+            Utils.showNotification('Connection lost. Waiting to reconnect…', 'warning');
+        },
+        handleVisibilityChange() {
+            if (document.visibilityState === 'visible') APIFunctions.fetchTrackingData();
+        },
+        handleResize: Utils.debounce(() => {
+            if (State.map) google.maps.event.trigger(State.map, 'resize');
+        }, 250)
+    };
+
+    /* ==================== Global actions ==================== */
+    window.copyTrackingCode = function() {
+        navigator.clipboard.writeText(State.trackingCode);
+        Utils.showNotification('Tracking number copied to clipboard', 'success');
+    };
+
+    window.copyTrackingLink = function() {
+        const input = document.getElementById('trackingLink');
+        if (!input) return;
+        input.select();
+        navigator.clipboard.writeText(input.value);
+        Utils.showNotification('Tracking link copied to clipboard', 'success');
+    };
+
+    window.shareTracking = function(platform) {
+        const url = encodeURIComponent(window.location.href);
+        const text = encodeURIComponent(`Track this Global shippments shipment: ${State.trackingCode}`);
+        const urls = {
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+            twitter:  `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
+            whatsapp: `https://wa.me/?text=${text}%20${url}`,
+            email:    `mailto:?subject=Global shippments Package Tracking&body=${text}%20${url}`
+        };
+        if (urls[platform]) window.open(urls[platform], '_blank', 'width=600,height=400');
+    };
+
+    window.printTracking = () => window.print();
+    window.refreshLocation = () => APIFunctions.refreshLocation();
+    window.startLiveChat = () => Utils.showNotification('Live chat will open shortly…', 'info');
+
+    /* ==================== Init ==================== */
+    function init() {
+        if (!State.trackingCode) {
+            console.error('Tracking code missing');
+            return;
+        }
+
+        Utils.initTooltips();
+
+        if (document.getElementById('trackingMap')) MapFunctions.init();
+
+        WebSocketFunctions.connect();
+
+        State.updateInterval = setInterval(() => {
+            if (document.visibilityState === 'visible') APIFunctions.fetchTrackingData();
+        }, CONFIG.updateInterval);
+
+        UIFunctions.startCountdown();
+
+        if (State.packageStatus === 'on_hold' && State.holdStart) {
+            UIFunctions.updateHoldDuration(State.holdStart);
+        }
+
+        window.addEventListener('online', EventHandlers.handleOnline);
+        window.addEventListener('offline', EventHandlers.handleOffline);
+        document.addEventListener('visibilitychange', EventHandlers.handleVisibilityChange);
+        window.addEventListener('resize', EventHandlers.handleResize);
+
+        if (State.packageStatus === 'delivered') {
+            setTimeout(() => UIFunctions.showDeliveryModal(), 900);
+        }
+
+        console.log('Tracking page initialized:', State.trackingCode);
+    }
+
+    function scheduleInit() {
+        if (!State.trackingCode) return;
+        if ('requestIdleCallback' in window) {
+            try { requestIdleCallback(init, { timeout: 1000 }); }
+            catch (e) { setTimeout(init, 500); }
+        } else {
+            setTimeout(init, 500);
+        }
+    }
+
+    if (document.readyState === 'complete') scheduleInit();
+    else window.addEventListener('load', scheduleInit);
+
+    /* ==================== Cleanup ==================== */
+    window.addEventListener('beforeunload', () => {
+        WebSocketFunctions.disconnect();
+        if (State.updateInterval)    clearInterval(State.updateInterval);
+        if (State.countdownInterval) clearInterval(State.countdownInterval);
+        if (State.holdInterval)      clearInterval(State.holdInterval);
+        MapFunctions.cleanup();
+    });
+})();
+</script>
+{% endblock %}

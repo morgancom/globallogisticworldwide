@@ -1,0 +1,1463 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Package — Global shippments Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — CREATE PACKAGE (ADMIN)
+   Multi-step wizard for creating a new shipment.
+   Uses base.html design tokens.
+   ========================================================================= */
+
+:root {
+    --cp-surface:       #FFFFFF;
+    --cp-surface-alt:   #F8FAFC;
+    --cp-surface-soft:  #F1F5F9;
+    --cp-line:          #E6EAF0;
+    --cp-line-soft:     #EEF2F7;
+    --cp-ink:           #0B1220;
+    --cp-text:          #1E293B;
+    --cp-muted:         #64748B;
+    --cp-muted-2:       #94A3B8;
+
+    --cp-success:       #16A34A;
+    --cp-success-bg:    #ECFDF5;
+    --cp-danger:        #DC2626;
+    --cp-danger-bg:     #FEF2F2;
+    --cp-warning:       #D97706;
+    --cp-warning-bg:    #FFF7ED;
+    --cp-info:          #0EA5E9;
+    --cp-info-bg:       #EFF9FF;
+
+    --cp-sh-sm: 0 1px 2px rgba(15, 23, 42, .04);
+    --cp-sh-md: 0 12px 28px -14px rgba(15, 23, 42, .18);
+    --cp-sh-lg: 0 30px 60px -22px rgba(15, 23, 42, .28);
+
+    --cp-ease: cubic-bezier(.4, 0, .2, 1);
+    --cp-dur:  220ms;
+
+    --cp-r-sm: 8px;
+    --cp-r-md: 12px;
+    --cp-r-lg: 16px;
+    --cp-r-xl: 24px;
+    --cp-pill: 999px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --cp-surface:      #111C30;
+        --cp-surface-alt:  #0F172A;
+        --cp-surface-soft: #1A273F;
+        --cp-line:         #1E293B;
+        --cp-line-soft:    #172A45;
+        --cp-ink:          #F1F5F9;
+        --cp-text:         #CBD5E1;
+        --cp-muted:        #94A3B8;
+        --cp-muted-2:      #64748B;
+
+        --cp-success-bg:   #052E1A;
+        --cp-danger-bg:    #2E0A0D;
+        --cp-warning-bg:   #2E1A05;
+        --cp-info-bg:      #0B2A3E;
+
+        --cp-sh-sm: 0 1px 2px rgba(0, 0, 0, .4);
+        --cp-sh-md: 0 12px 28px -14px rgba(0, 0, 0, .6);
+        --cp-sh-lg: 0 30px 60px -22px rgba(0, 0, 0, .7);
+    }
+}
+
+body { background: var(--cp-surface-alt); color: var(--cp-text); }
+
+/* =========================================================================
+   PAGE HEADER
+   ========================================================================= */
+.cp-hero {
+    position: relative;
+    padding: clamp(28px, 4vw, 44px) 0 clamp(24px, 3vw, 32px);
+    background:
+        radial-gradient(ellipse 60% 70% at 20% 20%, rgba(225, 29, 42, .12), transparent 60%),
+        linear-gradient(180deg, #0b1220, #1a1a2a);
+    color: #fff;
+    overflow: hidden;
+}
+.cp-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    pointer-events: none;
+}
+.cp-hero > .container { position: relative; z-index: 1; }
+
+.cp-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .82rem;
+    color: rgba(255, 255, 255, .7);
+    margin-bottom: 14px;
+    list-style: none;
+    padding: 0;
+}
+.cp-breadcrumb li { display: inline-flex; align-items: center; gap: 8px; }
+.cp-breadcrumb li:not(:last-child)::after {
+    content: "\f105";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: .65rem;
+    opacity: .5;
+}
+.cp-breadcrumb a {
+    color: rgba(255, 255, 255, .8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--cp-dur) var(--cp-ease);
+}
+.cp-breadcrumb a:hover { color: #fff; }
+.cp-breadcrumb .active { color: #fff; font-weight: 600; }
+
+.cp-hero h1 {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: #fff;
+    margin: 0 0 8px;
+}
+.cp-hero h1 .hero-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--cp-r-md);
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    font-size: 1.1rem;
+    box-shadow: 0 10px 22px -8px rgba(225, 29, 42, .55);
+    flex-shrink: 0;
+}
+.cp-hero p {
+    font-size: .95rem;
+    color: rgba(255, 255, 255, .8);
+    margin: 0;
+    line-height: 1.55;
+}
+
+/* =========================================================================
+   WIZARD SHELL
+   ========================================================================= */
+.cp-shell {
+    max-width: 1080px;
+    margin: -28px auto 0;
+    padding: 0 16px 60px;
+    position: relative;
+    z-index: 2;
+}
+
+.cp-card {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-line);
+    border-radius: var(--cp-r-xl);
+    box-shadow: var(--cp-sh-lg);
+    overflow: hidden;
+}
+
+/* =========================================================================
+   STEPPER (top of card)
+   ========================================================================= */
+.cp-stepper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    padding: 22px clamp(16px, 3vw, 32px) 20px;
+    border-bottom: 1px solid var(--cp-line-soft);
+    background: var(--cp-surface-alt);
+}
+@media (max-width: 720px) {
+    .cp-stepper { grid-template-columns: repeat(4, 1fr); padding: 16px 12px; }
+}
+
+.cp-step {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+}
+.cp-step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 16px;
+    left: calc(100% - 12px);
+    width: calc(100% - 8px);
+    height: 2px;
+    background: var(--cp-line);
+    z-index: 0;
+    transition: background var(--cp-dur) var(--cp-ease);
+}
+.cp-step.completed:not(:last-child)::after,
+.cp-step.active:not(:last-child)::after {
+    background: color-mix(in srgb, var(--primary, #e11d2a) 45%, var(--cp-line));
+}
+
+.cp-step-dot {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--cp-surface);
+    border: 2px solid var(--cp-line);
+    color: var(--cp-muted);
+    font-weight: 800;
+    font-size: .85rem;
+    transition: all var(--cp-dur) var(--cp-ease);
+}
+.cp-step.active .cp-step-dot {
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary, #e11d2a) 18%, transparent);
+}
+.cp-step.completed .cp-step-dot {
+    background: var(--cp-success);
+    border-color: var(--cp-success);
+    color: #fff;
+}
+.cp-step.completed .cp-step-dot::before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: .8rem;
+}
+.cp-step.completed .cp-step-dot .cp-step-num { display: none; }
+
+.cp-step-meta {
+    min-width: 0;
+    padding-top: 2px;
+    display: none;
+}
+@media (min-width: 720px) {
+    .cp-step-meta { display: block; }
+}
+.cp-step-meta .label {
+    display: block;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--cp-muted);
+    margin-bottom: 2px;
+}
+.cp-step-meta .title {
+    display: block;
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--cp-ink);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cp-step.active .cp-step-meta .label { color: var(--primary, #e11d2a); }
+
+/* =========================================================================
+   PROGRESS BAR (thin, under stepper)
+   ========================================================================= */
+.cp-progress-track {
+    height: 3px;
+    background: var(--cp-line-soft);
+    position: relative;
+    overflow: hidden;
+}
+.cp-progress-bar {
+    height: 100%;
+    width: 25%;
+    background: linear-gradient(90deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    transition: width 380ms var(--cp-ease);
+}
+
+/* =========================================================================
+   FORM BODY
+   ========================================================================= */
+.cp-body { padding: clamp(22px, 3.4vw, 40px); }
+
+.cp-step-panel { display: none; }
+.cp-step-panel.active { display: block; animation: cpPanelIn 320ms var(--cp-ease); }
+
+@keyframes cpPanelIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.cp-step-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding-bottom: 20px;
+    margin-bottom: 26px;
+    border-bottom: 1px solid var(--cp-line-soft);
+}
+.cp-step-title .num {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--cp-r-md);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-weight: 800;
+    font-size: .95rem;
+    margin-top: 2px;
+}
+.cp-step-title h2 {
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px;
+    color: var(--cp-ink);
+}
+.cp-step-title p {
+    font-size: .88rem;
+    color: var(--cp-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* =========================================================================
+   FORM CONTROLS
+   ========================================================================= */
+.cp-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--cp-muted);
+    margin-bottom: 8px;
+}
+.cp-label .req {
+    color: var(--primary, #e11d2a);
+}
+.cp-label .opt {
+    font-size: .7rem;
+    color: var(--cp-muted-2);
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: none;
+}
+
+.cp-field {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--cp-surface);
+    border: 1.5px solid var(--cp-line);
+    border-radius: var(--cp-r-md);
+    color: var(--cp-ink);
+    font-size: .95rem;
+    font-weight: 500;
+    outline: none;
+    transition: border-color var(--cp-dur) var(--cp-ease),
+                box-shadow   var(--cp-dur) var(--cp-ease),
+                background   var(--cp-dur) var(--cp-ease);
+    font-family: inherit;
+}
+.cp-field::placeholder { color: var(--cp-muted-2); font-weight: 400; }
+.cp-field:focus {
+    border-color: var(--primary, #e11d2a);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary, #e11d2a) 15%, transparent);
+}
+textarea.cp-field {
+    resize: vertical;
+    min-height: 72px;
+    line-height: 1.55;
+}
+select.cp-field {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e11d2a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px 10px;
+    padding-right: 40px;
+}
+input[type="date"].cp-field {
+    padding: 11px 14px;
+    font-family: inherit;
+}
+
+/* Validation states */
+.cp-field.is-invalid {
+    border-color: var(--cp-danger);
+    background: color-mix(in srgb, var(--cp-danger) 5%, var(--cp-surface));
+}
+.cp-field.is-invalid:focus {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--cp-danger) 18%, transparent);
+}
+.cp-field.is-valid {
+    border-color: var(--cp-success);
+}
+
+/* Input with prefix */
+.cp-input-group {
+    display: flex;
+    border: 1.5px solid var(--cp-line);
+    border-radius: var(--cp-r-md);
+    overflow: hidden;
+    background: var(--cp-surface);
+    transition: border-color var(--cp-dur) var(--cp-ease),
+                box-shadow   var(--cp-dur) var(--cp-ease);
+}
+.cp-input-group:focus-within {
+    border-color: var(--primary, #e11d2a);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary, #e11d2a) 15%, transparent);
+}
+.cp-input-group .prefix {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    background: var(--cp-surface-soft);
+    color: var(--cp-muted);
+    font-weight: 700;
+    font-size: .9rem;
+    border-right: 1px solid var(--cp-line);
+}
+.cp-input-group .cp-field {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+.cp-input-group .cp-field:focus { box-shadow: none; }
+
+.cp-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: .78rem;
+    color: var(--cp-muted-2);
+    line-height: 1.5;
+}
+
+/* =========================================================================
+   CHECKBOXES (Additional services)
+   ========================================================================= */
+.cp-services {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 20px 22px;
+    background: var(--cp-surface-alt);
+    border: 1px solid var(--cp-line);
+    border-radius: var(--cp-r-md);
+}
+@media (min-width: 720px) {
+    .cp-services { grid-template-columns: 1fr 1fr; }
+}
+
+.cp-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-line);
+    border-radius: var(--cp-r-md);
+    cursor: pointer;
+    transition: all var(--cp-dur) var(--cp-ease);
+}
+.cp-check:hover {
+    border-color: color-mix(in srgb, var(--primary, #e11d2a) 30%, var(--cp-line));
+}
+.cp-check input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    margin: 1px 0 0;
+    border: 2px solid var(--cp-line);
+    border-radius: 5px;
+    background: var(--cp-surface);
+    cursor: pointer;
+    position: relative;
+    transition: all var(--cp-dur) var(--cp-ease);
+}
+.cp-check input[type="checkbox"]:checked {
+    background: var(--primary, #e11d2a);
+    border-color: var(--primary, #e11d2a);
+}
+.cp-check input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 6px;
+    height: 11px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.cp-check input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--primary, #e11d2a);
+    outline-offset: 3px;
+}
+.cp-check .check-body { min-width: 0; }
+.cp-check .check-title {
+    display: block;
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--cp-ink);
+    margin-bottom: 2px;
+}
+.cp-check .check-desc {
+    display: block;
+    font-size: .8rem;
+    color: var(--cp-muted);
+    line-height: 1.5;
+}
+
+/* =========================================================================
+   COST CALCULATOR PANEL
+   ========================================================================= */
+.cp-calc {
+    padding: 22px 24px;
+    background:
+        radial-gradient(ellipse 60% 80% at 90% 10%, rgba(225, 29, 42, .08), transparent 60%),
+        var(--cp-surface-alt);
+    border: 1px solid var(--cp-line);
+    border-left: 4px solid var(--primary, #e11d2a);
+    border-radius: var(--cp-r-md);
+    margin-top: 24px;
+}
+.cp-calc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--cp-muted);
+    margin-bottom: 16px;
+}
+.cp-calc-header i { color: var(--primary, #e11d2a); }
+
+.cp-calc-rows {
+    display: flex;
+    flex-direction: column;
+}
+.cp-calc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px dashed var(--cp-line);
+    font-size: .9rem;
+}
+.cp-calc-row:last-child { border-bottom: 0; }
+.cp-calc-row .k { color: var(--cp-muted); }
+.cp-calc-row .v { color: var(--cp-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.cp-calc-row.total {
+    padding-top: 12px;
+    margin-top: 4px;
+    border-top: 2px solid var(--cp-line);
+    border-bottom: 0;
+}
+.cp-calc-row.total .k { color: var(--cp-ink); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; font-size: .78rem; }
+.cp-calc-row.total .v {
+    color: var(--primary, #e11d2a);
+    font-size: 1.35rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+/* =========================================================================
+   SUMMARY PANEL
+   ========================================================================= */
+.cp-summary {
+    padding: 22px 24px;
+    background: var(--cp-surface-alt);
+    border: 1px solid var(--cp-line);
+    border-left: 4px solid var(--primary, #e11d2a);
+    border-radius: var(--cp-r-md);
+    margin-top: 24px;
+}
+.cp-summary-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--cp-muted);
+    margin-bottom: 16px;
+}
+.cp-summary-header i { color: var(--primary, #e11d2a); }
+
+.cp-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+}
+@media (max-width: 640px) {
+    .cp-summary-grid { grid-template-columns: 1fr; }
+}
+.cp-summary-item .k {
+    display: block;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--cp-muted);
+    margin-bottom: 4px;
+}
+.cp-summary-item .v {
+    display: block;
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--cp-ink);
+    line-height: 1.45;
+    word-break: break-word;
+}
+.cp-summary-item.cost .v {
+    color: var(--primary, #e11d2a);
+    font-size: 1.15rem;
+}
+
+/* =========================================================================
+   ACTIONS (footer of each step)
+   ========================================================================= */
+.cp-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-top: 26px;
+    margin-top: 26px;
+    border-top: 1px solid var(--cp-line-soft);
+    flex-wrap: wrap;
+}
+.cp-actions .spacer { flex: 1 1 auto; }
+
+.cp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 13px 24px;
+    border: 1.5px solid transparent;
+    border-radius: var(--cp-pill);
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--cp-dur) var(--cp-ease);
+    white-space: nowrap;
+}
+.cp-btn i { transition: transform var(--cp-dur) var(--cp-ease); }
+.cp-btn:focus-visible {
+    outline: 2px solid var(--primary, #e11d2a);
+    outline-offset: 2px;
+}
+
+.cp-btn.primary {
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    box-shadow: 0 10px 22px -10px rgba(225, 29, 42, .55);
+}
+.cp-btn.primary:hover,
+.cp-btn.primary:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px -12px rgba(225, 29, 42, .6);
+    color: #fff;
+}
+.cp-btn.primary:hover i { transform: translateX(3px); }
+.cp-btn.primary.prev:hover i { transform: translateX(-3px); }
+
+.cp-btn.ghost {
+    background: transparent;
+    color: var(--cp-text);
+    border-color: var(--cp-line);
+}
+.cp-btn.ghost:hover,
+.cp-btn.ghost:focus-visible {
+    border-color: var(--cp-ink);
+    color: var(--cp-ink);
+    background: var(--cp-surface-alt);
+    transform: translateY(-2px);
+}
+.cp-btn.ghost:hover i { transform: translateX(-3px); }
+
+.cp-btn.success {
+    background: linear-gradient(135deg, var(--cp-success), #15803D);
+    color: #fff;
+    box-shadow: 0 10px 22px -10px rgba(22, 163, 74, .55);
+}
+.cp-btn.success:hover,
+.cp-btn.success:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px -12px rgba(22, 163, 74, .6);
+    color: #fff;
+}
+.cp-btn.success:hover i { transform: scale(1.1); }
+
+.cp-btn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* =========================================================================
+   NOTIFICATIONS
+   ========================================================================= */
+.cp-toast {
+    position: fixed;
+    top: 88px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    min-width: 280px;
+    max-width: calc(100vw - 48px);
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-line);
+    border-left: 4px solid var(--primary, #e11d2a);
+    border-radius: var(--cp-r-sm);
+    box-shadow: var(--cp-sh-lg);
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--cp-text);
+    animation: cpToastIn 280ms var(--cp-ease);
+}
+.cp-toast i { font-size: 1.15rem; color: var(--primary, #e11d2a); flex-shrink: 0; }
+.cp-toast.success { border-left-color: var(--cp-success); }
+.cp-toast.success i { color: var(--cp-success); }
+.cp-toast.error   { border-left-color: var(--cp-danger); }
+.cp-toast.error   i { color: var(--cp-danger); }
+.cp-toast.warning { border-left-color: var(--cp-warning); }
+.cp-toast.warning i { color: var(--cp-warning); }
+.cp-toast.info    { border-left-color: var(--cp-info); }
+.cp-toast.info    i { color: var(--cp-info); }
+.cp-toast.fade-out { animation: cpToastOut 280ms var(--cp-ease) forwards; }
+
+@keyframes cpToastIn {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes cpToastOut {
+    to { opacity: 0; transform: translateX(24px); }
+}
+@media (max-width: 576px) {
+    .cp-toast { left: 16px; right: 16px; top: 76px; min-width: auto; }
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+@media (max-width: 640px) {
+    .cp-hero h1 { font-size: 1.35rem; }
+    .cp-hero h1 .hero-icon { width: 38px; height: 38px; font-size: 1rem; }
+    .cp-body { padding: 22px 20px; }
+    .cp-step-title { padding-bottom: 16px; margin-bottom: 22px; }
+    .cp-actions { flex-direction: column; align-items: stretch; }
+    .cp-actions .spacer { display: none; }
+    .cp-actions .cp-btn { width: 100%; }
+}
+
+/* Motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* Print */
+@media print {
+    .cp-hero, .cp-stepper, .cp-progress-track, .cp-actions,
+    .cp-toast, .navbar, footer, .back-to-top { display: none !important; }
+    .cp-shell { margin: 0; padding: 0; }
+    .cp-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+    .cp-step-panel { display: block !important; }
+    .cp-step-panel:not(:first-child) { margin-top: 24px; padding-top: 24px; border-top: 1px dashed #ccc; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ==================== PAGE HEADER ==================== -->
+<section class="cp-hero">
+    <div class="container">
+        <ol class="cp-breadcrumb">
+            <li><a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a></li>
+            <li><a href="{{ url_for('manage_packages') }}">Packages</a></li>
+            <li class="active">Create Package</li>
+        </ol>
+
+        <h1>
+            <span class="hero-icon"><i class="fas fa-plus"></i></span>
+            Create a new package
+        </h1>
+        <p>Complete the four steps below. All required fields are marked with an asterisk (*).</p>
+    </div>
+</section>
+
+<!-- ==================== WIZARD ==================== -->
+<div class="cp-shell">
+    <div class="cp-card">
+
+        <!-- Stepper -->
+        <div class="cp-stepper" role="tablist" aria-label="Form steps">
+            <div class="cp-step active" id="navStep1" role="tab" aria-selected="true" aria-controls="step1">
+                <span class="cp-step-dot"><span class="cp-step-num">1</span></span>
+                <span class="cp-step-meta">
+                    <span class="label">Step 1</span>
+                    <span class="title">Sender</span>
+                </span>
+            </div>
+            <div class="cp-step" id="navStep2" role="tab" aria-selected="false" aria-controls="step2">
+                <span class="cp-step-dot"><span class="cp-step-num">2</span></span>
+                <span class="cp-step-meta">
+                    <span class="label">Step 2</span>
+                    <span class="title">Recipient</span>
+                </span>
+            </div>
+            <div class="cp-step" id="navStep3" role="tab" aria-selected="false" aria-controls="step3">
+                <span class="cp-step-dot"><span class="cp-step-num">3</span></span>
+                <span class="cp-step-meta">
+                    <span class="label">Step 3</span>
+                    <span class="title">Package</span>
+                </span>
+            </div>
+            <div class="cp-step" id="navStep4" role="tab" aria-selected="false" aria-controls="step4">
+                <span class="cp-step-dot"><span class="cp-step-num">4</span></span>
+                <span class="cp-step-meta">
+                    <span class="label">Step 4</span>
+                    <span class="title">Pickup &amp; Delivery</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="cp-progress-track" role="progressbar" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1" aria-label="Form progress">
+            <div class="cp-progress-bar" id="formProgress"></div>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" action="{{ url_for('create_package') }}" id="createPackageForm" novalidate>
+
+            <div class="cp-body">
+
+                <!-- ==================== STEP 1 — SENDER ==================== -->
+                <section class="cp-step-panel active" id="step1" aria-labelledby="titleStep1">
+                    <div class="cp-step-title">
+                        <span class="num">1</span>
+                        <div>
+                            <h2 id="titleStep1">Sender information</h2>
+                            <p>Who is sending this shipment?</p>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="sender_name" class="cp-label">Full name <span class="req">*</span></label>
+                            <input type="text" class="cp-field" id="sender_name" name="sender_name"
+                                   required autocomplete="name" placeholder="e.g. Jane Doe">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sender_company" class="cp-label">Company <span class="opt">optional</span></label>
+                            <input type="text" class="cp-field" id="sender_company" name="sender_company"
+                                   autocomplete="organization" placeholder="e.g. Acme Logistics">
+                        </div>
+                        <div class="col-12">
+                            <label for="sender_address" class="cp-label">Address <span class="req">*</span></label>
+                            <textarea class="cp-field" id="sender_address" name="sender_address"
+                                      rows="2" required autocomplete="street-address"
+                                      placeholder="Street, city, postal code, country"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sender_phone" class="cp-label">Phone <span class="req">*</span></label>
+                            <input type="tel" class="cp-field" id="sender_phone" name="sender_phone"
+                                   required autocomplete="tel" placeholder="+1 234 567 8900">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sender_email" class="cp-label">Email <span class="req">*</span></label>
+                            <input type="email" class="cp-field" id="sender_email" name="sender_email"
+                                   required autocomplete="email" placeholder="sender@example.com">
+                        </div>
+                    </div>
+
+                    <div class="cp-actions">
+                        <span class="spacer"></span>
+                        <button type="button" class="cp-btn primary" onclick="nextStep(2)">
+                            Continue <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ==================== STEP 2 — RECIPIENT ==================== -->
+                <section class="cp-step-panel" id="step2" aria-labelledby="titleStep2">
+                    <div class="cp-step-title">
+                        <span class="num">2</span>
+                        <div>
+                            <h2 id="titleStep2">Recipient information</h2>
+                            <p>Who should receive this shipment?</p>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="recipient_name" class="cp-label">Full name <span class="req">*</span></label>
+                            <input type="text" class="cp-field" id="recipient_name" name="recipient_name"
+                                   required autocomplete="name" placeholder="e.g. John Smith">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="recipient_company" class="cp-label">Company <span class="opt">optional</span></label>
+                            <input type="text" class="cp-field" id="recipient_company" name="recipient_company"
+                                   autocomplete="organization" placeholder="e.g. Northwind Retail">
+                        </div>
+                        <div class="col-12">
+                            <label for="recipient_address" class="cp-label">Delivery address <span class="req">*</span></label>
+                            <textarea class="cp-field" id="recipient_address" name="recipient_address"
+                                      rows="2" required autocomplete="street-address"
+                                      placeholder="Street, city, postal code, country"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="recipient_phone" class="cp-label">Phone <span class="req">*</span></label>
+                            <input type="tel" class="cp-field" id="recipient_phone" name="recipient_phone"
+                                   required autocomplete="tel" placeholder="+1 234 567 8900">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="recipient_email" class="cp-label">Email <span class="req">*</span></label>
+                            <input type="email" class="cp-field" id="recipient_email" name="recipient_email"
+                                   required autocomplete="email" placeholder="recipient@example.com">
+                        </div>
+                    </div>
+
+                    <div class="cp-actions">
+                        <button type="button" class="cp-btn ghost" onclick="prevStep(1)">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="cp-btn primary" onclick="nextStep(3)">
+                            Continue <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ==================== STEP 3 — PACKAGE ==================== -->
+                <section class="cp-step-panel" id="step3" aria-labelledby="titleStep3">
+                    <div class="cp-step-title">
+                        <span class="num">3</span>
+                        <div>
+                            <h2 id="titleStep3">Package details</h2>
+                            <p>Describe what you're shipping and choose the service level.</p>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="weight" class="cp-label">Weight (kg) <span class="req">*</span></label>
+                            <input type="number" step="0.01" min="0.01" class="cp-field" id="weight" name="weight"
+                                   required placeholder="0.00">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="dimensions" class="cp-label">Dimensions <span class="opt">L×W×H cm</span></label>
+                            <input type="text" class="cp-field" id="dimensions" name="dimensions"
+                                   placeholder="e.g. 30x20x15"
+                                   title="Enter dimensions separated by ×, *, comma or space">
+                            <small class="cp-hint">Length × Width × Height in centimetres.</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="declared_value" class="cp-label">Declared value <span class="opt">optional</span></label>
+                            <div class="cp-input-group">
+                                <span class="prefix">$</span>
+                                <input type="number" step="0.01" min="0" class="cp-field"
+                                       id="declared_value" name="declared_value" placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="package_type" class="cp-label">Package type <span class="req">*</span></label>
+                            <select class="cp-field" id="package_type" name="package_type" required>
+                                <option value="documents">Documents</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="fragile">Fragile</option>
+                                <option value="general" selected>General</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="shipping_type" class="cp-label">Shipping type <span class="req">*</span></label>
+                            <select class="cp-field" id="shipping_type" name="shipping_type" required>
+                                <option value="express">Express</option>
+                                <option value="standard" selected>Standard</option>
+                                <option value="freight">Freight</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="shipping_method" class="cp-label">Shipping method <span class="req">*</span></label>
+                            <select class="cp-field" id="shipping_method" name="shipping_method" required>
+                                <option value="air">Air</option>
+                                <option value="ground" selected>Ground</option>
+                                <option value="sea">Sea</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Cost calculator -->
+                    <div class="cp-calc" aria-live="polite">
+                        <div class="cp-calc-header">
+                            <i class="fas fa-calculator"></i>
+                            Estimated shipping cost
+                        </div>
+                        <div class="cp-calc-rows">
+                            <div class="cp-calc-row">
+                                <span class="k">Base rate</span>
+                                <span class="v" id="baseRate">$0.00</span>
+                            </div>
+                            <div class="cp-calc-row">
+                                <span class="k">Weight charge</span>
+                                <span class="v" id="weightCharge">$0.00</span>
+                            </div>
+                            <div class="cp-calc-row">
+                                <span class="k">Package type multiplier</span>
+                                <span class="v" id="typeMultiplier">1.0×</span>
+                            </div>
+                            <div class="cp-calc-row total">
+                                <span class="k">Estimated total</span>
+                                <span class="v" id="totalCost">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cp-actions">
+                        <button type="button" class="cp-btn ghost" onclick="prevStep(2)">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="cp-btn primary" onclick="nextStep(4)">
+                            Continue <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ==================== STEP 4 — PICKUP & DELIVERY ==================== -->
+                <section class="cp-step-panel" id="step4" aria-labelledby="titleStep4">
+                    <div class="cp-step-title">
+                        <span class="num">4</span>
+                        <div>
+                            <h2 id="titleStep4">Pickup &amp; delivery</h2>
+                            <p>Confirm the pickup and destination addresses, then choose any additional services.</p>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="pickup_address" class="cp-label">Pickup address <span class="req">*</span></label>
+                            <textarea class="cp-field" id="pickup_address" name="pickup_address"
+                                      rows="2" required placeholder="Where should we collect the package?"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label for="destination_address" class="cp-label">Destination address <span class="req">*</span></label>
+                            <textarea class="cp-field" id="destination_address" name="destination_address"
+                                      rows="2" required placeholder="Where should we deliver the package?"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="pickup_date" class="cp-label">Pickup date <span class="opt">optional</span></label>
+                            <input type="date" class="cp-field" id="pickup_date" name="pickup_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="estimated_delivery" class="cp-label">Estimated delivery <span class="opt">auto-calculated</span></label>
+                            <input type="date" class="cp-field" id="estimated_delivery" name="estimated_delivery">
+                        </div>
+                    </div>
+
+                    <!-- Additional services -->
+                    <h3 class="cp-label" style="margin-top: 24px;">Additional services</h3>
+                    <div class="cp-services">
+                        <label class="cp-check">
+                            <input type="checkbox" id="insurance" name="insurance">
+                            <span class="check-body">
+                                <span class="check-title">Insurance</span>
+                                <span class="check-desc">Recommended for high-value items.</span>
+                            </span>
+                        </label>
+                        <label class="cp-check">
+                            <input type="checkbox" id="signature_required" name="signature_required">
+                            <span class="check-body">
+                                <span class="check-title">Signature required</span>
+                                <span class="check-desc">Recipient must sign on delivery.</span>
+                            </span>
+                        </label>
+                        <label class="cp-check">
+                            <input type="checkbox" id="email_notifications" name="email_notifications" checked>
+                            <span class="check-body">
+                                <span class="check-title">Email notifications</span>
+                                <span class="check-desc">Send status updates to the recipient.</span>
+                            </span>
+                        </label>
+                        <label class="cp-check">
+                            <input type="checkbox" id="sms_notifications" name="sms_notifications">
+                            <span class="check-body">
+                                <span class="check-title">SMS notifications</span>
+                                <span class="check-desc">Additional charges may apply.</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="cp-summary" aria-live="polite">
+                        <div class="cp-summary-header">
+                            <i class="fas fa-clipboard-list"></i>
+                            Order summary
+                        </div>
+                        <div class="cp-summary-grid">
+                            <div class="cp-summary-item">
+                                <span class="k">From</span>
+                                <span class="v" id="summary_sender">—</span>
+                            </div>
+                            <div class="cp-summary-item">
+                                <span class="k">To</span>
+                                <span class="v" id="summary_recipient">—</span>
+                            </div>
+                            <div class="cp-summary-item">
+                                <span class="k">Package</span>
+                                <span class="v" id="summary_package">—</span>
+                            </div>
+                            <div class="cp-summary-item">
+                                <span class="k">Shipping service</span>
+                                <span class="v" id="summary_shipping">—</span>
+                            </div>
+                            <div class="cp-summary-item">
+                                <span class="k">Estimated delivery</span>
+                                <span class="v" id="summary_delivery">—</span>
+                            </div>
+                            <div class="cp-summary-item cost">
+                                <span class="k">Total cost</span>
+                                <span class="v" id="summary_cost">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cp-actions">
+                        <button type="button" class="cp-btn ghost" onclick="prevStep(3)">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="submit" class="cp-btn success" id="submitBtn">
+                            <i class="fas fa-check"></i> Create package
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    /* ==================== Config ==================== */
+    const CONFIG = {
+        totalSteps: 4,
+        toastDuration: 3400
+    };
+
+    /* ==================== State ==================== */
+    let currentStep = 1;
+
+    /* ==================== Toast ==================== */
+    function showNotification(message, type = 'info') {
+        const el = document.createElement('div');
+        el.className = `cp-toast ${type}`;
+        const icon = {
+            success: 'circle-check',
+            error:   'circle-exclamation',
+            warning: 'triangle-exclamation',
+            info:    'circle-info'
+        }[type] || 'circle-info';
+
+        el.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(el);
+
+        setTimeout(() => {
+            el.classList.add('fade-out');
+            setTimeout(() => el.remove(), 300);
+        }, CONFIG.toastDuration);
+    }
+
+    /* ==================== Step navigation ==================== */
+    function goToStep(step) {
+        // Hide all panels
+        document.querySelectorAll('.cp-step-panel').forEach(p => p.classList.remove('active'));
+
+        // Show target
+        const target = document.getElementById('step' + step);
+        if (target) target.classList.add('active');
+
+        // Update stepper
+        document.querySelectorAll('.cp-step').forEach((s, i) => {
+            const num = i + 1;
+            s.classList.toggle('active', num === step);
+            s.classList.toggle('completed', num < step);
+            s.setAttribute('aria-selected', num === step ? 'true' : 'false');
+        });
+
+        // Update progress bar
+        const bar = document.getElementById('formProgress');
+        if (bar) {
+            const pct = (step / CONFIG.totalSteps) * 100;
+            bar.style.width = pct + '%';
+            const track = bar.parentElement;
+            if (track) track.setAttribute('aria-valuenow', String(step));
+        }
+
+        // Scroll card into view (below the sticky navbar)
+        const card = document.querySelector('.cp-card');
+        if (card) {
+            const navH = parseInt(getComputedStyle(document.documentElement)
+                        .getPropertyValue('--nav-h')) || 68;
+            const top = card.getBoundingClientRect().top + window.scrollY - navH - 24;
+            window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+        }
+
+        currentStep = step;
+    }
+
+    window.nextStep = function (step) {
+        if (!validateStep(currentStep)) return;
+        if (step === 4) updateSummary();
+        goToStep(step);
+    };
+
+    window.prevStep = function (step) {
+        goToStep(step);
+    };
+
+    /* ==================== Validation ==================== */
+    const REQUIRED = {
+        1: ['sender_name', 'sender_address', 'sender_phone', 'sender_email'],
+        2: ['recipient_name', 'recipient_address', 'recipient_phone', 'recipient_email'],
+        3: ['weight', 'package_type', 'shipping_type', 'shipping_method'],
+        4: ['pickup_address', 'destination_address']
+    };
+
+    function validateStep(step) {
+        const fields = REQUIRED[step] || [];
+        let firstInvalid = null;
+
+        for (const id of fields) {
+            const el = document.getElementById(id);
+            if (!el) continue;
+            const value = (el.value || '').trim();
+            if (!value) {
+                el.classList.add('is-invalid');
+                el.classList.remove('is-valid');
+                if (!firstInvalid) firstInvalid = el;
+            } else {
+                el.classList.remove('is-invalid');
+                el.classList.add('is-valid');
+            }
+        }
+
+        if (firstInvalid) {
+            const stepName = { 1: 'Sender', 2: 'Recipient', 3: 'Package', 4: 'Pickup & Delivery' }[step] || 'this step';
+            showNotification(`Please complete all required fields in the ${stepName} step.`, 'error');
+            firstInvalid.focus();
+            return false;
+        }
+        return true;
+    }
+
+    /* ==================== Cost calculator ==================== */
+    const BASE_RATES = {
+        air:    { express: 15, standard: 10, freight: 8 },
+        ground: { express: 8,  standard: 5,  freight: 3 },
+        sea:    { express: 5,  standard: 3,  freight: 1.5 }
+    };
+    const TYPE_MULTIPLIERS = {
+        documents: 1,
+        electronics: 2.5,
+        fragile: 2,
+        general: 1.5
+    };
+    const DELIVERY_DAYS = {
+        air:    { express: 1, standard: 3,  freight: 5 },
+        ground: { express: 2, standard: 5,  freight: 10 },
+        sea:    { express: 7, standard: 14, freight: 21 }
+    };
+
+    function calculateCost() {
+        const weightEl    = document.getElementById('weight');
+        const packageEl   = document.getElementById('package_type');
+        const typeEl      = document.getElementById('shipping_type');
+        const methodEl    = document.getElementById('shipping_method');
+        if (!weightEl || !packageEl || !typeEl || !methodEl) return 0;
+
+        const weight = parseFloat(weightEl.value) || 0;
+        const packageType = packageEl.value;
+        const shippingType = typeEl.value;
+        const shippingMethod = methodEl.value;
+
+        const baseRate = (BASE_RATES[shippingMethod] || {})[shippingType] || 5;
+        const typeMultiplier = TYPE_MULTIPLIERS[packageType] || 1.5;
+        const weightCharge = weight * 0.5;
+        const total = (baseRate + weightCharge) * typeMultiplier;
+
+        setText('baseRate',       '$' + baseRate.toFixed(2));
+        setText('weightCharge',   '$' + weightCharge.toFixed(2));
+        setText('typeMultiplier', typeMultiplier.toFixed(1) + '×');
+        setText('totalCost',      '$' + total.toFixed(2));
+
+        return total;
+    }
+
+    function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    }
+
+    /* ==================== Summary ==================== */
+    function updateSummary() {
+        const senderEl    = document.getElementById('sender_name');
+        const recipientEl = document.getElementById('recipient_name');
+        const weightEl    = document.getElementById('weight');
+        const packageEl   = document.getElementById('package_type');
+        const typeEl      = document.getElementById('shipping_type');
+        const methodEl    = document.getElementById('shipping_method');
+        const costEl      = document.getElementById('totalCost');
+
+        setText('summary_sender',    (senderEl?.value || '').trim() || 'Not provided');
+        setText('summary_recipient', (recipientEl?.value || '').trim() || 'Not provided');
+
+        const weight = (weightEl?.value || '0');
+        const pkg    = (packageEl?.value || 'general');
+        const pkgLabel = pkg.charAt(0).toUpperCase() + pkg.slice(1);
+        setText('summary_package', `${weight} kg · ${pkgLabel}`);
+
+        const method = (methodEl?.value || 'ground');
+        const type   = (typeEl?.value || 'standard');
+        setText('summary_shipping',
+            method.charAt(0).toUpperCase() + method.slice(1) + ' · ' +
+            type.charAt(0).toUpperCase() + type.slice(1)
+        );
+
+        // Estimate delivery
+        const days = (DELIVERY_DAYS[method] || {})[type] || 5;
+        const deliveryDate = new Date();
+        deliveryDate.setDate(deliveryDate.getDate() + days);
+
+        const estEl = document.getElementById('estimated_delivery');
+        if (estEl) estEl.value = deliveryDate.toISOString().split('T')[0];
+
+        setText('summary_delivery', deliveryDate.toLocaleDateString(undefined, {
+            weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+        }));
+
+        setText('summary_cost', costEl?.textContent || '$0.00');
+    }
+
+    /* ==================== Wire up ==================== */
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initial cost calc
+        calculateCost();
+
+        // Recalc on relevant fields
+        ['weight', 'package_type', 'shipping_type', 'shipping_method'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('input', calculateCost);
+            el.addEventListener('change', calculateCost);
+        });
+
+        // Live validation feedback
+        document.querySelectorAll('.cp-field').forEach(el => {
+            el.addEventListener('blur', () => {
+                if (el.hasAttribute('required')) {
+                    const ok = (el.value || '').trim().length > 0;
+                    el.classList.toggle('is-invalid', !ok);
+                    el.classList.toggle('is-valid', ok);
+                }
+            });
+        });
+
+        // Smooth scroll to first error on invalid submit
+        const form = document.getElementById('createPackageForm');
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                // Normalize dimensions
+                const dimEl = document.getElementById('dimensions');
+                if (dimEl) {
+                    const raw = (dimEl.value || '').trim();
+                    if (raw) {
+                        let norm = raw.replace(/[×,*\s]+/g, 'x');
+                        norm = norm.replace(/x+/g, 'x').replace(/^x|x$/g, '');
+                        dimEl.value = norm;
+
+                        const re = /^\d+(?:\.\d+)?x\d+(?:\.\d+)?x\d+(?:\.\d+)?$/;
+                        if (!re.test(norm)) {
+                            e.preventDefault();
+                            showNotification('Invalid dimensions format. Use L×W×H, e.g. 30x20x15.', 'error');
+                            dimEl.classList.add('is-invalid');
+                            goToStep(3);
+                            setTimeout(() => dimEl.focus(), 400);
+                            return;
+                        }
+                    }
+                }
+
+                // Validate every step
+                for (let s = 1; s <= 4; s++) {
+                    if (!validateStep(s)) {
+                        e.preventDefault();
+                        goToStep(s);
+                        return;
+                    }
+                }
+
+                // Loading state on submit button
+                const btn = document.getElementById('submitBtn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Creating…';
+                }
+                showNotification('Creating package…', 'info');
+            });
+        }
+    });
+
+    // Expose for debugging
+    window.__cpState = () => ({ currentStep });
+})();
+</script>
+{% endblock %}

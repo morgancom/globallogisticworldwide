@@ -1,0 +1,1022 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — PRIVACY POLICY
+   Legal document layout. Sticky sidebar + trust badges + warm neutrals.
+   ========================================================================= */
+
+:root {
+    --pp-surface:       #ffffff;
+    --pp-surface-alt:   #f7f6f3;
+    --pp-surface-soft:  #f0ede7;
+    --pp-line:          #e6e2db;
+    --pp-line-soft:     #eeebe5;
+    --pp-ink:           #141414;
+    --pp-text:          #2c2c2c;
+    --pp-muted:         #6b6b6b;
+    --pp-muted-2:       #9a948a;
+
+    --pp-success:       #3d7a4e;
+    --pp-success-bg:    #eff6f1;
+
+    --pp-sh-sm: 0 1px 2px rgba(20, 20, 20, .04);
+    --pp-sh-md: 0 4px 12px -6px rgba(20, 20, 20, .10);
+    --pp-sh-lg: 0 16px 40px -20px rgba(20, 20, 20, .18);
+
+    --pp-ease: cubic-bezier(.4, 0, .2, 1);
+    --pp-dur:  180ms;
+
+    --pp-r-sm: 4px;
+    --pp-r-md: 6px;
+    --pp-r-lg: 8px;
+    --pp-pill: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --pp-surface:      #221f1c;
+        --pp-surface-alt:  #1c1a17;
+        --pp-surface-soft: #26231f;
+        --pp-line:         #2b2823;
+        --pp-line-soft:    #24211d;
+        --pp-ink:          #f4f2ee;
+        --pp-text:         #d4cec5;
+        --pp-muted:        #9a948a;
+        --pp-muted-2:      #7a746a;
+
+        --pp-success-bg:   #16261a;
+
+        --pp-sh-sm: 0 1px 2px rgba(0, 0, 0, .4);
+        --pp-sh-md: 0 4px 12px -6px rgba(0, 0, 0, .5);
+        --pp-sh-lg: 0 16px 40px -20px rgba(0, 0, 0, .7);
+    }
+}
+
+body { background: var(--pp-surface-alt); color: var(--pp-text); }
+
+.pp-page h1, .pp-page h2, .pp-page h3,
+.pp-page h4, .pp-page h5, .pp-page h6 {
+    color: var(--pp-ink);
+    letter-spacing: -0.015em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+.pp-hero {
+    position: relative;
+    padding: clamp(52px, 7vw, 88px) 0 clamp(40px, 5vw, 64px);
+    overflow: hidden;
+    background: var(--pp-surface);
+    border-bottom: 1px solid var(--pp-line);
+}
+.pp-hero > .container { position: relative; z-index: 1; }
+
+.pp-hero .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: var(--pp-pill);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.pp-hero .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary, #a51e2b);
+}
+
+.pp-hero h1 {
+    font-size: clamp(1.85rem, 4.4vw, 2.75rem);
+    line-height: 1.08;
+    margin: 0 0 16px;
+    letter-spacing: -0.025em;
+}
+.pp-hero h1 em {
+    font-style: normal;
+    color: var(--primary, #a51e2b);
+}
+
+.pp-hero .lead {
+    font-size: clamp(1rem, 1.2vw, 1.08rem);
+    line-height: 1.7;
+    color: var(--pp-muted);
+    max-width: 720px;
+    margin: 0 0 24px;
+}
+
+.pp-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
+    padding-top: 22px;
+    border-top: 1px dashed var(--pp-line);
+    font-size: .84rem;
+    color: var(--pp-muted);
+}
+.pp-hero-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.pp-hero-meta span i { color: var(--primary, #a51e2b); }
+.pp-hero-meta span strong { color: var(--pp-ink); font-weight: 700; }
+
+/* =========================================================================
+   LAYOUT
+   ========================================================================= */
+.pp-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: clamp(28px, 4vw, 52px);
+    padding: clamp(36px, 5vw, 64px) 0;
+    align-items: start;
+}
+@media (max-width: 992px) {
+    .pp-layout { grid-template-columns: 1fr; }
+}
+
+/* =========================================================================
+   SIDEBAR
+   ========================================================================= */
+.pp-sidebar {
+    position: sticky;
+    top: calc(var(--nav-h, 68px) + 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: calc(100vh - var(--nav-h, 68px) - 48px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+@media (max-width: 992px) {
+    .pp-sidebar {
+        position: static;
+        max-height: none;
+        overflow: visible;
+        margin-bottom: 28px;
+    }
+}
+
+.pp-nav-card {
+    padding: 20px 18px;
+    background: var(--pp-surface);
+    border: 1px solid var(--pp-line);
+    border-radius: var(--pp-r-md);
+}
+.pp-nav-card h6 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--pp-line-soft);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--pp-muted);
+}
+.pp-nav-card h6 i { color: var(--primary, #a51e2b); }
+
+.pp-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.pp-nav-list li a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    font-size: .84rem;
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--pp-text);
+    text-decoration: none;
+    border-radius: var(--pp-r-sm);
+    border-left: 2px solid transparent;
+    transition: color var(--pp-dur) var(--pp-ease),
+                background-color var(--pp-dur) var(--pp-ease),
+                border-color var(--pp-dur) var(--pp-ease);
+}
+.pp-nav-list li a i {
+    font-size: .62rem;
+    opacity: .5;
+    color: var(--pp-muted);
+}
+.pp-nav-list li a:hover,
+.pp-nav-list li a:focus-visible {
+    background: var(--pp-surface-alt);
+    color: var(--primary, #a51e2b);
+    border-left-color: var(--primary, #a51e2b);
+}
+.pp-nav-list li a:hover i,
+.pp-nav-list li a:focus-visible i {
+    opacity: 1;
+    color: var(--primary, #a51e2b);
+}
+.pp-nav-list li a.active {
+    color: var(--primary, #a51e2b);
+    background: var(--primary-50, #fbf3f4);
+    border-left-color: var(--primary, #a51e2b);
+    font-weight: 700;
+}
+.pp-nav-list li a.active i { opacity: 1; color: var(--primary, #a51e2b); }
+
+@media (max-width: 992px) {
+    .pp-nav-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2px;
+    }
+}
+@media (max-width: 560px) {
+    .pp-nav-list { grid-template-columns: 1fr; }
+}
+
+/* Trust badges in sidebar */
+.pp-trust-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.pp-trust {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--pp-surface);
+    border: 1px solid var(--pp-line);
+    border-radius: var(--pp-r-md);
+    transition: border-color var(--pp-dur) var(--pp-ease);
+}
+.pp-trust:hover {
+    border-color: var(--pp-line-strong, #d3cec5);
+}
+.pp-trust .icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--pp-r-sm);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .95rem;
+}
+.pp-trust .meta strong {
+    display: block;
+    font-size: .84rem;
+    font-weight: 800;
+    color: var(--pp-ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+}
+.pp-trust .meta span {
+    font-size: .74rem;
+    color: var(--pp-muted);
+}
+
+/* =========================================================================
+   CONTENT
+   ========================================================================= */
+.pp-content {
+    min-width: 0;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--pp-text);
+}
+
+.pp-section {
+    scroll-margin-top: calc(var(--nav-h, 68px) + 32px);
+    padding: 24px 26px;
+    margin-bottom: 16px;
+    background: var(--pp-surface);
+    border: 1px solid var(--pp-line);
+    border-left: 3px solid var(--pp-line);
+    border-radius: var(--pp-r-md);
+    transition: border-left-color var(--pp-dur) var(--pp-ease),
+                border-color var(--pp-dur) var(--pp-ease);
+}
+.pp-section:hover {
+    border-left-color: var(--primary, #a51e2b);
+}
+@media (max-width: 640px) {
+    .pp-section { padding: 20px 18px; }
+}
+
+.pp-section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+.pp-section-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--pp-r-md);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .88rem;
+    font-weight: 800;
+    margin-top: 2px;
+}
+.pp-section h2 {
+    font-size: clamp(1.1rem, 1.7vw, 1.3rem);
+    line-height: 1.3;
+    margin: 0;
+    letter-spacing: -0.015em;
+}
+
+.pp-content p {
+    margin: 0 0 14px;
+    line-height: 1.75;
+    color: var(--pp-text);
+}
+.pp-content p:last-child { margin-bottom: 0; }
+.pp-content strong { color: var(--pp-ink); font-weight: 700; }
+
+.pp-content a {
+    color: var(--primary, #a51e2b);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color var(--pp-dur) var(--pp-ease);
+}
+.pp-content a:hover { color: var(--primary-700, #77141f); }
+
+/* Lists */
+.pp-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px;
+}
+.pp-content ul li {
+    position: relative;
+    padding: 8px 0 8px 28px;
+    line-height: 1.65;
+    color: var(--pp-text);
+    border-bottom: 1px dashed var(--pp-line);
+}
+.pp-content ul li:last-child { border-bottom: 0; padding-bottom: 0; }
+.pp-content ul li::before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .55rem;
+}
+
+.pp-list-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 24px;
+}
+@media (max-width: 640px) {
+    .pp-list-cols { grid-template-columns: 1fr; gap: 0; }
+}
+
+.pp-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    font-size: .84rem;
+    line-height: 1.6;
+    color: var(--pp-muted);
+    background: var(--pp-surface-alt);
+    border: 1px solid var(--pp-line);
+    border-radius: var(--pp-r-sm);
+}
+.pp-tip i {
+    color: var(--primary, #a51e2b);
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+/* =========================================================================
+   CONTACT CARD
+   ========================================================================= */
+.pp-contact {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    align-items: start;
+    padding: 24px 26px;
+    margin-top: 10px;
+    background: var(--pp-surface);
+    border: 1px solid var(--pp-line);
+    border-left: 4px solid var(--primary, #a51e2b);
+    border-radius: var(--pp-r-md);
+}
+.pp-contact .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--pp-r-md);
+    background: var(--primary, #a51e2b);
+    color: #fff;
+    font-size: 1.1rem;
+}
+.pp-contact h3 {
+    font-size: 1.02rem;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+}
+.pp-contact p {
+    font-size: .9rem;
+    color: var(--pp-muted);
+    margin: 0 0 14px;
+    line-height: 1.55;
+}
+.pp-contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.pp-contact-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .88rem;
+    color: var(--pp-text);
+}
+.pp-contact-list li i {
+    color: var(--primary, #a51e2b);
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.pp-contact-list li a {
+    color: var(--primary, #a51e2b);
+    text-decoration: none;
+    font-weight: 600;
+}
+.pp-contact-list li a:hover { text-decoration: underline; }
+.pp-contact small {
+    display: block;
+    margin-top: 10px;
+    font-size: .76rem;
+    color: var(--pp-muted);
+    font-style: italic;
+}
+
+@media (max-width: 560px) {
+    .pp-contact { grid-template-columns: 1fr; text-align: left; }
+}
+
+/* =========================================================================
+   DPA DOWNLOAD CARD
+   ========================================================================= */
+.pp-dpa {
+    padding: 22px 24px;
+    margin-top: 16px;
+    background: var(--pp-surface);
+    border: 1px solid var(--pp-line);
+    border-radius: var(--pp-r-md);
+}
+.pp-dpa h3 {
+    font-size: 1rem;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+}
+.pp-dpa p {
+    font-size: .9rem;
+    color: var(--pp-muted);
+    margin: 0 0 18px;
+    line-height: 1.6;
+}
+.pp-dpa-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+@media (max-width: 560px) {
+    .pp-dpa-actions { grid-template-columns: 1fr; }
+}
+.pp-dpa-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-radius: var(--pp-r-md);
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color var(--pp-dur) var(--pp-ease),
+                border-color var(--pp-dur) var(--pp-ease),
+                color var(--pp-dur) var(--pp-ease);
+}
+.pp-dpa-btn.primary {
+    background: var(--primary, #a51e2b);
+    border-color: var(--primary, #a51e2b);
+    color: #fff;
+}
+.pp-dpa-btn.primary:hover {
+    background: var(--primary-600, #8f1825);
+    border-color: var(--primary-600, #8f1825);
+    color: #fff;
+}
+.pp-dpa-btn.ghost {
+    background: transparent;
+    color: var(--pp-ink);
+    border-color: var(--pp-line-strong, #d3cec5);
+}
+.pp-dpa-btn.ghost:hover {
+    border-color: var(--primary, #a51e2b);
+    color: var(--primary, #a51e2b);
+    background: var(--primary-50, #fbf3f4);
+}
+
+/* =========================================================================
+   MOBILE TRUST ROW
+   ========================================================================= */
+.pp-trust-mobile {
+    display: none;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 24px;
+}
+.pp-trust-mobile .pp-trust {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    padding: 14px 10px;
+}
+.pp-trust-mobile .pp-trust .icon { width: 40px; height: 40px; }
+@media (max-width: 992px) {
+    .pp-trust-mobile { display: grid; }
+}
+@media (max-width: 480px) {
+    .pp-trust-mobile { grid-template-columns: 1fr; }
+    .pp-trust-mobile .pp-trust { flex-direction: row; text-align: left; }
+}
+
+/* =========================================================================
+   FOOTNOTE
+   ========================================================================= */
+.pp-footnote {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 28px;
+    padding: 16px 20px;
+    background: var(--pp-surface);
+    border: 1px solid var(--pp-line);
+    border-radius: var(--pp-r-md);
+    font-size: .8rem;
+    color: var(--pp-muted);
+}
+.pp-footnote .date { display: inline-flex; align-items: center; gap: 8px; }
+.pp-footnote .date i { color: var(--primary, #a51e2b); }
+@media (max-width: 560px) {
+    .pp-footnote { text-align: center; justify-content: center; }
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .pp-sidebar, .pp-dpa-actions,
+    .navbar, footer, .back-to-top, #cookie-consent { display: none !important; }
+    .pp-layout { grid-template-columns: 1fr; gap: 0; padding: 0; }
+    body { background: #fff !important; color: #000 !important; }
+    .pp-hero { background: #fff !important; padding: 20px 0 !important; border-bottom: 2px solid #000; }
+    .pp-hero h1, .pp-hero .lead, .pp-hero-meta { color: #000 !important; }
+    .pp-section, .pp-contact, .pp-dpa {
+        page-break-inside: avoid;
+        border: 1px solid #ddd !important;
+    }
+    .pp-content a { color: #000; text-decoration: underline; }
+    .pp-section-num { background: #eee !important; color: #000 !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pp-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="pp-hero">
+        <div class="container">
+            <span class="eyebrow">Privacy &amp; data protection</span>
+            <h1>Your data, <em>handled with care.</em></h1>
+            <p class="lead">
+                This Privacy Policy explains what personal information Global shippments collects, how we use it,
+                who we share it with, and the rights you have over your data — across our websites, mobile
+                applications and logistics services.
+            </p>
+            <div class="pp-hero-meta">
+                <span><i class="fas fa-calendar-check"></i> <strong>Last updated:</strong> January 2026</span>
+                <span><i class="fas fa-file-shield"></i> <strong>Version 3.1</strong></span>
+                <span><i class="fas fa-globe"></i> <strong>Applies to:</strong> Global shippments Group entities</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== LAYOUT ==================== -->
+    <div class="container">
+        <div class="pp-layout">
+
+            <!-- ============ SIDEBAR ============ -->
+            <aside class="pp-sidebar" aria-label="Policy navigation">
+                <div class="pp-nav-card">
+                    <h6><i class="fas fa-list"></i> On this page</h6>
+                    <ul class="pp-nav-list">
+                        <li><a href="#section1"><i class="fas fa-chevron-right"></i> Information we collect</a></li>
+                        <li><a href="#section2"><i class="fas fa-chevron-right"></i> How we use it</a></li>
+                        <li><a href="#section3"><i class="fas fa-chevron-right"></i> Information sharing</a></li>
+                        <li><a href="#section4"><i class="fas fa-chevron-right"></i> Data security</a></li>
+                        <li><a href="#section5"><i class="fas fa-chevron-right"></i> Your rights</a></li>
+                        <li><a href="#contact"><i class="fas fa-chevron-right"></i> Contact us</a></li>
+                    </ul>
+                </div>
+
+                <div class="pp-trust-list">
+                    <div class="pp-trust">
+                        <span class="icon"><i class="fas fa-lock"></i></span>
+                        <div class="meta">
+                            <strong>256-bit encryption</strong>
+                            <span>Enterprise-grade security</span>
+                        </div>
+                    </div>
+                    <div class="pp-trust">
+                        <span class="icon"><i class="fas fa-certificate"></i></span>
+                        <div class="meta">
+                            <strong>GDPR compliant</strong>
+                            <span>EU data protection</span>
+                        </div>
+                    </div>
+                    <div class="pp-trust">
+                        <span class="icon"><i class="fas fa-shield-halved"></i></span>
+                        <div class="meta">
+                            <strong>ISO 27001</strong>
+                            <span>Certified security</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ============ CONTENT ============ -->
+            <div class="pp-content">
+
+                <!-- 1 -->
+                <section id="section1" class="pp-section">
+                    <div class="pp-section-header">
+                        <span class="pp-section-num">01</span>
+                        <h2>Information we collect</h2>
+                    </div>
+
+                    <p>
+                        We collect information you provide directly to us when you create an account,
+                        book a shipment, contact support, or interact with our digital services.
+                        We also collect certain information automatically when you use our website
+                        or mobile applications.
+                    </p>
+
+                    <ul>
+                        <li><strong>Account details</strong> — full name, email address, phone number and login credentials</li>
+                        <li><strong>Shipping information</strong> — sender and recipient addresses, contact details, and delivery preferences</li>
+                        <li><strong>Payment information</strong> — processed securely by PCI-DSS-compliant payment providers; we never store full card numbers</li>
+                        <li><strong>Shipment details</strong> — contents, dimensions, weight, declared value and any customs documentation</li>
+                        <li><strong>Communication preferences</strong> — how you would like to receive updates and marketing messages</li>
+                        <li><strong>Technical data</strong> — IP address, browser type, device identifiers and pages visited, collected via cookies and similar technologies</li>
+                    </ul>
+
+                    <div class="pp-tip">
+                        <i class="fas fa-circle-info"></i>
+                        <div>
+                            We do not collect sensitive personal information such as political opinions,
+                            religious beliefs, health data or biometric identifiers.
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2 -->
+                <section id="section2" class="pp-section">
+                    <div class="pp-section-header">
+                        <span class="pp-section-num">02</span>
+                        <h2>How we use your information</h2>
+                    </div>
+
+                    <p>
+                        We use your personal information only where we have a legal basis to do so —
+                        typically to perform our contract with you, to comply with a legal obligation,
+                        or based on our legitimate business interests. Specifically, we use it to:
+                    </p>
+
+                    <ul>
+                        <li><strong>Provide and manage our services</strong> — process bookings, deliver shipments and provide customer support</li>
+                        <li><strong>Send transactional updates</strong> — tracking notifications, delivery confirmations and account alerts by email or SMS</li>
+                        <li><strong>Comply with legal obligations</strong> — customs documentation, tax records and regulatory reporting</li>
+                        <li><strong>Improve our services</strong> — analyse usage patterns, fix issues and develop new features</li>
+                        <li><strong>Prevent fraud and abuse</strong> — detect and prevent fraudulent activity and secure our systems</li>
+                        <li><strong>Send marketing communications</strong> — only where you have opted in; you can unsubscribe at any time</li>
+                    </ul>
+                </section>
+
+                <!-- 3 -->
+                <section id="section3" class="pp-section">
+                    <div class="pp-section-header">
+                        <span class="pp-section-num">03</span>
+                        <h2>Information sharing</h2>
+                    </div>
+
+                    <p>
+                        We do not sell your personal information. Sharing is limited to the
+                        parties needed to deliver our services, and only under strict contractual
+                        data-protection obligations:
+                    </p>
+
+                    <ul>
+                        <li><strong>Delivery and logistics partners</strong> — carriers, customs brokers and last-mile providers in our network</li>
+                        <li><strong>Service providers</strong> — IT, payment, analytics and customer support vendors acting on our instructions</li>
+                        <li><strong>Customs and regulatory authorities</strong> — where required by law for international shipments</li>
+                        <li><strong>Law enforcement and courts</strong> — in response to lawful requests, legal process or to protect our rights</li>
+                        <li><strong>Group companies</strong> — Global shippments Group entities that support our operations under internal data-protection rules</li>
+                    </ul>
+
+                    <p>
+                        All third parties are bound by written agreements that require them to protect your
+                        personal information to the same standards we apply internally.
+                    </p>
+                </section>
+
+                <!-- 4 -->
+                <section id="section4" class="pp-section">
+                    <div class="pp-section-header">
+                        <span class="pp-section-num">04</span>
+                        <h2>Data security</h2>
+                    </div>
+
+                    <p>
+                        We implement technical and organisational measures designed to protect your
+                        personal information against unauthorised access, alteration, disclosure or
+                        destruction:
+                    </p>
+
+                    <div class="pp-list-cols">
+                        <ul>
+                            <li><strong>256-bit TLS encryption</strong> for all data in transit</li>
+                            <li><strong>Encryption at rest</strong> for sensitive databases</li>
+                            <li><strong>Multi-factor authentication</strong> for account access</li>
+                        </ul>
+                        <ul>
+                            <li><strong>24/7 security monitoring</strong> and intrusion detection</li>
+                            <li><strong>Regular audits</strong> and independent penetration testing</li>
+                            <li><strong>Employee training</strong> on data protection and privacy</li>
+                        </ul>
+                    </div>
+
+                    <p style="margin-top: 14px;">
+                        Where a personal data breach affects your rights or freedoms, we will notify
+                        the relevant supervisory authority and you without undue delay, in accordance
+                        with applicable law.
+                    </p>
+                </section>
+
+                <!-- 5 -->
+                <section id="section5" class="pp-section">
+                    <div class="pp-section-header">
+                        <span class="pp-section-num">05</span>
+                        <h2>Your rights</h2>
+                    </div>
+
+                    <p>
+                        Depending on your location, you may have the following rights under the EU
+                        General Data Protection Regulation (GDPR), the California Consumer Privacy
+                        Act (CCPA) or similar laws:
+                    </p>
+
+                    <ul>
+                        <li><strong>Right of access</strong> — request a copy of the personal information we hold about you</li>
+                        <li><strong>Right to rectification</strong> — correct inaccurate or incomplete information</li>
+                        <li><strong>Right to erasure</strong> — request deletion of your personal data ("right to be forgotten")</li>
+                        <li><strong>Right to restrict processing</strong> — limit how we use your information</li>
+                        <li><strong>Right to data portability</strong> — receive your data in a structured, machine-readable format</li>
+                        <li><strong>Right to object</strong> — object to processing based on legitimate interests, including profiling</li>
+                        <li><strong>Right to withdraw consent</strong> — at any time, without affecting the lawfulness of prior processing</li>
+                        <li><strong>Right to lodge a complaint</strong> — with your local data-protection supervisory authority</li>
+                    </ul>
+
+                    <p>
+                        To exercise any of these rights, contact our Data Protection Officer using the
+                        details below. We will respond within the timeframe required by applicable law —
+                        typically within 30 days.
+                    </p>
+                </section>
+
+                <!-- Contact -->
+                <section id="contact" class="pp-contact">
+                    <span class="icon"><i class="fas fa-user-shield"></i></span>
+                    <div>
+                        <h3>Global shippments Data Protection Officer</h3>
+                        <p>
+                            For privacy inquiries, data subject requests, or any concern about how we
+                            handle your personal information, please contact us:
+                        </p>
+                        <ul class="pp-contact-list">
+                            <li>
+                                <i class="fas fa-envelope"></i>
+                                <a href="mailto:privacy@Globalshippments.com">privacy@Globalshippments.com</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-phone"></i>
+                                <a href="tel:+18007363673">+1-800-SEND-EXPRESS</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-location-dot"></i>
+                                <span>Global shippments International GmbH, Bonn, Germany</span>
+                            </li>
+                        </ul>
+                        <small>Typical response time: within 24–48 hours on business days.</small>
+                    </div>
+                </section>
+
+                <!-- DPA download -->
+                <section class="pp-dpa">
+                    <h3>Data processing agreement</h3>
+                    <p>
+                        Business customers processing personal data on our platform can request the
+                        Global shippments Data Processing Agreement (DPA), which includes the EU Standard
+                        Contractual Clauses for international transfers.
+                    </p>
+                    <div class="pp-dpa-actions">
+                        <a href="{{ url_for('contact') }}" class="pp-dpa-btn primary">
+                            <i class="fas fa-file-signature"></i> Request the DPA
+                        </a>
+                        <a href="{{ url_for('terms') }}" class="pp-dpa-btn ghost">
+                            <i class="fas fa-file-contract"></i> View our terms
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Mobile trust row -->
+                <div class="pp-trust-mobile" aria-hidden="true">
+                    <div class="pp-trust">
+                        <span class="icon"><i class="fas fa-lock"></i></span>
+                        <div class="meta">
+                            <strong>256-bit</strong>
+                            <span>Encryption</span>
+                        </div>
+                    </div>
+                    <div class="pp-trust">
+                        <span class="icon"><i class="fas fa-certificate"></i></span>
+                        <div class="meta">
+                            <strong>GDPR</strong>
+                            <span>Compliant</span>
+                        </div>
+                    </div>
+                    <div class="pp-trust">
+                        <span class="icon"><i class="fas fa-shield-halved"></i></span>
+                        <div class="meta">
+                            <strong>ISO 27001</strong>
+                            <span>Certified</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footnote -->
+                <div class="pp-footnote">
+                    <span class="date">
+                        <i class="fas fa-calendar-check"></i>
+                        Last updated: January 2026
+                    </span>
+                    <span>© 2026 Global shippments International GmbH. All rights reserved.</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* ---------- Smooth-scroll for anchor links ---------- */
+    (function () {
+        const links = document.querySelectorAll('.pp-nav-list a, .pp-content a[href^="#"]');
+        if (!links.length) return;
+
+        links.forEach(link => {
+            link.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (!href || !href.startsWith('#')) return;
+
+                const target = document.querySelector(href);
+                if (!target) return;
+
+                e.preventDefault();
+
+                const top = target.getBoundingClientRect().top +
+                            window.scrollY -
+                            (parseInt(getComputedStyle(document.documentElement)
+                                .getPropertyValue('--nav-h')) || 68) - 24;
+
+                window.scrollTo({ top, behavior: 'smooth' });
+                history.replaceState(null, '', href);
+            });
+        });
+    })();
+
+    /* ---------- Highlight the currently visible section in the sidebar ---------- */
+    (function () {
+        const sections = document.querySelectorAll('.pp-content .pp-section, .pp-content .pp-contact, .pp-content .pp-dpa');
+        const navLinks = document.querySelectorAll('.pp-nav-list a');
+        if (!sections.length || !navLinks.length) return;
+
+        const map = new Map();
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) map.set(href.replace('#', ''), link);
+        });
+
+        function setActive(id) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const active = map.get(id);
+            if (active) active.classList.add('active');
+        }
+
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(entries => {
+                const visible = entries
+                    .filter(e => e.isIntersecting)
+                    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+                if (visible.length) setActive(visible[0].target.id);
+            }, {
+                rootMargin: '-30% 0px -60% 0px',
+                threshold: 0
+            });
+
+            sections.forEach(section => {
+                if (section.id) observer.observe(section);
+            });
+        } else {
+            let ticking = false;
+            function onScroll() {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    let current = '';
+                    const scrollY = window.scrollY + 200;
+                    sections.forEach(section => {
+                        if (section.offsetTop <= scrollY && section.id) current = section.id;
+                    });
+                    if (current) setActive(current);
+                    ticking = false;
+                });
+            }
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        }
+    })();
+</script>
+{% endblock %}

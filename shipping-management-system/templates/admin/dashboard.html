@@ -1,0 +1,1952 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — ADMIN DASHBOARD
+   Operations overview: stats, charts, recent packages, quick actions.
+   Uses base.html design tokens. Full dark-mode support.
+   ========================================================================= */
+
+:root {
+    --ad-surface:       #FFFFFF;
+    --ad-surface-alt:   #F8FAFC;
+    --ad-surface-soft:  #F1F5F9;
+    --ad-line:          #E6EAF0;
+    --ad-line-soft:     #EEF2F7;
+    --ad-ink:           #0B1220;
+    --ad-text:          #1E293B;
+    --ad-muted:         #64748B;
+    --ad-muted-2:       #94A3B8;
+
+    --ad-success:       #16A34A;
+    --ad-success-bg:    #ECFDF5;
+    --ad-warning:       #D97706;
+    --ad-warning-bg:    #FFF7ED;
+    --ad-info:          #0EA5E9;
+    --ad-info-bg:       #EFF9FF;
+    --ad-danger:        #DC2626;
+    --ad-danger-bg:     #FEF2F2;
+
+    --ad-sh-xs: 0 1px 2px rgba(15, 23, 42, .04);
+    --ad-sh-sm: 0 2px 8px rgba(15, 23, 42, .06);
+    --ad-sh-md: 0 12px 28px -14px rgba(15, 23, 42, .18);
+    --ad-sh-lg: 0 30px 60px -22px rgba(15, 23, 42, .28);
+
+    --ad-ease: cubic-bezier(.4, 0, .2, 1);
+    --ad-dur:  220ms;
+
+    --ad-r-sm: 8px;
+    --ad-r-md: 12px;
+    --ad-r-lg: 16px;
+    --ad-r-xl: 24px;
+    --ad-pill: 999px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --ad-surface:      #111C30;
+        --ad-surface-alt:  #0F172A;
+        --ad-surface-soft: #1A273F;
+        --ad-line:         #1E293B;
+        --ad-line-soft:    #172A45;
+        --ad-ink:          #F1F5F9;
+        --ad-text:         #CBD5E1;
+        --ad-muted:        #94A3B8;
+        --ad-muted-2:      #64748B;
+
+        --ad-success-bg:   #052E1A;
+        --ad-warning-bg:   #2E1A05;
+        --ad-info-bg:      #0B2A3E;
+        --ad-danger-bg:    #2E0A0D;
+
+        --ad-sh-xs: 0 1px 2px rgba(0, 0, 0, .4);
+        --ad-sh-sm: 0 2px 8px rgba(0, 0, 0, .5);
+        --ad-sh-md: 0 12px 28px -14px rgba(0, 0, 0, .6);
+        --ad-sh-lg: 0 30px 60px -22px rgba(0, 0, 0, .7);
+    }
+}
+
+body { background: var(--ad-surface-alt); color: var(--ad-text); }
+
+.ad-page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: clamp(20px, 3vw, 32px) 16px 60px;
+}
+
+.ad-page h1, .ad-page h2, .ad-page h3,
+.ad-page h4, .ad-page h5, .ad-page h6 {
+    color: var(--ad-ink);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   WELCOME BANNER
+   ========================================================================= */
+.ad-hero {
+    position: relative;
+    padding: clamp(26px, 4vw, 40px) clamp(24px, 4vw, 44px);
+    border-radius: var(--ad-r-xl);
+    background:
+        radial-gradient(ellipse 60% 80% at 80% 20%, rgba(255, 255, 255, .08), transparent 60%),
+        linear-gradient(135deg, #0b1220, #1a1a2a);
+    color: #fff;
+    overflow: hidden;
+    box-shadow: var(--ad-sh-lg);
+    margin-bottom: 26px;
+}
+.ad-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 70% 80% at 20% 50%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 80% at 20% 50%, #000 20%, transparent 75%);
+    pointer-events: none;
+}
+.ad-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 50% 70% at 90% 80%, rgba(225, 29, 42, .2), transparent 60%);
+    pointer-events: none;
+}
+.ad-hero > * { position: relative; z-index: 1; }
+
+.ad-hero-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.ad-hero h1 {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    color: #fff;
+    margin: 0 0 10px;
+    line-height: 1.15;
+}
+.ad-hero h1 .hero-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: var(--ad-r-md);
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+    box-shadow: 0 10px 22px -8px rgba(225, 29, 42, .55);
+}
+.ad-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    font-size: .88rem;
+    color: rgba(255, 255, 255, .8);
+    margin: 0;
+}
+.ad-hero-meta span { display: inline-flex; align-items: center; gap: 8px; }
+.ad-hero-meta i { color: rgba(255, 255, 255, .55); }
+.ad-hero-meta strong { color: #fff; font-weight: 700; }
+
+.ad-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 26px;
+    border-radius: var(--ad-pill);
+    background: #fff;
+    color: #0b1220;
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all var(--ad-dur) var(--ad-ease);
+    box-shadow: 0 12px 28px -10px rgba(0, 0, 0, .4);
+    white-space: nowrap;
+}
+.ad-hero-btn:hover,
+.ad-hero-btn:focus-visible {
+    transform: translateY(-2px);
+    background: #f1f5f9;
+    color: #0b1220;
+}
+.ad-hero-btn i { transition: transform var(--ad-dur) var(--ad-ease); }
+.ad-hero-btn:hover i { transform: translateX(3px); }
+
+/* =========================================================================
+   STATS CARDS
+   ========================================================================= */
+.ad-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 26px;
+}
+@media (max-width: 1000px) { .ad-stats { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .ad-stats { grid-template-columns: 1fr; } }
+
+.ad-stat {
+    position: relative;
+    padding: 22px 24px;
+    background: var(--ad-surface);
+    border: 1px solid var(--ad-line);
+    border-radius: var(--ad-r-lg);
+    overflow: hidden;
+    transition: all var(--ad-dur) var(--ad-ease);
+}
+.ad-stat::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--ad-muted-2);
+    transition: transform var(--ad-dur) var(--ad-ease);
+}
+.ad-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--ad-sh-md);
+    border-color: color-mix(in srgb, var(--ad-muted-2) 20%, var(--ad-line));
+}
+.ad-stat.primary::before { background: var(--primary, #e11d2a); }
+.ad-stat.success::before { background: var(--ad-success); }
+.ad-stat.warning::before { background: var(--ad-warning); }
+.ad-stat.info::before    { background: var(--ad-info); }
+
+.ad-stat.primary:hover { border-color: color-mix(in srgb, var(--primary, #e11d2a) 25%, var(--ad-line)); }
+.ad-stat.success:hover { border-color: color-mix(in srgb, var(--ad-success) 25%, var(--ad-line)); }
+.ad-stat.warning:hover { border-color: color-mix(in srgb, var(--ad-warning) 25%, var(--ad-line)); }
+.ad-stat.info:hover    { border-color: color-mix(in srgb, var(--ad-info) 25%, var(--ad-line)); }
+
+.ad-stat-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+.ad-stat-label {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ad-muted);
+    margin-bottom: 8px;
+}
+.ad-stat.primary .ad-stat-label { color: var(--primary, #e11d2a); }
+.ad-stat.success .ad-stat-label { color: var(--ad-success); }
+.ad-stat.warning .ad-stat-label { color: var(--ad-warning); }
+.ad-stat.info .ad-stat-label    { color: var(--ad-info); }
+
+.ad-stat-value {
+    font-size: clamp(1.75rem, 3vw, 2.15rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--ad-ink);
+    line-height: 1;
+    margin-bottom: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.ad-stat-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--ad-r-md);
+    background: var(--ad-surface-soft);
+    color: var(--ad-muted);
+    font-size: 1.15rem;
+    transition: all var(--ad-dur) var(--ad-ease);
+}
+.ad-stat.primary .ad-stat-icon { background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent); color: var(--primary, #e11d2a); }
+.ad-stat.success .ad-stat-icon { background: var(--ad-success-bg); color: var(--ad-success); }
+.ad-stat.warning .ad-stat-icon { background: var(--ad-warning-bg); color: var(--ad-warning); }
+.ad-stat.info    .ad-stat-icon { background: var(--ad-info-bg);    color: var(--ad-info); }
+
+.ad-stat:hover .ad-stat-icon {
+    transform: scale(1.05) rotate(-4deg);
+}
+.ad-stat.primary:hover .ad-stat-icon { background: var(--primary, #e11d2a); color: #fff; }
+.ad-stat.success:hover .ad-stat-icon { background: var(--ad-success); color: #fff; }
+.ad-stat.warning:hover .ad-stat-icon { background: var(--ad-warning); color: #fff; }
+.ad-stat.info:hover    .ad-stat-icon { background: var(--ad-info);    color: #fff; }
+
+.ad-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: var(--ad-pill);
+    font-size: .74rem;
+    font-weight: 700;
+    background: var(--ad-success-bg);
+    color: var(--ad-success);
+}
+.ad-delta.down { background: var(--ad-danger-bg); color: var(--ad-danger); }
+.ad-delta i { font-size: .8em; }
+.ad-delta-note {
+    margin-left: 8px;
+    font-size: .75rem;
+    color: var(--ad-muted);
+    font-weight: 500;
+}
+
+/* =========================================================================
+   CHART CARDS
+   ========================================================================= */
+.ad-charts {
+    display: grid;
+    grid-template-columns: 1.9fr 1fr;
+    gap: 18px;
+    margin-bottom: 26px;
+}
+@media (max-width: 1000px) { .ad-charts { grid-template-columns: 1fr; } }
+
+.ad-card {
+    background: var(--ad-surface);
+    border: 1px solid var(--ad-line);
+    border-radius: var(--ad-r-lg);
+    box-shadow: var(--ad-sh-xs);
+    overflow: hidden;
+    transition: box-shadow var(--ad-dur) var(--ad-ease), border-color var(--ad-dur) var(--ad-ease);
+}
+.ad-card:hover {
+    box-shadow: var(--ad-sh-md);
+    border-color: color-mix(in srgb, var(--primary, #e11d2a) 18%, var(--ad-line));
+}
+
+.ad-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--ad-line-soft);
+}
+.ad-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .92rem;
+    font-weight: 800;
+    color: var(--ad-ink);
+    letter-spacing: -0.01em;
+    margin: 0;
+}
+.ad-card-title i { color: var(--primary, #e11d2a); }
+
+.ad-range-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--ad-surface);
+    border: 1px solid var(--ad-line);
+    border-radius: var(--ad-pill);
+    color: var(--ad-text);
+    font-size: .78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--ad-dur) var(--ad-ease);
+}
+.ad-range-btn:hover {
+    border-color: var(--primary, #e11d2a);
+    color: var(--primary, #e11d2a);
+}
+.ad-range-btn::after {
+    content: "\f107";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: .8em;
+    transition: transform var(--ad-dur) var(--ad-ease);
+}
+.ad-range-btn[aria-expanded="true"]::after { transform: rotate(-180deg); }
+
+.ad-card-body { padding: 20px; }
+
+.ad-chart-area { height: 320px; position: relative; }
+.ad-chart-pie  { height: 260px; position: relative; }
+
+.ad-chart-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-top: 20px;
+    font-size: .82rem;
+    color: var(--ad-muted);
+}
+.ad-chart-legend span { display: inline-flex; align-items: center; gap: 8px; }
+.ad-chart-legend i { font-size: .7rem; }
+
+/* =========================================================================
+   RECENT PACKAGES TABLE
+   ========================================================================= */
+.ad-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.ad-table thead th {
+    padding: 12px 20px;
+    background: var(--ad-surface-soft);
+    color: var(--ad-muted);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-align: left;
+    border-bottom: 1px solid var(--ad-line);
+    white-space: nowrap;
+}
+.ad-table tbody td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--ad-line-soft);
+    font-size: .9rem;
+    color: var(--ad-text);
+    vertical-align: middle;
+}
+.ad-table tbody tr {
+    transition: background var(--ad-dur) var(--ad-ease);
+}
+.ad-table tbody tr:hover {
+    background: color-mix(in srgb, var(--primary, #e11d2a) 3%, var(--ad-surface));
+}
+.ad-table tbody tr:last-child td { border-bottom: 0; }
+
+.ad-tracking-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+.ad-tracking-code {
+    display: inline-block;
+    padding: 5px 10px;
+    background: var(--ad-surface-soft);
+    border: 1px solid var(--ad-line);
+    border-radius: var(--ad-r-sm);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--ad-ink);
+    letter-spacing: .01em;
+    white-space: nowrap;
+}
+.ad-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--ad-line);
+    background: var(--ad-surface);
+    border-radius: var(--ad-r-sm);
+    color: var(--ad-muted);
+    cursor: pointer;
+    transition: all var(--ad-dur) var(--ad-ease);
+    flex-shrink: 0;
+}
+.ad-copy-btn:hover {
+    color: var(--primary, #e11d2a);
+    border-color: var(--primary, #e11d2a);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 6%, var(--ad-surface));
+}
+
+.ad-recipient-name {
+    display: block;
+    font-weight: 700;
+    color: var(--ad-ink);
+    margin-bottom: 2px;
+    font-size: .9rem;
+}
+.ad-recipient-email {
+    display: block;
+    font-size: .78rem;
+    color: var(--ad-muted);
+    word-break: break-all;
+}
+
+/* Badges */
+.ad-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: var(--ad-pill);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+.ad-badge.success {
+    background: var(--ad-success-bg);
+    color: var(--ad-success);
+    border-color: color-mix(in srgb, var(--ad-success) 25%, transparent);
+}
+.ad-badge.warning {
+    background: var(--ad-warning-bg);
+    color: var(--ad-warning);
+    border-color: color-mix(in srgb, var(--ad-warning) 25%, transparent);
+}
+.ad-badge.info {
+    background: var(--ad-info-bg);
+    color: var(--ad-info);
+    border-color: color-mix(in srgb, var(--ad-info) 25%, transparent);
+}
+.ad-badge.secondary {
+    background: var(--ad-surface-soft);
+    color: var(--ad-muted);
+    border-color: var(--ad-line);
+}
+.ad-badge.danger {
+    background: var(--ad-danger-bg);
+    color: var(--ad-danger);
+    border-color: color-mix(in srgb, var(--ad-danger) 25%, transparent);
+}
+.ad-badge i { font-size: .85em; }
+
+.ad-overdue {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    margin-left: 6px;
+    border-radius: var(--ad-pill);
+    background: var(--ad-danger-bg);
+    color: var(--ad-danger);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.ad-service-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .85rem;
+    color: var(--ad-text);
+    white-space: nowrap;
+}
+.ad-service-cell i { color: var(--primary, #e11d2a); font-size: .9em; }
+.ad-service-cell .muted { color: var(--ad-muted); font-size: .8rem; }
+
+/* Action buttons */
+.ad-actions {
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.ad-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--ad-r-sm);
+    font-size: .85rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--ad-dur) var(--ad-ease);
+    flex-shrink: 0;
+}
+.ad-action-btn:focus-visible {
+    outline: 2px solid var(--primary, #e11d2a);
+    outline-offset: 2px;
+}
+.ad-action-btn.primary { background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent); color: var(--primary, #e11d2a); }
+.ad-action-btn.primary:hover { background: var(--primary, #e11d2a); color: #fff; transform: translateY(-2px); }
+
+.ad-action-btn.success { background: var(--ad-success-bg); color: var(--ad-success); }
+.ad-action-btn.success:hover { background: var(--ad-success); color: #fff; transform: translateY(-2px); }
+
+.ad-action-btn.warning { background: var(--ad-warning-bg); color: var(--ad-warning); }
+.ad-action-btn.warning:hover { background: var(--ad-warning); color: #fff; transform: translateY(-2px); }
+
+.ad-action-btn.info { background: var(--ad-info-bg); color: var(--ad-info); }
+.ad-action-btn.info:hover { background: var(--ad-info); color: #fff; transform: translateY(-2px); }
+
+.ad-action-btn.secondary { background: var(--ad-surface-soft); color: var(--ad-muted); }
+.ad-action-btn.secondary:hover { background: var(--ad-muted); color: #fff; transform: translateY(-2px); }
+
+/* =========================================================================
+   BOTTOM GRID (Quick actions + Notifications)
+   ========================================================================= */
+.ad-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+@media (max-width: 900px) { .ad-bottom { grid-template-columns: 1fr; } }
+
+.ad-quick-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+@media (max-width: 480px) { .ad-quick-grid { grid-template-columns: 1fr; } }
+
+.ad-quick-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border: 1px solid transparent;
+    border-radius: var(--ad-r-md);
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--ad-dur) var(--ad-ease);
+    white-space: nowrap;
+}
+.ad-quick-btn i { font-size: .95em; }
+.ad-quick-btn:focus-visible { outline: 2px solid var(--primary, #e11d2a); outline-offset: 2px; }
+
+.ad-quick-btn.primary {
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(225, 29, 42, .45);
+}
+.ad-quick-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(225, 29, 42, .55); color: #fff; }
+
+.ad-quick-btn.success {
+    background: linear-gradient(135deg, var(--ad-success), #15803D);
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(22, 163, 74, .45);
+}
+.ad-quick-btn.success:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(22, 163, 74, .55); color: #fff; }
+
+.ad-quick-btn.info {
+    background: linear-gradient(135deg, var(--ad-info), #0369A1);
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(14, 165, 233, .45);
+}
+.ad-quick-btn.info:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(14, 165, 233, .55); color: #fff; }
+
+.ad-quick-btn.warning {
+    background: linear-gradient(135deg, var(--ad-warning), #B45309);
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(217, 119, 6, .45);
+}
+.ad-quick-btn.warning:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(217, 119, 6, .55); color: #fff; }
+
+/* Notifications */
+.ad-notif-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.ad-notif {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--ad-line-soft);
+    transition: background var(--ad-dur) var(--ad-ease);
+}
+.ad-notif:last-child { border-bottom: 0; }
+.ad-notif:hover { background: color-mix(in srgb, var(--primary, #e11d2a) 3%, var(--ad-surface)); }
+
+.ad-notif .icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--ad-r-sm);
+    font-size: .9rem;
+}
+.ad-notif .icon.success { background: var(--ad-success-bg); color: var(--ad-success); }
+.ad-notif .icon.warning { background: var(--ad-warning-bg); color: var(--ad-warning); }
+.ad-notif .icon.info    { background: var(--ad-info-bg);    color: var(--ad-info); }
+
+.ad-notif .body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.ad-notif .body strong {
+    display: block;
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--ad-ink);
+    margin-bottom: 2px;
+}
+.ad-notif .body span {
+    font-size: .78rem;
+    color: var(--ad-muted);
+}
+
+.ad-notif-footer {
+    display: block;
+    padding: 14px 22px;
+    border-top: 1px solid var(--ad-line-soft);
+    text-align: center;
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    color: var(--primary, #e11d2a);
+    text-decoration: none;
+    transition: background var(--ad-dur) var(--ad-ease);
+}
+.ad-notif-footer:hover {
+    background: color-mix(in srgb, var(--primary, #e11d2a) 6%, var(--ad-surface));
+    color: var(--primary, #e11d2a);
+}
+
+/* =========================================================================
+   MODALS
+   ========================================================================= */
+.ad-modal .modal-content {
+    background: var(--ad-surface);
+    border: 1px solid var(--ad-line);
+    border-radius: var(--ad-r-lg);
+    overflow: hidden;
+    box-shadow: var(--ad-sh-lg);
+}
+.ad-modal .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 22px;
+    border-bottom: 0;
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+}
+.ad-modal .modal-header.warning {
+    background: linear-gradient(135deg, var(--ad-warning), #B45309);
+}
+.ad-modal .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+.ad-modal .modal-title i { color: rgba(255, 255, 255, .85); }
+.ad-modal .btn-close { filter: brightness(0) invert(1); opacity: .85; }
+.ad-modal .btn-close:hover { opacity: 1; }
+.ad-modal .modal-body { padding: 24px 22px; color: var(--ad-text); }
+.ad-modal .modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding: 16px 22px 20px;
+    border-top: 1px solid var(--ad-line-soft);
+}
+
+/* Map container */
+.ad-map {
+    width: 100%;
+    height: 300px;
+    border-radius: var(--ad-r-md);
+    overflow: hidden;
+    border: 1px solid var(--ad-line);
+    background: var(--ad-surface-alt);
+    margin-bottom: 20px;
+}
+
+/* Form controls */
+.ad-label {
+    display: block;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ad-muted);
+    margin-bottom: 8px;
+}
+.ad-field {
+    display: block;
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--ad-surface);
+    border: 1.5px solid var(--ad-line);
+    border-radius: var(--ad-r-sm);
+    color: var(--ad-ink);
+    font-size: .9rem;
+    font-weight: 500;
+    outline: none;
+    transition: border-color var(--ad-dur) var(--ad-ease),
+                box-shadow   var(--ad-dur) var(--ad-ease);
+    font-family: inherit;
+}
+.ad-field::placeholder { color: var(--ad-muted-2); font-weight: 400; }
+.ad-field:focus {
+    border-color: var(--primary, #e11d2a);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary, #e11d2a) 15%, transparent);
+}
+select.ad-field {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e11d2a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px 10px;
+    padding-right: 40px;
+}
+textarea.ad-field { resize: vertical; min-height: 80px; line-height: 1.55; }
+
+.ad-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: .88rem;
+    color: var(--ad-text);
+    cursor: pointer;
+}
+.ad-check input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    margin: 1px 0 0;
+    border: 2px solid var(--ad-line);
+    border-radius: 5px;
+    background: var(--ad-surface);
+    cursor: pointer;
+    position: relative;
+    transition: all var(--ad-dur) var(--ad-ease);
+}
+.ad-check input[type="checkbox"]:checked {
+    background: var(--primary, #e11d2a);
+    border-color: var(--primary, #e11d2a);
+}
+.ad-check input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px; top: 1px;
+    width: 6px; height: 11px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.ad-check input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--primary, #e11d2a);
+    outline-offset: 3px;
+}
+
+.ad-form-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: .78rem;
+    color: var(--ad-muted-2);
+    line-height: 1.5;
+}
+
+.ad-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border: 1.5px solid transparent;
+    border-radius: var(--ad-pill);
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--ad-dur) var(--ad-ease);
+    white-space: nowrap;
+}
+.ad-btn:focus-visible { outline: 2px solid var(--primary, #e11d2a); outline-offset: 2px; }
+
+.ad-btn.primary {
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(225, 29, 42, .45);
+}
+.ad-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(225, 29, 42, .55); color: #fff; }
+
+.ad-btn.warning {
+    background: linear-gradient(135deg, var(--ad-warning), #B45309);
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(217, 119, 6, .45);
+}
+.ad-btn.warning:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(217, 119, 6, .55); color: #fff; }
+
+.ad-btn.ghost {
+    background: transparent;
+    color: var(--ad-text);
+    border-color: var(--ad-line);
+}
+.ad-btn.ghost:hover {
+    border-color: var(--ad-ink);
+    background: var(--ad-surface-alt);
+    transform: translateY(-2px);
+    color: var(--ad-ink);
+}
+
+/* =========================================================================
+   TOAST NOTIFICATIONS
+   ========================================================================= */
+.ad-toast {
+    position: fixed;
+    top: 88px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    min-width: 280px;
+    max-width: calc(100vw - 48px);
+    background: var(--ad-surface);
+    border: 1px solid var(--ad-line);
+    border-left: 4px solid var(--primary, #e11d2a);
+    border-radius: var(--ad-r-sm);
+    box-shadow: var(--ad-sh-lg);
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--ad-text);
+    animation: adToastIn 280ms var(--ad-ease);
+}
+.ad-toast i { font-size: 1.15rem; color: var(--primary, #e11d2a); flex-shrink: 0; }
+.ad-toast.success { border-left-color: var(--ad-success); }
+.ad-toast.success i { color: var(--ad-success); }
+.ad-toast.error   { border-left-color: var(--ad-danger); }
+.ad-toast.error   i { color: var(--ad-danger); }
+.ad-toast.warning { border-left-color: var(--ad-warning); }
+.ad-toast.warning i { color: var(--ad-warning); }
+.ad-toast.info    { border-left-color: var(--ad-info); }
+.ad-toast.info    i { color: var(--ad-info); }
+.ad-toast.fade-out { animation: adToastOut 280ms var(--ad-ease) forwards; }
+
+@keyframes adToastIn {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes adToastOut {
+    to { opacity: 0; transform: translateX(24px); }
+}
+@media (max-width: 576px) {
+    .ad-toast { left: 16px; right: 16px; top: 76px; min-width: auto; }
+}
+
+/* =========================================================================
+   RESPONSIVE (mobile table transformation)
+   ========================================================================= */
+@media (max-width: 768px) {
+    .ad-table thead { display: none; }
+    .ad-table,
+    .ad-table tbody,
+    .ad-table tr,
+    .ad-table td { display: block; width: 100%; }
+    .ad-table tbody tr {
+        margin-bottom: 16px;
+        background: var(--ad-surface);
+        border: 1px solid var(--ad-line);
+        border-radius: var(--ad-r-md);
+        overflow: hidden;
+    }
+    .ad-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 18px;
+        text-align: right;
+        border-bottom: 1px solid var(--ad-line-soft);
+    }
+    .ad-table tbody td::before {
+        content: attr(data-label);
+        flex: 0 0 auto;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--ad-muted);
+        text-align: left;
+    }
+    .ad-table tbody td:last-child { border-bottom: 0; }
+    .ad-actions { justify-content: flex-end; }
+
+    .ad-hero-inner { flex-direction: column; align-items: stretch; }
+    .ad-hero-btn { justify-content: center; }
+}
+
+/* =========================================================================
+   MOTION
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .ad-hero::before, .ad-hero::after, .ad-hero-btn,
+    .ad-range-btn, .ad-actions, .ad-quick-btn,
+    .navbar, footer, .back-to-top, .ad-toast { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .ad-hero { background: #fff !important; color: #000 !important; padding: 20px 0 !important; border-bottom: 2px solid #000; box-shadow: none; }
+    .ad-hero h1, .ad-hero-meta, .ad-hero-meta strong { color: #000 !important; }
+    .ad-stat, .ad-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+    .ad-badge, .ad-tracking-code { border: 1px solid #000; color: #000 !important; background: transparent !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="ad-page">
+
+    <!-- ==================== WELCOME HERO ==================== -->
+    <section class="ad-hero" aria-label="Welcome">
+        <div class="ad-hero-inner">
+            <div>
+                <h1>
+                    <span class="hero-icon"><i class="fas fa-gauge-high"></i></span>
+                    Welcome back, {{ current_user.full_name or current_user.username }}
+                </h1>
+                <p class="ad-hero-meta">
+                    <span><i class="fas fa-calendar-day"></i> {{ now|format_dt("%A, %B %d, %Y") }}</span>
+                    <span>
+                        <i class="fas fa-clock-rotate-left"></i>
+                        Last login:
+                        <strong>
+                            {{ current_user.last_login|format_dt("%Y-%m-%d %H:%M") if current_user.last_login else 'First login' }}
+                        </strong>
+                    </span>
+                </p>
+            </div>
+            <a href="{{ url_for('create_package') }}" class="ad-hero-btn">
+                <i class="fas fa-plus"></i> New package
+            </a>
+        </div>
+    </section>
+
+    <!-- ==================== STATS ==================== -->
+    <section class="ad-stats" aria-label="Key metrics">
+        <div class="ad-stat primary">
+            <div class="ad-stat-row">
+                <div>
+                    <div class="ad-stat-label">Total packages</div>
+                    <div class="ad-stat-value" data-counter data-target="{{ total_packages }}">0</div>
+                </div>
+                <div class="ad-stat-icon"><i class="fas fa-box"></i></div>
+            </div>
+            <div>
+                <span class="ad-delta"><i class="fas fa-arrow-up"></i> 3.5%</span>
+                <span class="ad-delta-note">vs last month</span>
+            </div>
+        </div>
+
+        <div class="ad-stat success">
+            <div class="ad-stat-row">
+                <div>
+                    <div class="ad-stat-label">In transit</div>
+                    <div class="ad-stat-value" data-counter data-target="{{ in_transit }}">0</div>
+                </div>
+                <div class="ad-stat-icon"><i class="fas fa-truck-fast"></i></div>
+            </div>
+            <div>
+                <span class="ad-delta"><i class="fas fa-arrow-up"></i> 12%</span>
+                <span class="ad-delta-note">increase</span>
+            </div>
+        </div>
+
+        <div class="ad-stat warning">
+            <div class="ad-stat-row">
+                <div>
+                    <div class="ad-stat-label">On hold</div>
+                    <div class="ad-stat-value" data-counter data-target="{{ on_hold }}">0</div>
+                </div>
+                <div class="ad-stat-icon"><i class="fas fa-pause"></i></div>
+            </div>
+            <div>
+                <span class="ad-delta down"><i class="fas fa-arrow-down"></i> 5%</span>
+                <span class="ad-delta-note">decrease</span>
+            </div>
+        </div>
+
+        <div class="ad-stat info">
+            <div class="ad-stat-row">
+                <div>
+                    <div class="ad-stat-label">Delivered</div>
+                    <div class="ad-stat-value" data-counter data-target="{{ delivered }}">0</div>
+                </div>
+                <div class="ad-stat-icon"><i class="fas fa-circle-check"></i></div>
+            </div>
+            <div>
+                <span class="ad-delta"><i class="fas fa-arrow-up"></i> 8%</span>
+                <span class="ad-delta-note">this month</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CHARTS ==================== -->
+    <section class="ad-charts" aria-label="Performance charts">
+        <div class="ad-card">
+            <div class="ad-card-header">
+                <h3 class="ad-card-title">
+                    <i class="fas fa-chart-line"></i> Shipment overview
+                </h3>
+                <div class="dropdown">
+                    <button class="ad-range-btn" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        Last 30 days
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">Today</a></li>
+                        <li><a class="dropdown-item" href="#">Yesterday</a></li>
+                        <li><a class="dropdown-item" href="#">Last 7 days</a></li>
+                        <li><a class="dropdown-item" href="#">Last 30 days</a></li>
+                        <li><a class="dropdown-item" href="#">This month</a></li>
+                        <li><a class="dropdown-item" href="#">Last month</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="ad-card-body">
+                <div class="ad-chart-area">
+                    <canvas id="shipmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-card">
+            <div class="ad-card-header">
+                <h3 class="ad-card-title">
+                    <i class="fas fa-chart-pie"></i> Status distribution
+                </h3>
+            </div>
+            <div class="ad-card-body">
+                <div class="ad-chart-pie">
+                    <canvas id="distributionChart"></canvas>
+                </div>
+                <div class="ad-chart-legend">
+                    <span><i class="fas fa-circle" style="color: var(--primary, #e11d2a);"></i> In transit</span>
+                    <span><i class="fas fa-circle" style="color: var(--ad-success);"></i> Delivered</span>
+                    <span><i class="fas fa-circle" style="color: var(--ad-warning);"></i> On hold</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== RECENT PACKAGES ==================== -->
+    <section class="ad-card" style="margin-bottom: 26px;">
+        <div class="ad-card-header">
+            <h3 class="ad-card-title">
+                <i class="fas fa-clock-rotate-left"></i> Recent packages
+            </h3>
+            <a href="{{ url_for('manage_packages') }}" class="ad-range-btn" style="text-decoration: none;">
+                View all <i class="fas fa-arrow-right" style="margin-left: 4px;"></i>
+            </a>
+        </div>
+        <div class="ad-card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="ad-table" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Tracking code</th>
+                            <th>Recipient</th>
+                            <th>Status</th>
+                            <th>Service</th>
+                            <th>Created</th>
+                            <th>Est. delivery</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for package in recent_packages %}
+                        <tr>
+                            <td data-label="Tracking code">
+                                <div class="ad-tracking-cell">
+                                    <span class="ad-tracking-code">{{ package.tracking_code }}</span>
+                                    <button type="button" class="ad-copy-btn"
+                                            onclick="copyToClipboard('{{ package.tracking_code }}')"
+                                            title="Copy tracking code"
+                                            aria-label="Copy tracking code">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td data-label="Recipient">
+                                <span class="ad-recipient-name">{{ package.recipient_name }}</span>
+                                <span class="ad-recipient-email">{{ package.recipient_email }}</span>
+                            </td>
+                            <td data-label="Status">
+                                {% if package.status == 'in_transit' %}
+                                    <span class="ad-badge success"><i class="fas fa-truck"></i> In transit</span>
+                                {% elif package.status == 'on_hold' %}
+                                    <span class="ad-badge warning"><i class="fas fa-pause"></i> On hold</span>
+                                {% elif package.status == 'delivered' %}
+                                    <span class="ad-badge info"><i class="fas fa-circle-check"></i> Delivered</span>
+                                {% elif package.status == 'pending' %}
+                                    <span class="ad-badge secondary"><i class="fas fa-clock"></i> Pending</span>
+                                {% elif package.status == 'cancelled' %}
+                                    <span class="ad-badge danger"><i class="fas fa-times-circle"></i> Cancelled</span>
+                                {% elif package.status == 'shipped' %}
+                                    <span class="ad-badge info"><i class="fas fa-paper-plane"></i> Shipped</span>
+                                {% elif package.status == 'out_for_delivery' %}
+                                    <span class="ad-badge warning"><i class="fas fa-truck-fast"></i> Out for delivery</span>
+                                {% else %}
+                                    <span class="ad-badge secondary">{{ package.status|replace('_', ' ')|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="Service">
+                                <span class="ad-service-cell">
+                                    <i class="fas fa-{{ 'plane' if package.shipping_method == 'air' else 'truck' if package.shipping_method == 'ground' else 'ship' }}"></i>
+                                    {{ package.shipping_method|title }}
+                                    <span class="muted">· {{ package.shipping_type|title }}</span>
+                                </span>
+                            </td>
+                            <td data-label="Created">
+                                <span class="local-time"
+                                      data-iso="{{ package.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                                      data-format="short">
+                                    {{ package.created_at|format_dt("%Y-%m-%d %H:%M") }}
+                                </span>
+                            </td>
+                            <td data-label="Est. delivery">
+                                {% if package.estimated_delivery %}
+                                    <span class="local-time"
+                                          data-iso="{{ package.estimated_delivery.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                                          data-format="date">
+                                        {{ package.estimated_delivery|format_dt("%Y-%m-%d") }}
+                                    </span>
+                                    {% if parse_dt(package.estimated_delivery) and parse_dt(package.estimated_delivery) < now %}
+                                        <span class="ad-overdue">Overdue</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="muted" style="color: var(--ad-muted);">—</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="Actions">
+                                <div class="ad-actions">
+                                    <a href="{{ url_for('edit_package', package_id=package.id) }}"
+                                       class="ad-action-btn secondary" title="Edit package"
+                                       aria-label="Edit package">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <a href="{{ url_for('view_package', package_id=package.id) }}"
+                                       class="ad-action-btn primary" title="View details"
+                                       aria-label="View package">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button type="button" class="ad-action-btn success"
+                                            onclick="updateLocation({{ package.id }})"
+                                            title="Update location" aria-label="Update location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </button>
+                                    {% if package.status == 'in_transit' %}
+                                    <button type="button" class="ad-action-btn warning"
+                                            onclick="placeOnHold({{ package.id }})"
+                                            title="Place on hold" aria-label="Place on hold">
+                                        <i class="fas fa-pause"></i>
+                                    </button>
+                                    {% elif package.status == 'on_hold' %}
+                                    <button type="button" class="ad-action-btn info"
+                                            onclick="releaseHold({{ package.id }})"
+                                            title="Release from hold" aria-label="Release from hold">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button type="button" class="ad-action-btn secondary"
+                                            onclick="generateLabel({{ package.id }})"
+                                            title="Generate label" aria-label="Generate label">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== QUICK ACTIONS + NOTIFICATIONS ==================== -->
+    <section class="ad-bottom" aria-label="Quick actions and notifications">
+        <div class="ad-card">
+            <div class="ad-card-header">
+                <h3 class="ad-card-title">
+                    <i class="fas fa-rocket"></i> Quick actions
+                </h3>
+            </div>
+            <div class="ad-card-body">
+                <div class="ad-quick-grid">
+                    <a href="{{ url_for('create_package') }}" class="ad-quick-btn primary">
+                        <i class="fas fa-plus"></i> New package
+                    </a>
+                    <button type="button" class="ad-quick-btn success" onclick="bulkImport()">
+                        <i class="fas fa-upload"></i> Bulk import
+                    </button>
+                    <button type="button" class="ad-quick-btn info" onclick="generateReport()">
+                        <i class="fas fa-file-pdf"></i> Generate report
+                    </button>
+                    <button type="button" class="ad-quick-btn warning" onclick="exportData()">
+                        <i class="fas fa-download"></i> Export data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-card">
+            <div class="ad-card-header">
+                <h3 class="ad-card-title">
+                    <i class="fas fa-bell"></i> Recent notifications
+                </h3>
+            </div>
+            <div style="padding: 0;">
+                <ul class="ad-notif-list">
+                    <li class="ad-notif">
+                        <span class="icon success"><i class="fas fa-circle-check"></i></span>
+                        <div class="body">
+                            <strong>Package SHIP2024 delivered successfully</strong>
+                            <span>5 minutes ago</span>
+                        </div>
+                    </li>
+                    <li class="ad-notif">
+                        <span class="icon warning"><i class="fas fa-triangle-exclamation"></i></span>
+                        <div class="body">
+                            <strong>Package TRK9876 placed on hold</strong>
+                            <span>25 minutes ago</span>
+                        </div>
+                    </li>
+                    <li class="ad-notif">
+                        <span class="icon info"><i class="fas fa-map-marker-alt"></i></span>
+                        <div class="body">
+                            <strong>Location updated for PKG123</strong>
+                            <span>1 hour ago</span>
+                        </div>
+                    </li>
+                </ul>
+                <a href="#" class="ad-notif-footer">View all notifications</a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ==================== LOCATION UPDATE MODAL ==================== -->
+<div class="modal fade ad-modal" id="locationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-map-marker-alt"></i> Update package location
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="updateMap" class="ad-map" aria-label="Map for location selection"></div>
+
+                <form id="locationForm">
+                    <input type="hidden" id="packageId">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="locationName" class="ad-label">Location name</label>
+                            <input type="text" class="ad-field" id="locationName"
+                                   placeholder="e.g. New York sorting centre" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="coordinates" class="ad-label">Coordinates</label>
+                            <input type="text" class="ad-field" id="coordinates"
+                                   placeholder="Click on the map to set" readonly>
+                            <small class="ad-form-hint">Optional — click anywhere on the map.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="status" class="ad-label">Status</label>
+                            <select class="ad-field" id="status">
+                                <option value="in_transit">In transit</option>
+                                <option value="in_transit">Arrived at facility</option>
+                                <option value="out_for_delivery">Out for delivery</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="updateNotes" class="ad-label">Notes <span style="text-transform: none; color: var(--ad-muted-2); font-weight: 500;">optional</span></label>
+                            <input type="text" class="ad-field" id="updateNotes"
+                                   placeholder="Any additional notes">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="ad-check">
+                                <input type="checkbox" id="notifyRecipient">
+                                <span>Notify recipient via email / SMS</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="ad-btn ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="ad-btn primary" onclick="saveLocation()">
+                    <i class="fas fa-save"></i> Update location
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== HOLD PACKAGE MODAL ==================== -->
+<div class="modal fade ad-modal" id="holdModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header warning">
+                <h5 class="modal-title">
+                    <i class="fas fa-pause"></i> Place package on hold
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="holdForm">
+                    <input type="hidden" id="holdPackageId">
+
+                    <div class="mb-3">
+                        <label for="holdReason" class="ad-label">Reason for hold</label>
+                        <select class="ad-field" id="holdReason" required>
+                            <option value="">Select a reason</option>
+                            <option value="Customs Inspection">Customs inspection</option>
+                            <option value="Weather Delay">Weather delay</option>
+                            <option value="Address Issue">Address issue</option>
+                            <option value="Recipient Request">Recipient request</option>
+                            <option value="Payment Pending">Payment pending</option>
+                            <option value="Documentation Required">Documentation required</option>
+                            <option value="Operational Delay">Operational delay</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="customReasonDiv" style="display: none;">
+                        <label for="customReason" class="ad-label">Custom reason</label>
+                        <input type="text" class="ad-field" id="customReason"
+                               placeholder="Describe the reason">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="holdNotes" class="ad-label">Additional notes <span style="text-transform: none; color: var(--ad-muted-2); font-weight: 500;">optional</span></label>
+                        <textarea class="ad-field" id="holdNotes" rows="3"
+                                  placeholder="Any additional information…"></textarea>
+                    </div>
+
+                    <label class="ad-check">
+                        <input type="checkbox" id="notifyHold">
+                        <span>Notify recipient about the hold</span>
+                    </label>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="ad-btn ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="ad-btn warning" onclick="confirmHold()">
+                    <i class="fas fa-pause"></i> Place on hold
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js is included in base.html -->
+<!-- Google Maps is included in base.html when need_maps is set -->
+
+<script>
+(function () {
+    'use strict';
+
+    /* ==================== Globals (referenced by inline onclick) ==================== */
+    let currentPackageId = null;
+    let updateMap = null;
+
+    /* ==================== Toast ==================== */
+    function showNotification(message, type = 'info') {
+        const el = document.createElement('div');
+        el.className = `ad-toast ${type}`;
+        const icon = {
+            success: 'circle-check',
+            error:   'circle-exclamation',
+            warning: 'triangle-exclamation',
+            info:    'circle-info'
+        }[type] || 'circle-info';
+
+        el.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(el);
+
+        setTimeout(() => {
+            el.classList.add('fade-out');
+            setTimeout(() => el.remove(), 300);
+        }, 3400);
+    }
+    window.showNotification = showNotification;
+
+    /* ==================== Counters ==================== */
+    (function () {
+        const counters = document.querySelectorAll('[data-counter]');
+        if (!counters.length) return;
+
+        function animate(el) {
+            const target = parseFloat(el.dataset.target) || 0;
+            const duration = 1400;
+            const start = performance.now();
+
+            function tick(now) {
+                const t = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - t, 3);
+                el.textContent = Math.floor(target * eased).toLocaleString();
+                if (t < 1) requestAnimationFrame(tick);
+                else el.textContent = target.toLocaleString();
+            }
+            requestAnimationFrame(tick);
+        }
+
+        if ('IntersectionObserver' in window) {
+            const seen = new WeakSet();
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !seen.has(entry.target)) {
+                        seen.add(entry.target);
+                        animate(entry.target);
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.4 });
+            counters.forEach(el => obs.observe(el));
+        } else {
+            counters.forEach(animate);
+        }
+    })();
+
+    /* ==================== Charts ==================== */
+    (function initializeCharts() {
+        if (typeof Chart === 'undefined') return;
+
+        const brandRed = '#e11d2a';
+        const brandRedSoft = 'rgba(225, 29, 42, .12)';
+        const success = '#16a34a';
+        const warning = '#d97706';
+
+        const lineCanvas = document.getElementById('shipmentChart');
+        if (lineCanvas) {
+            new Chart(lineCanvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+                    datasets: [{
+                        label: 'Shipments',
+                        data: [65, 59, 80, 81, 56, 55, 40, 65, 59, 80, 81, 56],
+                        borderColor: brandRed,
+                        backgroundColor: brandRedSoft,
+                        tension: 0.32,
+                        fill: true,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: brandRed,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(11, 18, 32, .95)',
+                            titleColor: '#fff',
+                            bodyColor: '#cbd5e1',
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8', font: { size: 11 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(148, 163, 184, .12)' },
+                            ticks: { color: '#94a3b8', font: { size: 11 } },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        const pieCanvas = document.getElementById('distributionChart');
+        if (pieCanvas) {
+            new Chart(pieCanvas.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['In transit', 'Delivered', 'On hold'],
+                    datasets: [{
+                        data: [
+                            {{ in_transit|default(0) }},
+                            {{ delivered|default(0) }},
+                            {{ on_hold|default(0) }}
+                        ],
+                        backgroundColor: [brandRed, success, warning],
+                        hoverBackgroundColor: ['#a30f18', '#15803d', '#b45309'],
+                        borderColor: 'transparent',
+                        borderWidth: 0,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(11, 18, 32, .95)',
+                            titleColor: '#fff',
+                            bodyColor: '#cbd5e1',
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    }
+                }
+            });
+        }
+    })();
+
+    /* ==================== Package actions ==================== */
+    window.updateLocation = function (packageId) {
+        currentPackageId = packageId;
+        const idEl = document.getElementById('packageId');
+        if (idEl) idEl.value = packageId;
+
+        // Initialize the map once
+        if (!updateMap && typeof initializeMap === 'function') {
+            try {
+                updateMap = initializeMap('updateMap', [-74.5, 40], 9);
+                window.updateMap = updateMap;
+
+                let adminMarker = null;
+
+                if (updateMap && updateMap.addListener) {
+                    updateMap.addListener('click', function (e) {
+                        const lat = e.latLng.lat();
+                        const lng = e.latLng.lng();
+                        const coords = document.getElementById('coordinates');
+                        if (coords) coords.value = lng.toFixed(6) + ', ' + lat.toFixed(6);
+
+                        if (adminMarker && adminMarker.setPosition) {
+                            adminMarker.setPosition({ lat, lng });
+                        } else if (typeof addMarker === 'function') {
+                            adminMarker = addMarker(updateMap, [lng, lat], '#e11d2a');
+                        }
+                        window.adminMarker = adminMarker;
+                    });
+                }
+            } catch (err) {
+                console.warn('Map initialization skipped:', err);
+            }
+        }
+
+        const modalEl = document.getElementById('locationModal');
+        if (modalEl) new bootstrap.Modal(modalEl).show();
+    };
+
+    window.saveLocation = function () {
+        const coords = (document.getElementById('coordinates')?.value || '').split(', ');
+        const lat = coords.length >= 2 ? parseFloat(coords[1]) : null;
+        const lng = coords.length >= 2 ? parseFloat(coords[0]) : null;
+
+        const data = {
+            location_name: document.getElementById('locationName')?.value || '',
+            status: document.getElementById('status')?.value || 'in_transit',
+            notes: document.getElementById('updateNotes')?.value || '',
+            notify_recipient: document.getElementById('notifyRecipient')?.checked || false
+        };
+        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+            data.lat = lat;
+            data.lng = lng;
+        }
+
+        if (!data.location_name) {
+            showNotification('Please enter a location name', 'warning');
+            return;
+        }
+
+        fetch('/admin/package/' + currentPackageId + '/update-location', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(async (response) => {
+            const ct = response.headers.get('content-type') || '';
+            if (!response.ok) {
+                if (ct.includes('application/json')) {
+                    const err = await response.json();
+                    throw new Error(err.error || JSON.stringify(err));
+                }
+                const text = await response.text();
+                throw new Error(text.split('\n')[0] || 'Server error');
+            }
+            if (ct.includes('application/json')) return response.json();
+            const text = await response.text();
+            try { return JSON.parse(text); } catch (e) {
+                throw new Error(text.split('\n')[0] || 'Invalid server response');
+            }
+        })
+        .then((result) => {
+            if (!result || !result.success) {
+                showNotification('Error updating location: ' + ((result && result.error) || 'Unknown error'), 'error');
+                return;
+            }
+
+            const newLat = Number.isFinite(lat) ? lat : (result.lat ? parseFloat(result.lat) : null);
+            const newLng = Number.isFinite(lng) ? lng : (result.lng ? parseFloat(result.lng) : null);
+
+            if (window.updateMap && Number.isFinite(newLat) && Number.isFinite(newLng)) {
+                if (window.adminMarker && window.adminMarker.setPosition) {
+                    window.adminMarker.setPosition({ lat: newLat, lng: newLng });
+                } else if (typeof addMarker === 'function') {
+                    window.adminMarker = addMarker(window.updateMap, [newLng, newLat], '#e11d2a');
+                }
+                if (typeof window.updateMap.setCenter === 'function') {
+                    window.updateMap.setCenter({ lat: newLat, lng: newLng });
+                }
+
+                // Optional: broadcast to subscribed clients if Socket.IO is available
+                try {
+                    if (typeof io !== 'undefined') {
+                        if (!window.socket) window.socket = io();
+                        if (window.socket && window.socket.emit) {
+                            window.socket.emit('location_update', {
+                                package_id: currentPackageId,
+                                lat: newLat,
+                                lng: newLng,
+                                location_name: data.location_name,
+                                status: data.status
+                            });
+                        }
+                    }
+                } catch (e) { console.warn('Socket emit failed:', e); }
+            }
+
+            const modalEl = document.getElementById('locationModal');
+            const inst = bootstrap.Modal.getInstance(modalEl);
+            if (inst) inst.hide();
+            showNotification('Location updated successfully', 'success');
+            setTimeout(() => location.reload(), 1200);
+        })
+        .catch(err => {
+            showNotification('Error updating location: ' + (err.message || err), 'error');
+        });
+    };
+
+    window.placeOnHold = function (packageId) {
+        currentPackageId = packageId;
+        const idEl = document.getElementById('holdPackageId');
+        if (idEl) idEl.value = packageId;
+
+        const modalEl = document.getElementById('holdModal');
+        if (modalEl) new bootstrap.Modal(modalEl).show();
+    };
+
+    window.confirmHold = function () {
+        const packageId = document.getElementById('holdPackageId')?.value;
+        const reason = document.getElementById('holdReason')?.value;
+        const customReason = document.getElementById('customReason')?.value || '';
+        const notes = document.getElementById('holdNotes')?.value || '';
+
+        if (!reason) {
+            showNotification('Please select a reason for the hold', 'warning');
+            return;
+        }
+
+        const finalReason = reason === 'Other' ? customReason : reason;
+        if (!finalReason) {
+            showNotification('Please provide a custom reason', 'warning');
+            return;
+        }
+
+        fetch('/admin/package/' + packageId + '/hold', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                reason: finalReason,
+                notes: notes,
+                notify: document.getElementById('notifyHold')?.checked || false
+            })
+        })
+        .then(async (response) => {
+            const ct = response.headers.get('content-type') || '';
+            if (!response.ok) {
+                if (ct.includes('application/json')) {
+                    const err = await response.json();
+                    throw new Error(err.error || JSON.stringify(err));
+                }
+                const text = await response.text();
+                throw new Error(text.split('\n')[0] || 'Server error');
+            }
+            if (ct.includes('application/json')) return response.json();
+            const text = await response.text();
+            try { return JSON.parse(text); } catch (e) {
+                throw new Error(text.split('\n')[0] || 'Invalid server response');
+            }
+        })
+        .then(data => {
+            if (data && data.success) {
+                const inst = bootstrap.Modal.getInstance(document.getElementById('holdModal'));
+                if (inst) inst.hide();
+                showNotification('Package placed on hold', 'warning');
+                setTimeout(() => location.reload(), 1200);
+            } else {
+                showNotification('Error placing package on hold: ' + ((data && data.error) || 'Unknown error'), 'error');
+            }
+        })
+        .catch(err => {
+            showNotification('Error placing package on hold: ' + (err.message || err), 'error');
+        });
+    };
+
+    window.releaseHold = function (packageId) {
+        if (!confirm('Release this package from hold?')) return;
+
+        fetch('/admin/package/' + packageId + '/release-hold', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(async (response) => {
+            const ct = response.headers.get('content-type') || '';
+            if (!response.ok) {
+                if (ct.includes('application/json')) {
+                    const err = await response.json();
+                    throw new Error(err.error || JSON.stringify(err));
+                }
+                const text = await response.text();
+                throw new Error(text.split('\n')[0] || 'Server error');
+            }
+            if (ct.includes('application/json')) return response.json();
+            const text = await response.text();
+            try { return JSON.parse(text); } catch (e) {
+                throw new Error(text.split('\n')[0] || 'Invalid server response');
+            }
+        })
+        .then(data => {
+            if (data && data.success) {
+                showNotification('Hold released successfully', 'success');
+                setTimeout(() => location.reload(), 1200);
+            } else {
+                showNotification('Error releasing hold: ' + ((data && data.error) || 'Unknown error'), 'error');
+            }
+        })
+        .catch(err => {
+            showNotification('Error releasing hold: ' + (err.message || err), 'error');
+        });
+    };
+
+    window.copyToClipboard = function (text) {
+        navigator.clipboard.writeText(text).then(function () {
+            showNotification('Tracking code copied to clipboard', 'success');
+        }).catch(function () {
+            showNotification('Failed to copy tracking code', 'error');
+        });
+    };
+
+    window.generateLabel = function (packageId) {
+        window.open('/admin/package/' + packageId + '/label', '_blank');
+    };
+
+    window.bulkImport = function () {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.csv,.xlsx,.xls';
+        input.onchange = function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+
+            showNotification('Uploading import file…', 'info');
+
+            fetch('/admin/bulk-import', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.success) {
+                    showNotification('Imported ' + data.imported + ' packages', 'success');
+                    setTimeout(() => location.reload(), 1800);
+                } else {
+                    showNotification('Import error: ' + ((data && data.error) || 'Unknown'), 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Upload error: ' + error, 'error');
+            });
+        };
+        input.click();
+    };
+
+    window.generateReport = function () {
+        window.open('/admin/export-report', '_blank');
+    };
+
+    window.exportData = function () {
+        window.open('/admin/export-data', '_blank');
+    };
+
+    /* ==================== Wire-up ==================== */
+    document.addEventListener('DOMContentLoaded', () => {
+        const holdReason = document.getElementById('holdReason');
+        if (holdReason) {
+            holdReason.addEventListener('change', function () {
+                const custom = document.getElementById('customReasonDiv');
+                if (custom) custom.style.display = this.value === 'Other' ? 'block' : 'none';
+            });
+        }
+    });
+
+})();
+</script>
+{% endblock %}

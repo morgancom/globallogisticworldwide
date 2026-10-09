@@ -1,0 +1,780 @@
+{% extends "base.html" %}
+
+{% block title %}Sign in — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — LOGIN PAGE
+   Bound to base.html tokens. Sized to fit in one viewport between
+   the navbar and footer, centered on tall screens.
+   ========================================================================= */
+
+/* ---------- PAGE WRAPPER ----------
+   Fills the space between the sticky navbar and the top of the footer.
+   Uses svh (small viewport height) so mobile browser chrome doesn't
+   cause overflow. Caps at a reasonable max so ultra-tall monitors
+   don't leave the card floating in dead space. */
+.login-page {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: min(640px, calc(100svh - 80px));
+    padding: clamp(20px, 4vw, 40px) 16px;
+    background: transparent;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 440px;
+}
+
+/* =========================================================================
+   INTRO
+   ========================================================================= */
+.login-intro {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.login-intro .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: var(--r-md);
+    background: var(--primary-50);
+    color: var(--primary);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+.login-intro .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+.login-intro h1 {
+    font-size: clamp(1.4rem, 3vw, 1.75rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--text-strong);
+    margin: 0 0 6px;
+}
+.login-intro p {
+    font-size: .88rem;
+    color: var(--muted);
+    margin: 0;
+}
+
+/* =========================================================================
+   CARD
+   ========================================================================= */
+.login-card {
+    position: relative;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-lg);
+    overflow: hidden;
+    animation: cardIn 320ms var(--ease) both;
+}
+.login-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: var(--primary);
+}
+
+.login-card-header {
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--border);
+}
+.login-card-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    color: var(--text-strong);
+    margin: 0;
+    text-transform: uppercase;
+}
+.login-card-header h2 .icon-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--r-md);
+    background: var(--primary-50);
+    color: var(--primary);
+    font-size: .9rem;
+    flex-shrink: 0;
+}
+.login-card-header p {
+    font-size: .82rem;
+    color: var(--muted);
+    margin: 8px 0 0;
+    line-height: 1.5;
+}
+
+.login-card-body {
+    padding: 22px 24px 24px;
+}
+
+/* =========================================================================
+   FORM
+   ========================================================================= */
+.login-form .field { margin-bottom: 14px; }
+
+.login-form label {
+    display: block;
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.login-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    transition:
+        border-color var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease),
+        background var(--dur) var(--ease);
+}
+.login-field:focus-within {
+    background: var(--bg-elev);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.login-field .field-icon {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 44px;
+    color: var(--muted);
+    font-size: .9rem;
+    transition: color var(--dur) var(--ease);
+}
+.login-field:focus-within .field-icon { color: var(--primary); }
+
+.login-field input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 12px 12px 12px 0;
+    border: 0;
+    background: transparent;
+    color: var(--text-strong);
+    font-size: .92rem;
+    font-weight: 500;
+    outline: none;
+}
+.login-field input::placeholder {
+    color: var(--muted);
+    font-weight: 400;
+}
+
+/* password toggle */
+.password-toggle {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 44px;
+    color: var(--muted);
+    font-size: .9rem;
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+    transition: color var(--dur) var(--ease);
+}
+.password-toggle:hover { color: var(--primary); }
+.password-toggle:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -4px;
+    border-radius: var(--r-md);
+}
+
+/* ---------- Remember row ---------- */
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding: 0;
+}
+.form-check-input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex-shrink: 0;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--r-sm);
+    background: var(--bg-elev);
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+}
+.form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+}
+.form-check-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.form-check-label {
+    font-size: .85rem;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+}
+
+/* ---------- Primary button ---------- */
+.btn-login {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px 22px;
+    border: 1px solid var(--primary);
+    border-radius: var(--r-md);
+    background: var(--primary);
+    color: #fff;
+    font-size: .85rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease);
+}
+.btn-login:hover:not(:disabled),
+.btn-login:focus-visible:not(:disabled) {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: #fff;
+}
+.btn-login:disabled {
+    opacity: .75;
+    cursor: not-allowed;
+}
+
+/* ---------- Helper links ---------- */
+.login-helpers {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+.login-helpers a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color var(--dur) var(--ease);
+}
+.login-helpers a:hover,
+.login-helpers a:focus-visible {
+    color: var(--primary);
+    text-decoration: underline;
+}
+.login-helpers a i { font-size: .82em; opacity: .85; }
+
+/* =========================================================================
+   SECURITY NOTICE
+   ========================================================================= */
+.login-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 13px 16px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--r-md);
+    font-size: .82rem;
+    color: var(--muted);
+    line-height: 1.5;
+}
+.login-notice i {
+    color: var(--primary);
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.login-notice strong {
+    color: var(--text-strong);
+    font-weight: 700;
+}
+
+/* =========================================================================
+   ALERTS
+   ========================================================================= */
+.login-card-body .alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border: 1px solid transparent;
+    border-left-width: 3px;
+    border-radius: var(--r-sm);
+    font-size: .85rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+    animation: alertIn 240ms var(--ease) both;
+}
+.login-card-body .alert i { flex-shrink: 0; font-size: .95rem; }
+.login-card-body .alert .btn-close {
+    margin-left: auto;
+    padding: 6px;
+    opacity: .5;
+}
+.login-card-body .alert .btn-close:hover { opacity: 1; }
+
+.login-card-body .alert-success {
+    background: #f2f8f3;
+    color: #2f6b3c;
+    border-color: #d4e6d8;
+    border-left-color: #4c8a5c;
+}
+.login-card-body .alert-danger {
+    background: #fbf2f3;
+    color: #8b1c27;
+    border-color: #ecd0d3;
+    border-left-color: var(--primary);
+}
+.login-card-body .alert-warning {
+    background: #fcf7ec;
+    color: #8a5a1c;
+    border-color: #ece1c6;
+    border-left-color: #b8862d;
+}
+.login-card-body .alert-info {
+    background: #eff5fa;
+    color: #275a82;
+    border-color: #d2e2ef;
+    border-left-color: #4b8ab8;
+}
+
+@media (prefers-color-scheme: dark) {
+    .login-card-body .alert-success { background: #16261a; color: #8ec99e; border-color: #24402c; }
+    .login-card-body .alert-danger  { background: #2a1719; color: #e6a1a8; border-color: #462227; }
+    .login-card-body .alert-warning { background: #2a2214; color: #e0c484; border-color: #483a1f; }
+    .login-card-body .alert-info    { background: #14212d; color: #94bdd9; border-color: #223a50; }
+}
+
+/* =========================================================================
+   MODAL (Forgot password)
+   ========================================================================= */
+body .modal .modal-content {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--sh-lg);
+}
+.modal .modal-header {
+    background: var(--primary);
+    color: #fff;
+    border-bottom: 0;
+    padding: 16px 20px;
+}
+.modal .modal-header .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .95rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+}
+.modal .modal-header .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: .85;
+}
+.modal .modal-header .btn-close:hover { opacity: 1; }
+.modal .modal-body {
+    padding: 22px 20px;
+    color: var(--text);
+    font-size: .9rem;
+}
+.modal .modal-body p {
+    color: var(--muted);
+    margin-bottom: 16px;
+    line-height: 1.55;
+}
+.modal .modal-body .form-label {
+    display: block;
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+.modal .modal-body .form-control {
+    padding: 11px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    background: var(--bg-soft);
+    color: var(--text-strong);
+    font-size: .92rem;
+    outline: none;
+    width: 100%;
+    transition:
+        border-color var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease),
+        background var(--dur) var(--ease);
+}
+.modal .modal-body .form-control:focus {
+    background: var(--bg-elev);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.modal .modal-footer {
+    padding: 14px 20px 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+.modal .modal-footer .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--r-md);
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+}
+.modal .modal-footer .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border-strong);
+}
+.modal .modal-footer .btn-secondary:hover {
+    background: var(--bg-soft);
+    color: var(--text-strong);
+    border-color: var(--border-strong);
+}
+.modal .modal-footer .btn-shpe,
+.modal .modal-footer .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+.modal .modal-footer .btn-shpe:hover,
+.modal .modal-footer .btn-primary:hover {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: #fff;
+}
+
+/* =========================================================================
+   ANIMATIONS
+   ========================================================================= */
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes alertIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+@media (max-width: 520px) {
+    .login-page { padding: 20px 14px; }
+    .login-card-header { padding: 20px 20px 16px; }
+    .login-card-body   { padding: 20px; }
+    .login-card-header h2 { font-size: .98rem; }
+    .login-intro h1 { font-size: 1.35rem; }
+    .btn-login { padding: 12px 18px; font-size: .82rem; }
+    .login-helpers { gap: 10px; }
+}
+
+/* Very short viewports (e.g. landscape phones) — let it scroll naturally */
+@media (max-height: 640px) {
+    .login-page {
+        align-items: flex-start;
+        padding-top: 20px;
+        padding-bottom: 24px;
+    }
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .login-notice, .login-helpers, .btn-login { display: none !important; }
+    body { background: #fff !important; }
+    .login-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="login-page">
+    <div class="login-container">
+
+        <!-- Intro -->
+        <div class="login-intro">
+            <h1>Welcome back</h1>
+            <p>Sign in to manage your shipments and track deliveries.</p>
+        </div>
+
+        <!-- Login card -->
+        <div class="login-card">
+            <div class="login-card-header">
+                <h2>
+                    <span class="icon-chip"><i class="fas fa-lock"></i></span>
+                    Sign in to Global shippments
+                </h2>
+                <p>Use your account credentials to access your dashboard.</p>
+            </div>
+
+            <div class="login-card-body">
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                                <span>{{ message }}</span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('login') }}" class="login-form" novalidate>
+                    <!-- Username -->
+                    <div class="field">
+                        <label for="username">Username or email</label>
+                        <div class="login-field">
+                            <span class="field-icon"><i class="fas fa-user"></i></span>
+                            <input type="text"
+                                   id="username"
+                                   name="username"
+                                   required
+                                   autocomplete="username"
+                                   spellcheck="false"
+                                   placeholder="you@example.com">
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <div class="login-field">
+                            <span class="field-icon"><i class="fas fa-key"></i></span>
+                            <input type="password"
+                                   id="password"
+                                   name="password"
+                                   required
+                                   autocomplete="current-password"
+                                   placeholder="Enter your password">
+                            <button type="button"
+                                    class="password-toggle"
+                                    onclick="togglePassword()"
+                                    aria-label="Toggle password visibility"
+                                    aria-controls="password">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Remember -->
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
+                        <label class="form-check-label" for="rememberMe">Keep me signed in on this device</label>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Sign in
+                    </button>
+
+                    <!-- Helpers -->
+                    <div class="login-helpers">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
+                            <i class="fas fa-key"></i> Forgot password?
+                        </a>
+                        <a href="{{ url_for('register') }}">
+                            <i class="fas fa-user-plus"></i> Create account
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Security notice -->
+        <div class="login-notice">
+            <i class="fas fa-shield-halved"></i>
+            <div>
+                <strong>Secure connection.</strong>
+                Your credentials are encrypted in transit and your session is protected end-to-end.
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ==================== FORGOT PASSWORD MODAL ==================== -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forgotPasswordModalLabel">
+                    <i class="fas fa-key"></i> Reset your password
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Enter the email address on your account and we'll send you a link to reset your password.</p>
+                <label for="resetEmail" class="form-label">Email address</label>
+                <input type="email"
+                       class="form-control"
+                       id="resetEmail"
+                       placeholder="you@example.com"
+                       autocomplete="email">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-shpe" onclick="sendResetLink()">
+                    <i class="fas fa-paper-plane"></i> Send reset link
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* ---------- Password visibility toggle ---------- */
+    function togglePassword() {
+        const input = document.getElementById('password');
+        const icon  = document.getElementById('toggleIcon');
+        if (!input || !icon) return;
+
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        icon.classList.toggle('fa-eye', !show);
+        icon.classList.toggle('fa-eye-slash', show);
+    }
+
+    /* ---------- Login form validation + loading state ---------- */
+    (function () {
+        const form = document.querySelector('.login-form');
+        if (!form) return;
+
+        form.addEventListener('submit', function (e) {
+            const username = document.getElementById('username');
+            const password = document.getElementById('password');
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            if (!username.value.trim() || !password.value.trim()) {
+                e.preventDefault();
+                if (!username.value.trim()) username.focus();
+                else password.focus();
+                return;
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in…';
+            }
+        });
+    })();
+
+    /* ---------- Forgot password ---------- */
+    function sendResetLink() {
+        const emailInput = document.getElementById('resetEmail');
+        const email = emailInput ? emailInput.value.trim() : '';
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!email) { emailInput?.focus(); return; }
+        if (!emailPattern.test(email)) { emailInput?.focus(); return; }
+
+        // TODO: wire this up to a real endpoint that sends the reset email.
+        if (typeof bootstrap !== 'undefined') {
+            const modalEl = document.getElementById('forgotPasswordModal');
+            const inst = bootstrap.Modal.getInstance(modalEl);
+            if (inst) inst.hide();
+        }
+        if (emailInput) emailInput.value = '';
+    }
+
+    /* ---------- Auto-dismiss flash messages ---------- */
+    setTimeout(function () {
+        document.querySelectorAll('.login-card-body .alert').forEach(function (alert) {
+            if (typeof bootstrap !== 'undefined') {
+                try { new bootstrap.Alert(alert).close(); } catch (e) {}
+            }
+        });
+    }, 6000);
+
+    /* ---------- Ctrl+Enter submits the form ---------- */
+    document.addEventListener('keydown', function (e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+            const form = document.querySelector('.login-form');
+            if (form) form.requestSubmit();
+        }
+    });
+
+    /* ---------- Focus username on load ---------- */
+    window.addEventListener('load', function () {
+        const username = document.getElementById('username');
+        if (username && !username.value) username.focus();
+    });
+</script>
+{% endblock %}

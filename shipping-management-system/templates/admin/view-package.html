@@ -1,0 +1,1966 @@
+{% extends "base.html" %}
+
+{% block title %}Package {{ package.tracking_code }} — Global shippments Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — VIEW PACKAGE (ADMIN)
+   Full detail view of a single shipment.
+   Uses base.html design tokens. Full dark-mode support.
+   ========================================================================= */
+
+:root {
+    --vp-surface:       #FFFFFF;
+    --vp-surface-alt:   #F8FAFC;
+    --vp-surface-soft:  #F1F5F9;
+    --vp-line:          #E6EAF0;
+    --vp-line-soft:     #EEF2F7;
+    --vp-ink:           #0B1220;
+    --vp-text:          #1E293B;
+    --vp-muted:         #64748B;
+    --vp-muted-2:       #94A3B8;
+
+    --vp-success:       #16A34A;
+    --vp-success-bg:    #ECFDF5;
+    --vp-danger:        #DC2626;
+    --vp-danger-bg:     #FEF2F2;
+    --vp-warning:       #D97706;
+    --vp-warning-bg:    #FFF7ED;
+    --vp-info:          #0EA5E9;
+    --vp-info-bg:       #EFF9FF;
+    --vp-neutral:       #475569;
+    --vp-neutral-bg:    #F1F5F9;
+
+    --vp-sh-xs: 0 1px 2px rgba(15, 23, 42, .04);
+    --vp-sh-sm: 0 2px 8px rgba(15, 23, 42, .06);
+    --vp-sh-md: 0 12px 28px -14px rgba(15, 23, 42, .18);
+    --vp-sh-lg: 0 30px 60px -22px rgba(15, 23, 42, .28);
+
+    --vp-ease: cubic-bezier(.4, 0, .2, 1);
+    --vp-dur:  220ms;
+
+    --vp-r-sm: 8px;
+    --vp-r-md: 12px;
+    --vp-r-lg: 16px;
+    --vp-r-xl: 24px;
+    --vp-pill: 999px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --vp-surface:      #111C30;
+        --vp-surface-alt:  #0F172A;
+        --vp-surface-soft: #1A273F;
+        --vp-line:         #1E293B;
+        --vp-line-soft:    #172A45;
+        --vp-ink:          #F1F5F9;
+        --vp-text:         #CBD5E1;
+        --vp-muted:        #94A3B8;
+        --vp-muted-2:      #64748B;
+
+        --vp-success-bg:   #052E1A;
+        --vp-danger-bg:    #2E0A0D;
+        --vp-warning-bg:   #2E1A05;
+        --vp-info-bg:      #0B2A3E;
+        --vp-neutral-bg:   #1E293B;
+
+        --vp-sh-xs: 0 1px 2px rgba(0, 0, 0, .4);
+        --vp-sh-sm: 0 2px 8px rgba(0, 0, 0, .5);
+        --vp-sh-md: 0 12px 28px -14px rgba(0, 0, 0, .6);
+        --vp-sh-lg: 0 30px 60px -22px rgba(0, 0, 0, .7);
+    }
+}
+
+body { background: var(--vp-surface-alt); color: var(--vp-text); }
+
+.vp-page h1, .vp-page h2, .vp-page h3,
+.vp-page h4, .vp-page h5, .vp-page h6 {
+    color: var(--vp-ink);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+.vp-hero {
+    position: relative;
+    padding: clamp(28px, 4vw, 48px) 0 clamp(24px, 3vw, 40px);
+    background:
+        radial-gradient(ellipse 60% 70% at 20% 20%, rgba(225, 29, 42, .12), transparent 60%),
+        linear-gradient(180deg, #0b1220, #1a1a2a);
+    color: #fff;
+    overflow: hidden;
+}
+.vp-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    pointer-events: none;
+}
+.vp-hero > .container { position: relative; z-index: 1; max-width: 1400px; }
+
+.vp-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .82rem;
+    color: rgba(255, 255, 255, .7);
+    margin-bottom: 14px;
+    list-style: none;
+    padding: 0;
+    flex-wrap: wrap;
+}
+.vp-breadcrumb li { display: inline-flex; align-items: center; gap: 8px; }
+.vp-breadcrumb li:not(:last-child)::after {
+    content: "\f105";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: .65rem;
+    opacity: .5;
+}
+.vp-breadcrumb a {
+    color: rgba(255, 255, 255, .8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--vp-dur) var(--vp-ease);
+}
+.vp-breadcrumb a:hover { color: #fff; }
+.vp-breadcrumb .active { color: #fff; font-weight: 600; }
+
+.vp-hero-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+}
+.vp-hero-meta { min-width: 0; }
+
+.vp-tracking-code {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+.vp-tracking-code code {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: var(--vp-r-sm);
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    font-weight: 700;
+    letter-spacing: .04em;
+    word-break: break-all;
+}
+.vp-tracking-code .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--vp-r-sm);
+    border: 1px solid rgba(255, 255, 255, .25);
+    background: rgba(255, 255, 255, .1);
+    color: #fff;
+    cursor: pointer;
+    transition: all var(--vp-dur) var(--vp-ease);
+    flex-shrink: 0;
+}
+.vp-tracking-code .copy-btn:hover {
+    background: rgba(255, 255, 255, .2);
+    border-color: #fff;
+}
+
+.vp-status-line {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.vp-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    border-radius: var(--vp-pill);
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .2);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.vp-status-pill .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, .25);
+}
+.vp-status-pill.warning .dot { background: #fbbf24; box-shadow: 0 0 0 3px rgba(251, 191, 36, .25); }
+.vp-status-pill.info    .dot { background: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, .25); }
+.vp-status-pill.danger  .dot { background: #f87171; box-shadow: 0 0 0 3px rgba(248, 113, 113, .25); }
+.vp-status-pill.muted   .dot { background: #94a3b8; box-shadow: 0 0 0 3px rgba(148, 163, 184, .25); }
+
+.vp-public-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, .85);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all var(--vp-dur) var(--vp-ease);
+}
+.vp-public-link:hover {
+    color: #fff;
+    border-bottom-color: #fff;
+}
+
+/* =========================================================================
+   SHELL
+   ========================================================================= */
+.vp-shell {
+    max-width: 1400px;
+    margin: -20px auto 0;
+    padding: 0 16px 60px;
+    position: relative;
+    z-index: 2;
+}
+
+/* =========================================================================
+   ACTION BAR
+   ========================================================================= */
+.vp-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    background: var(--vp-surface);
+    border: 1px solid var(--vp-line);
+    border-radius: var(--vp-r-lg);
+    box-shadow: var(--vp-sh-sm);
+}
+.vp-actions .spacer { flex: 1 1 auto; }
+
+.vp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border: 1.5px solid transparent;
+    border-radius: var(--vp-pill);
+    font-size: .8rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--vp-dur) var(--vp-ease);
+    white-space: nowrap;
+}
+.vp-btn:focus-visible { outline: 2px solid var(--primary, #e11d2a); outline-offset: 2px; }
+.vp-btn i { transition: transform var(--vp-dur) var(--vp-ease); }
+
+.vp-btn.primary {
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(225, 29, 42, .45);
+}
+.vp-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(225, 29, 42, .55); color: #fff; }
+
+.vp-btn.warning {
+    background: linear-gradient(135deg, var(--vp-warning), #B45309);
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(217, 119, 6, .45);
+}
+.vp-btn.warning:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(217, 119, 6, .55); color: #fff; }
+
+.vp-btn.success {
+    background: linear-gradient(135deg, var(--vp-success), #15803D);
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(22, 163, 74, .45);
+}
+.vp-btn.success:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(22, 163, 74, .55); color: #fff; }
+
+.vp-btn.danger {
+    background: transparent;
+    color: var(--vp-danger);
+    border-color: var(--vp-danger);
+}
+.vp-btn.danger:hover {
+    background: var(--vp-danger);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.vp-btn.ghost {
+    background: transparent;
+    color: var(--vp-text);
+    border-color: var(--vp-line);
+}
+.vp-btn.ghost:hover {
+    border-color: var(--vp-ink);
+    background: var(--vp-surface-alt);
+    transform: translateY(-2px);
+    color: var(--vp-ink);
+}
+
+/* =========================================================================
+   STATUS / PROGRESS CARD
+   ========================================================================= */
+.vp-status-card {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1.4fr 1fr;
+    gap: 24px;
+    padding: 24px 26px;
+    background: var(--vp-surface);
+    border: 1px solid var(--vp-line);
+    border-left: 4px solid var(--primary, #e11d2a);
+    border-radius: var(--vp-r-lg);
+    box-shadow: var(--vp-sh-sm);
+    margin-bottom: 20px;
+}
+@media (max-width: 900px) {
+    .vp-status-card { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 520px) {
+    .vp-status-card { grid-template-columns: 1fr; }
+}
+
+.vp-stat-label {
+    display: block;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--vp-muted);
+    margin-bottom: 6px;
+}
+.vp-stat-value {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--vp-ink);
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+    word-break: break-word;
+}
+.vp-stat-value .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.vp-stat-value small {
+    display: block;
+    font-size: .75rem;
+    font-weight: 500;
+    color: var(--vp-muted);
+    letter-spacing: 0;
+    margin-top: 2px;
+}
+
+.vp-progress {
+    height: 6px;
+    background: var(--vp-line-soft);
+    border-radius: var(--vp-pill);
+    overflow: hidden;
+    margin-top: 10px;
+}
+.vp-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    transition: width 380ms var(--vp-ease);
+}
+.vp-progress-text {
+    display: block;
+    font-size: .74rem;
+    font-weight: 600;
+    color: var(--vp-muted);
+    margin-top: 6px;
+}
+
+/* =========================================================================
+   CARDS
+   ========================================================================= */
+.vp-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+@media (max-width: 900px) {
+    .vp-grid { grid-template-columns: 1fr; }
+}
+
+.vp-card {
+    background: var(--vp-surface);
+    border: 1px solid var(--vp-line);
+    border-radius: var(--vp-r-lg);
+    box-shadow: var(--vp-sh-sm);
+    overflow: hidden;
+    transition: box-shadow var(--vp-dur) var(--vp-ease), border-color var(--vp-dur) var(--vp-ease);
+}
+.vp-card:hover {
+    box-shadow: var(--vp-sh-md);
+    border-color: color-mix(in srgb, var(--primary, #e11d2a) 18%, var(--vp-line));
+}
+.vp-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--vp-line-soft);
+}
+.vp-card-header .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--vp-r-sm);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: .88rem;
+    flex-shrink: 0;
+}
+.vp-card-title {
+    font-size: .9rem;
+    font-weight: 800;
+    color: var(--vp-ink);
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-transform: uppercase;
+}
+.vp-card-body { padding: 22px; }
+
+/* Info table inside cards */
+.vp-info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.vp-info-table tr {
+    border-bottom: 1px dashed var(--vp-line);
+}
+.vp-info-table tr:last-child { border-bottom: 0; }
+.vp-info-table th {
+    padding: 10px 0;
+    text-align: left;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--vp-muted);
+    width: 40%;
+    vertical-align: top;
+}
+.vp-info-table td {
+    padding: 10px 0;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--vp-ink);
+    text-align: right;
+    vertical-align: top;
+    word-break: break-word;
+}
+.vp-info-table a { color: var(--primary, #e11d2a); text-decoration: none; font-weight: 600; }
+.vp-info-table a:hover { text-decoration: underline; }
+
+/* Address block */
+.vp-address-block + .vp-address-block {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--vp-line);
+}
+.vp-address-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--vp-muted);
+    margin-bottom: 8px;
+}
+.vp-address-label i { color: var(--primary, #e11d2a); }
+.vp-address-text {
+    font-size: .9rem;
+    line-height: 1.6;
+    color: var(--vp-text);
+    margin: 0;
+    word-break: break-word;
+}
+.vp-coords-pill {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-top: 10px;
+    background: var(--vp-surface-soft);
+    border: 1px solid var(--vp-line);
+    border-radius: var(--vp-r-sm);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--vp-ink);
+}
+
+/* =========================================================================
+   QUICK ACTIONS CARD
+   ========================================================================= */
+.vp-quick {
+    padding: 22px 24px;
+    background: var(--vp-surface);
+    border: 1px solid var(--vp-line);
+    border-radius: var(--vp-r-lg);
+    box-shadow: var(--vp-sh-sm);
+    margin-bottom: 20px;
+}
+.vp-quick h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .9rem;
+    font-weight: 800;
+    color: var(--vp-ink);
+    letter-spacing: -0.01em;
+    margin: 0 0 18px;
+    text-transform: uppercase;
+}
+.vp-quick h3 .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--vp-r-sm);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: .8rem;
+}
+.vp-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+/* Status change sub-panel */
+.vp-status-change {
+    margin-top: 22px;
+    padding-top: 22px;
+    border-top: 1px solid var(--vp-line-soft);
+}
+.vp-status-change-grid {
+    display: grid;
+    grid-template-columns: 2fr 1.4fr 1fr;
+    gap: 14px;
+    align-items: end;
+}
+@media (max-width: 720px) {
+    .vp-status-change-grid { grid-template-columns: 1fr; }
+}
+
+/* =========================================================================
+   FORM CONTROLS
+   ========================================================================= */
+.vp-label {
+    display: block;
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--vp-muted);
+    margin-bottom: 8px;
+}
+.vp-field {
+    display: block;
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--vp-surface);
+    border: 1.5px solid var(--vp-line);
+    border-radius: var(--vp-r-sm);
+    color: var(--vp-ink);
+    font-size: .9rem;
+    font-weight: 500;
+    outline: none;
+    transition: border-color var(--vp-dur) var(--vp-ease),
+                box-shadow   var(--vp-dur) var(--vp-ease);
+    font-family: inherit;
+}
+.vp-field::placeholder { color: var(--vp-muted-2); font-weight: 400; }
+.vp-field:focus {
+    border-color: var(--primary, #e11d2a);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary, #e11d2a) 15%, transparent);
+}
+select.vp-field {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e11d2a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px 10px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+textarea.vp-field { resize: vertical; min-height: 72px; line-height: 1.55; }
+
+.vp-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .88rem;
+    color: var(--vp-text);
+    cursor: pointer;
+    user-select: none;
+}
+.vp-check input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--vp-line);
+    border-radius: 4px;
+    background: var(--vp-surface);
+    cursor: pointer;
+    position: relative;
+    transition: all var(--vp-dur) var(--vp-ease);
+}
+.vp-check input[type="checkbox"]:checked {
+    background: var(--primary, #e11d2a);
+    border-color: var(--primary, #e11d2a);
+}
+.vp-check input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 4px; top: 0px;
+    width: 5px; height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.vp-check input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--primary, #e11d2a);
+    outline-offset: 3px;
+}
+
+/* =========================================================================
+   DATA TABLES
+   ========================================================================= */
+.vp-table-card {
+    background: var(--vp-surface);
+    border: 1px solid var(--vp-line);
+    border-radius: var(--vp-r-lg);
+    box-shadow: var(--vp-sh-sm);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+.vp-table-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--vp-line-soft);
+}
+.vp-table-header .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--vp-r-sm);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: .88rem;
+    flex-shrink: 0;
+}
+.vp-table-header h3 {
+    font-size: .9rem;
+    font-weight: 800;
+    color: var(--vp-ink);
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-transform: uppercase;
+}
+.vp-table-header .count {
+    margin-left: auto;
+    padding: 3px 10px;
+    border-radius: var(--vp-pill);
+    background: var(--vp-surface-soft);
+    color: var(--vp-muted);
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.vp-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.vp-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 640px;
+}
+.vp-table thead th {
+    padding: 12px 22px;
+    background: var(--vp-surface-soft);
+    color: var(--vp-muted);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-align: left;
+    border-bottom: 1px solid var(--vp-line);
+    white-space: nowrap;
+}
+.vp-table tbody td {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--vp-line-soft);
+    font-size: .88rem;
+    color: var(--vp-text);
+    vertical-align: middle;
+}
+.vp-table tbody tr:last-child td { border-bottom: 0; }
+.vp-table tbody tr {
+    transition: background var(--vp-dur) var(--vp-ease);
+}
+.vp-table tbody tr:hover {
+    background: color-mix(in srgb, var(--primary, #e11d2a) 3%, var(--vp-surface));
+}
+.vp-table code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .82rem;
+    color: var(--vp-ink);
+    background: var(--vp-surface-soft);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Badges */
+.vp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: var(--vp-pill);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+.vp-badge.success {
+    background: var(--vp-success-bg);
+    color: var(--vp-success);
+    border-color: color-mix(in srgb, var(--vp-success) 25%, transparent);
+}
+.vp-badge.warning {
+    background: var(--vp-warning-bg);
+    color: var(--vp-warning);
+    border-color: color-mix(in srgb, var(--vp-warning) 25%, transparent);
+}
+.vp-badge.info {
+    background: var(--vp-info-bg);
+    color: var(--vp-info);
+    border-color: color-mix(in srgb, var(--vp-info) 25%, transparent);
+}
+.vp-badge.secondary {
+    background: var(--vp-neutral-bg);
+    color: var(--vp-neutral);
+    border-color: color-mix(in srgb, var(--vp-neutral) 20%, transparent);
+}
+.vp-badge.danger {
+    background: var(--vp-danger-bg);
+    color: var(--vp-danger);
+    border-color: color-mix(in srgb, var(--vp-danger) 25%, transparent);
+}
+
+/* Empty state inside a card */
+.vp-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--vp-muted);
+    font-size: .9rem;
+}
+.vp-empty i {
+    display: block;
+    font-size: 1.75rem;
+    margin-bottom: 10px;
+    color: var(--vp-muted-2);
+}
+
+/* =========================================================================
+   MAPS
+   ========================================================================= */
+.vp-map {
+    width: 100%;
+    height: 240px;
+    border-radius: var(--vp-r-md);
+    overflow: hidden;
+    border: 1px solid var(--vp-line);
+    background: var(--vp-surface-alt);
+    margin-top: 12px;
+}
+.vp-map--lg { height: 400px; }
+.vp-map--sm { height: 200px; }
+
+/* =========================================================================
+   MODALS
+   ========================================================================= */
+.vp-modal .modal-content {
+    background: var(--vp-surface);
+    border: 1px solid var(--vp-line);
+    border-radius: var(--vp-r-lg);
+    overflow: hidden;
+    box-shadow: var(--vp-sh-lg);
+}
+.vp-modal .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 22px;
+    border-bottom: 0;
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+}
+.vp-modal .modal-header.warning {
+    background: linear-gradient(135deg, var(--vp-warning), #B45309);
+}
+.vp-modal .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+.vp-modal .modal-title i { color: rgba(255, 255, 255, .85); }
+.vp-modal .btn-close { filter: brightness(0) invert(1); opacity: .85; }
+.vp-modal .btn-close:hover { opacity: 1; }
+.vp-modal .modal-body { padding: 24px 22px; color: var(--vp-text); }
+.vp-modal .modal-body p { font-size: .9rem; line-height: 1.6; color: var(--vp-muted); margin: 0 0 16px; }
+.vp-modal .modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding: 16px 22px 20px;
+    border-top: 1px solid var(--vp-line-soft);
+}
+
+/* =========================================================================
+   TOASTS
+   ========================================================================= */
+.vp-toast {
+    position: fixed;
+    top: 88px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    min-width: 280px;
+    max-width: calc(100vw - 48px);
+    background: var(--vp-surface);
+    border: 1px solid var(--vp-line);
+    border-left: 4px solid var(--primary, #e11d2a);
+    border-radius: var(--vp-r-sm);
+    box-shadow: var(--vp-sh-lg);
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--vp-text);
+    animation: vpToastIn 280ms var(--vp-ease);
+}
+.vp-toast i { font-size: 1.15rem; color: var(--primary, #e11d2a); flex-shrink: 0; }
+.vp-toast.success { border-left-color: var(--vp-success); }
+.vp-toast.success i { color: var(--vp-success); }
+.vp-toast.error   { border-left-color: var(--vp-danger); }
+.vp-toast.error   i { color: var(--vp-danger); }
+.vp-toast.warning { border-left-color: var(--vp-warning); }
+.vp-toast.warning i { color: var(--vp-warning); }
+.vp-toast.info    { border-left-color: var(--vp-info); }
+.vp-toast.info    i { color: var(--vp-info); }
+.vp-toast.fade-out { animation: vpToastOut 280ms var(--vp-ease) forwards; }
+
+@keyframes vpToastIn {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes vpToastOut {
+    to { opacity: 0; transform: translateX(24px); }
+}
+@media (max-width: 576px) {
+    .vp-toast { left: 16px; right: 16px; top: 76px; min-width: auto; }
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+@media (max-width: 640px) {
+    .vp-hero-head { flex-direction: column; align-items: flex-start; }
+    .vp-tracking-code code { width: 100%; text-align: center; }
+    .vp-actions { flex-direction: column; align-items: stretch; }
+    .vp-actions .spacer { display: none; }
+    .vp-btn { width: 100%; justify-content: center; }
+    .vp-card-body, .vp-quick { padding: 18px; }
+    .vp-status-card { padding: 20px 18px; gap: 18px; }
+    .vp-table { min-width: 560px; }
+    .vp-table thead th,
+    .vp-table tbody td { padding: 10px 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+@media print {
+    .vp-hero::before, .vp-actions, .vp-quick, .vp-toast,
+    .navbar, footer, .back-to-top { display: none !important; }
+    .vp-hero { background: #fff !important; color: #000 !important; padding: 20px 0 !important; border-bottom: 2px solid #000; }
+    .vp-hero-title, .vp-hero-sub, .vp-breadcrumb,
+    .vp-breadcrumb a, .vp-breadcrumb .active,
+    .vp-tracking-code code, .vp-status-pill { color: #000 !important; }
+    .vp-tracking-code code { background: #f5f5f5 !important; border-color: #ccc !important; }
+    .vp-status-pill { background: #f5f5f5 !important; border-color: #ccc !important; }
+    .vp-shell { margin: 0 !important; }
+    .vp-card, .vp-table-card, .vp-status-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="vp-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="vp-hero">
+        <div class="container">
+                        <div class="vp-hero-head">
+                <div class="vp-hero-meta">
+                    <div class="vp-tracking-code">
+                        <code>{{ package.tracking_code }}</code>
+                        <button type="button" class="copy-btn"
+                                onclick="copyTrackingCode('{{ package.tracking_code }}')"
+                                title="Copy tracking code" aria-label="Copy tracking code">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+
+                    <div class="vp-status-line">
+                        {% if package.status in ['delivered', 'returned'] %}
+                            {% set pill_class = 'info' %}
+                        {% elif package.status == 'on_hold' %}
+                            {% set pill_class = 'warning' %}
+                        {% elif package.status == 'cancelled' %}
+                            {% set pill_class = 'danger' %}
+                        {% elif package.status in ['in_transit', 'out_for_delivery', 'dispatched', 'shipped'] %}
+                            {% set pill_class = '' %}
+                        {% else %}
+                            {% set pill_class = 'muted' %}
+                        {% endif %}
+                        <span class="vp-status-pill {{ pill_class }}">
+                            <span class="dot"></span>
+                            {{ package.status|replace('_', ' ')|title }}
+                        </span>
+
+                        <a href="{{ url_for('track_package', tracking_code=package.tracking_code) }}"
+                           class="vp-public-link" target="_blank" rel="noopener">
+                            <i class="fas fa-arrow-up-right-from-square"></i>
+                            View public tracking page
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SHELL ==================== -->
+    <div class="vp-shell">
+
+        <!-- ==================== ACTION BAR ==================== -->
+        <div class="vp-actions">
+            <a href="{{ url_for('edit_package', package_id=package.id) }}" class="vp-btn ghost">
+                <i class="fas fa-pen"></i> Edit
+            </a>
+            <button type="button" class="vp-btn ghost" onclick="openSimModal()">
+                <i class="fas fa-route"></i> Simulate route
+            </button>
+
+            {% if package.simulation_active %}
+            <button type="button" id="toggleSimBtn" class="vp-btn ghost"
+                    onclick="toggleSimulation({{ package.id }})">
+                <i class="fas fa-pause"></i> Pause simulation
+            </button>
+            {% else %}
+            <button type="button" id="toggleSimBtn" class="vp-btn ghost"
+                    onclick="toggleSimulation({{ package.id }})">
+                <i class="fas fa-play"></i> Resume simulation
+            </button>
+            {% endif %}
+
+            <button type="button" class="vp-btn danger" onclick="stopSimulationConfirm()">
+                <i class="fas fa-stop"></i> Stop
+            </button>
+
+            <span class="spacer"></span>
+
+            <button type="button" class="vp-btn ghost" onclick="window.print()">
+                <i class="fas fa-print"></i> Print
+            </button>
+            <a href="{{ url_for('generate_label', package_id=package.id) }}"
+               class="vp-btn primary" target="_blank" rel="noopener">
+                <i class="fas fa-tag"></i> Generate label
+            </a>
+            <a href="{{ url_for('manage_packages') }}" class="vp-btn ghost">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+
+        <!-- ==================== STATUS / PROGRESS ==================== -->
+        <div class="vp-status-card">
+            <div>
+                <span class="vp-stat-label">Current status</span>
+                <div class="vp-stat-value">
+                    {% if package.status == 'in_transit' %}
+                        <span class="status-dot" style="background:#16a34a;"></span>
+                    {% elif package.status == 'on_hold' %}
+                        <span class="status-dot" style="background:#d97706;"></span>
+                    {% elif package.status == 'delivered' %}
+                        <span class="status-dot" style="background:#0ea5e9;"></span>
+                    {% elif package.status == 'cancelled' %}
+                        <span class="status-dot" style="background:#dc2626;"></span>
+                    {% else %}
+                        <span class="status-dot" style="background:#94a3b8;"></span>
+                    {% endif %}
+                    {{ package.status|replace('_', ' ')|title }}
+                </div>
+                <div class="vp-progress">
+                    <div class="vp-progress-bar" id="adminProgressBar" style="width: 0%;"></div>
+                </div>
+                <span class="vp-progress-text" id="adminProgressText">Progress: 0%</span>
+            </div>
+
+            <div>
+                <span class="vp-stat-label">Created</span>
+                <div class="vp-stat-value">
+                    <span class="local-time"
+                          data-iso="{{ package.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                          data-format="datetime">
+                        {{ package.created_at|format_dt('%Y-%m-%d %H:%M') }}
+                    </span>
+                </div>
+            </div>
+
+            <div>
+                <span class="vp-stat-label">Estimated delivery</span>
+                <div class="vp-stat-value">
+                    {% if package.estimated_delivery %}
+                        <span class="local-time"
+                              data-iso="{{ package.estimated_delivery.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                              data-format="date">
+                            {{ package.estimated_delivery|format_dt('%Y-%m-%d') }}
+                        </span>
+                    {% else %}
+                        Not set
+                    {% endif %}
+                    <small id="adminLiveEta">ETA: calculating…</small>
+                    <small id="adminEtaNextText">To next stop: calculating…</small>
+                </div>
+            </div>
+
+            <div>
+                <span class="vp-stat-label">Last updated</span>
+                <div class="vp-stat-value">
+                    {% if package.updated_at %}
+                        <span class="local-time"
+                              data-iso="{{ package.updated_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                              data-format="datetime">
+                            {{ package.updated_at|format_dt('%Y-%m-%d %H:%M') }}
+                        </span>
+                    {% else %}
+                        Never
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== INFO GRID ==================== -->
+        <div class="vp-grid">
+
+            <!-- Sender -->
+            <div class="vp-card">
+                <div class="vp-card-header">
+                    <span class="icon"><i class="fas fa-arrow-up-from-bracket"></i></span>
+                    <h2 class="vp-card-title">Sender information</h2>
+                </div>
+                <div class="vp-card-body">
+                    <table class="vp-info-table">
+                        <tr><th>Name</th><td>{{ package.sender_name or '—' }}</td></tr>
+                        <tr><th>Address</th><td>{{ package.sender_address or '—' }}</td></tr>
+                        <tr><th>Phone</th><td>{{ package.sender_phone or '—' }}</td></tr>
+                        <tr><th>Email</th>
+                            <td>
+                                {% if package.sender_email %}
+                                    <a href="mailto:{{ package.sender_email }}">{{ package.sender_email }}</a>
+                                {% else %}—{% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recipient -->
+            <div class="vp-card">
+                <div class="vp-card-header">
+                    <span class="icon"><i class="fas fa-flag-checkered"></i></span>
+                    <h2 class="vp-card-title">Recipient information</h2>
+                </div>
+                <div class="vp-card-body">
+                    <table class="vp-info-table">
+                        <tr><th>Name</th><td>{{ package.recipient_name or '—' }}</td></tr>
+                        <tr><th>Address</th><td>{{ package.recipient_address or '—' }}</td></tr>
+                        <tr><th>Phone</th><td>{{ package.recipient_phone or '—' }}</td></tr>
+                        <tr><th>Email</th>
+                            <td>
+                                {% if package.recipient_email %}
+                                    <a href="mailto:{{ package.recipient_email }}">{{ package.recipient_email }}</a>
+                                {% else %}—{% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Package details -->
+            <div class="vp-card">
+                <div class="vp-card-header">
+                    <span class="icon"><i class="fas fa-box"></i></span>
+                    <h2 class="vp-card-title">Package details</h2>
+                </div>
+                <div class="vp-card-body">
+                    <table class="vp-info-table">
+                        <tr><th>Weight</th><td>{{ package.weight or '—' }} kg</td></tr>
+                        <tr><th>Dimensions</th><td>{{ package.dimensions or '—' }}</td></tr>
+                        <tr><th>Package type</th><td>{{ package.package_type|title if package.package_type else '—' }}</td></tr>
+                        <tr><th>Shipping type</th><td>{{ package.shipping_type|title if package.shipping_type else '—' }}</td></tr>
+                        <tr><th>Shipping method</th><td>{{ package.shipping_method|title if package.shipping_method else '—' }}</td></tr>
+                        <tr><th>Declared value</th>
+                            <td>${{ "%.2f"|format(package.declared_value) if package.declared_value else '0.00' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Location info -->
+            <div class="vp-card">
+                <div class="vp-card-header">
+                    <span class="icon"><i class="fas fa-map-location-dot"></i></span>
+                    <h2 class="vp-card-title">Location information</h2>
+                </div>
+                <div class="vp-card-body">
+                    <div class="vp-address-block">
+                        <div class="vp-address-label"><i class="fas fa-location-dot"></i> Pickup address</div>
+                        <p class="vp-address-text">{{ package.pickup_address or 'Not specified' }}</p>
+                    </div>
+
+                    <div class="vp-address-block">
+                        <div class="vp-address-label"><i class="fas fa-flag-checkered"></i> Destination address</div>
+                        <p class="vp-address-text">{{ package.destination_address or 'Not specified' }}</p>
+                    </div>
+
+                    {% if package.current_location_lat and package.current_location_lng %}
+                    <div class="vp-address-block">
+                        <div class="vp-address-label"><i class="fas fa-satellite-dish"></i> Current location</div>
+                        <span class="vp-coords-pill" id="adminCoordsValue">
+                            {{ "%.6f"|format(package.current_location_lat) }}, {{ "%.6f"|format(package.current_location_lng) }}
+                        </span>
+                        <div id="holdMap" class="vp-map" aria-label="Current location map"></div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==================== QUICK ACTIONS ==================== -->
+        <div class="vp-quick">
+            <h3><span class="icon"><i class="fas fa-bolt"></i></span> Quick actions</h3>
+
+            <div class="vp-quick-grid">
+                <button type="button" class="vp-btn primary" onclick="updateLocation({{ package.id }})">
+                    <i class="fas fa-map-marker-alt"></i> Update location
+                </button>
+
+                {% if package.status == 'in_transit' %}
+                <button type="button" class="vp-btn warning" onclick="placeOnHold({{ package.id }})">
+                    <i class="fas fa-pause"></i> Place on hold
+                </button>
+                {% elif package.status == 'on_hold' %}
+                <button type="button" class="vp-btn success" onclick="releaseHold({{ package.id }})">
+                    <i class="fas fa-play"></i> Release hold
+                </button>
+                {% endif %}
+
+                <a href="{{ url_for('generate_label', package_id=package.id) }}"
+                   class="vp-btn ghost" target="_blank" rel="noopener">
+                    <i class="fas fa-tag"></i> Download label
+                </a>
+
+                <button type="button" class="vp-btn ghost"
+                        onclick="copyTrackingCode('{{ package.tracking_code }}')">
+                    <i class="fas fa-copy"></i> Copy code
+                </button>
+            </div>
+
+            <!-- Inline status change -->
+            <div class="vp-status-change">
+                <div class="vp-status-change-grid">
+                
+                    <div>
+                        <span class="vp-label">Notify recipient</span>
+                        <label class="vp-check">
+                            <input type="checkbox" id="statusNotify" checked>
+                            <span>Send email &amp; SMS</span>
+                        </label>
+                    </div>
+
+                    <button type="button" class="vp-btn primary" onclick="changeStatus({{ package.id }})">
+                        <i class="fas fa-paper-plane"></i> Update
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== LOCATION HISTORY ==================== -->
+        <div class="vp-table-card">
+            <div class="vp-table-header">
+                <span class="icon"><i class="fas fa-clock-rotate-left"></i></span>
+                <h3>Location history</h3>
+                {% if location_history %}
+                <span class="count">{{ location_history|length }} update{{ '' if location_history|length == 1 else 's' }}</span>
+                {% endif %}
+            </div>
+
+            {% if location_history %}
+            <div class="vp-table-wrapper">
+                <table class="vp-table">
+                    <thead>
+                        <tr>
+                            <th>Date / time</th>
+                            <th>Location</th>
+                            <th>Coordinates</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loc in location_history %}
+                        <tr>
+                            <td>
+                                <span class="local-time"
+                                      data-iso="{{ loc.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                                      data-format="datetime">
+                                    {{ loc.created_at|format_dt('%Y-%m-%d %H:%M') }}
+                                </span>
+                            </td>
+                            <td>{{ loc.location_name or '—' }}</td>
+                            <td>
+                                {% if loc.latitude is not none and loc.longitude is not none %}
+                                    <code>{{ "%.4f"|format(loc.latitude) }}, {{ "%.4f"|format(loc.longitude) }}</code>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if loc.status == 'in_transit' %}
+                                    <span class="vp-badge success">In transit</span>
+                                {% elif loc.status == 'on_hold' %}
+                                    <span class="vp-badge warning">On hold</span>
+                                {% elif loc.status == 'delivered' %}
+                                    <span class="vp-badge info">Delivered</span>
+                                {% elif loc.status %}
+                                    <span class="vp-badge secondary">{{ loc.status|replace('_', ' ')|title }}</span>
+                                {% else %}
+                                    <span class="vp-badge secondary">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="vp-empty">
+                <i class="fas fa-inbox"></i>
+                No location updates recorded yet.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ==================== HOLD RECORDS ==================== -->
+        {% if hold_records %}
+        <div class="vp-table-card">
+            <div class="vp-table-header">
+                <span class="icon"><i class="fas fa-pause"></i></span>
+                <h3>Hold records</h3>
+                <span class="count">{{ hold_records|length }}</span>
+            </div>
+
+            <div class="vp-table-wrapper">
+                <table class="vp-table">
+                    <thead>
+                        <tr>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Reason</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hold in hold_records %}
+                        <tr>
+                            <td>{{ hold.hold_start|format_dt('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ hold.hold_end|format_dt('%Y-%m-%d %H:%M') if hold.hold_end else 'Active' }}</td>
+                            <td>{{ hold.reason or '—' }}</td>
+                            <td>
+                                {% if hold.hold_end %}
+                                    {% set _end = parse_dt(hold.hold_end) %}
+                                    {% set _start = parse_dt(hold.hold_start) %}
+                                    {% if _end and _start %}
+                                        {{ (((_end - _start).total_seconds() / 3600)|round(1)) }} h
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                {% else %}
+                                    {% set _start = parse_dt(hold.hold_start) %}
+                                    {% if _start %}
+                                        {{ ((( now - _start).total_seconds() / 3600)|round(1)) }} h (active)
+                                    {% else %}
+                                        Active
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- ==================== LOCATION MODAL ==================== -->
+<div class="modal fade vp-modal" id="locationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-map-marker-alt"></i> Update location
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="locationForm">
+                    <input type="hidden" id="packageId" value="{{ package.id }}">
+
+                    <div class="mb-3">
+                        <label for="locationName" class="vp-label">Location name <span style="color: var(--vp-danger);">*</span></label>
+                        <input type="text" class="vp-field" id="locationName"
+                               placeholder="e.g. Berlin sorting centre" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="locationStatus" class="vp-label">Status</label>
+                        <select class="vp-field" id="locationStatus">
+                            <option value="in_transit">In transit</option>
+                            <option value="arrived">Arrived at facility</option>
+                            <option value="departed">Departed facility</option>
+                            <option value="out_for_delivery">Out for delivery</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="pending">Pending</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="dispatched">Dispatched</option>
+                            <option value="on_hold">On hold</option>
+                        </select>
+                    </div>
+
+                    <label class="vp-check">
+                        <input type="checkbox" id="notifyRecipient">
+                        <span>Notify recipient via email / SMS</span>
+                    </label>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="vp-btn ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="vp-btn primary" onclick="saveLocation()">Update location</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== HOLD MODAL ==================== -->
+<div class="modal fade vp-modal" id="holdModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header warning">
+                <h5 class="modal-title">
+                    <i class="fas fa-pause"></i> Place on hold
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="holdForm">
+                    <input type="hidden" id="holdPackageId" value="{{ package.id }}">
+
+                    <div class="mb-3">
+                        <label for="holdReason" class="vp-label">Reason for hold <span style="color: var(--vp-danger);">*</span></label>
+                        <select class="vp-field" id="holdReason" required>
+                            <option value="">Select a reason</option>
+                            <option value="Customs Inspection">Customs inspection</option>
+                            <option value="Weather Delay">Weather delay</option>
+                            <option value="Address Issue">Address issue</option>
+                            <option value="Recipient Request">Recipient request</option>
+                            <option value="Payment Pending">Payment pending</option>
+                            <option value="Documentation Required">Documentation required</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="holdNotes" class="vp-label">Additional notes <span style="text-transform: none; color: var(--vp-muted-2); font-weight: 500;">optional</span></label>
+                        <textarea class="vp-field" id="holdNotes" rows="3"
+                                  placeholder="Any context that should appear in the hold record…"></textarea>
+                    </div>
+
+                    <label class="vp-check">
+                        <input type="checkbox" id="notifyHold">
+                        <span>Notify recipient</span>
+                    </label>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="vp-btn ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="vp-btn warning" onclick="confirmHold()">Place on hold</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== SIMULATE ROUTE MODAL ==================== -->
+<div class="modal fade vp-modal" id="simulateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-route"></i> Simulate route
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Click on the map to choose a destination, or enter coordinates manually. Then start the simulation.</p>
+
+                <div id="simulateMap" class="vp-map vp-map--lg" aria-label="Simulation map"></div>
+
+                <div class="row g-2 mt-3">
+                    <div class="col-md-4">
+                        <label for="simLat" class="vp-label">Latitude</label>
+                        <input id="simLat" class="vp-field" placeholder="e.g. 52.5200">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="simLng" class="vp-label">Longitude</label>
+                        <input id="simLng" class="vp-field" placeholder="e.g. 13.4050">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="simSpeed" class="vp-label">Speed (km/h)</label>
+                        <input id="simSpeed" type="number" class="vp-field" value="60" min="1">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="simInterval" class="vp-label">Interval (s)</label>
+                        <input id="simInterval" type="number" class="vp-field" value="5" min="1">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="vp-btn ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="vp-btn primary" onclick="startSimulation({{ package.id }})">
+                    Start simulation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Google Maps is included in base.html when need_maps is set -->
+<script>
+(function () {
+    'use strict';
+
+    const TRACKING_CODE = '{{ package.tracking_code }}';
+    const PACKAGE_ID    = {{ package.id }};
+
+    /* ==================== Toast ==================== */
+    function showNotification(message, type = 'info') {
+        const el = document.createElement('div');
+        el.className = `vp-toast ${type}`;
+        const icon = {
+            success: 'circle-check',
+            error:   'circle-exclamation',
+            warning: 'triangle-exclamation',
+            info:    'circle-info'
+        }[type] || 'circle-info';
+
+        el.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(el);
+
+        setTimeout(() => {
+            el.classList.add('fade-out');
+            setTimeout(() => el.remove(), 300);
+        }, 3400);
+    }
+    window.showNotification = showNotification;
+
+    /* ==================== JSON helper ==================== */
+    async function postJSON(url, payload) {
+        const response = await fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(payload || {})
+        });
+
+        const ct = response.headers.get('content-type') || '';
+
+        if (!response.ok) {
+            if (ct.includes('application/json')) {
+                const err = await response.json();
+                throw new Error(err.error || JSON.stringify(err));
+            }
+            const text = await response.text();
+            throw new Error(text.split('\n')[0] || `HTTP ${response.status}`);
+        }
+
+        if (ct.includes('application/json')) return response.json();
+        const text = await response.text();
+        try { return JSON.parse(text); } catch (e) {
+            throw new Error(text.split('\n')[0] || 'Invalid server response');
+        }
+    }
+
+    /* ==================== Clipboard ==================== */
+    window.copyTrackingCode = function (code) {
+        const done = () => showNotification('Tracking code copied to clipboard', 'success');
+        const fail = () => showNotification('Failed to copy tracking code', 'error');
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(done).catch(fail);
+            return;
+        }
+        const ta = document.createElement('textarea');
+        ta.value = code;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) { fail(); }
+        document.body.removeChild(ta);
+    };
+
+    /* ==================== Location update ==================== */
+    window.updateLocation = function () {
+        const modalEl = document.getElementById('locationModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+            new bootstrap.Modal(modalEl).show();
+        }
+    };
+
+    window.saveLocation = async function () {
+        const data = {
+            location_name: (document.getElementById('locationName')?.value || '').trim(),
+            status: document.getElementById('locationStatus')?.value || 'in_transit',
+            notify_recipient: document.getElementById('notifyRecipient')?.checked || false
+        };
+
+        if (!data.location_name) {
+            showNotification('Please enter a location name.', 'warning');
+            return;
+        }
+
+        try {
+            const result = await postJSON(`/admin/package/${PACKAGE_ID}/update-location`, data);
+            if (!result || !result.success) {
+                showNotification('Update failed: ' + ((result && result.error) || 'unknown error'), 'error');
+                return;
+            }
+
+            const newLat = result.lat ? parseFloat(result.lat) : null;
+            const newLng = result.lng ? parseFloat(result.lng) : null;
+
+            if (window.holdMap && newLat !== null && newLng !== null) {
+                if (window.holdMapCurrentMarker && window.holdMapCurrentMarker.setPosition) {
+                    window.holdMapCurrentMarker.setPosition({ lat: newLat, lng: newLng });
+                } else if (typeof addMarker === 'function') {
+                    window.holdMapCurrentMarker = addMarker(window.holdMap, [newLng, newLat], '#e11d2a');
+                }
+                if (typeof window.holdMap.setCenter === 'function') {
+                    window.holdMap.setCenter({ lat: newLat, lng: newLng });
+                }
+                const coordsEl = document.getElementById('adminCoordsValue');
+                if (coordsEl) coordsEl.textContent = `${newLat.toFixed(6)}, ${newLng.toFixed(6)}`;
+            }
+
+            const inst = bootstrap.Modal.getInstance(document.getElementById('locationModal'));
+            if (inst) inst.hide();
+            showNotification('Location updated successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+
+        } catch (err) {
+            showNotification('Update failed: ' + (err.message || err), 'error');
+        }
+    };
+
+    /* ==================== Hold ==================== */
+    window.placeOnHold = function () {
+        const modalEl = document.getElementById('holdModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+            new bootstrap.Modal(modalEl).show();
+        }
+    };
+
+    window.confirmHold = async function () {
+        const reason = document.getElementById('holdReason')?.value;
+        const notes = document.getElementById('holdNotes')?.value || '';
+
+        if (!reason) {
+            showNotification('Please select a reason for the hold.', 'warning');
+            return;
+        }
+
+        try {
+            const result = await postJSON(`/admin/package/${PACKAGE_ID}/hold`, {
+                reason: reason,
+                notes: notes,
+                notify: document.getElementById('notifyHold')?.checked || false
+            });
+
+            if (!result || !result.success) {
+                showNotification('Hold failed: ' + ((result && result.error) || 'unknown'), 'error');
+                return;
+            }
+
+            const inst = bootstrap.Modal.getInstance(document.getElementById('holdModal'));
+            if (inst) inst.hide();
+            showNotification('Package placed on hold', 'warning');
+            setTimeout(() => location.reload(), 1000);
+        } catch (err) {
+            showNotification('Hold failed: ' + (err.message || err), 'error');
+        }
+    };
+
+    window.releaseHold = async function () {
+        if (!confirm('Release this package from hold?')) return;
+        try {
+            const result = await postJSON(`/admin/package/${PACKAGE_ID}/release-hold`, {});
+            if (!result || !result.success) {
+                showNotification('Release failed: ' + ((result && result.error) || 'unknown'), 'error');
+                return;
+            }
+            showNotification('Hold released successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } catch (err) {
+            showNotification('Release failed: ' + (err.message || err), 'error');
+        }
+    };
+
+    /* ==================== Status change ==================== */
+    window.changeStatus = async function () {
+        const status = document.getElementById('statusSelect')?.value;
+        const notify = document.getElementById('statusNotify')?.checked || false;
+        if (!status) return;
+
+        try {
+            const result = await postJSON(`/admin/package/${PACKAGE_ID}/status`, {
+                status: status,
+                notify: notify
+            });
+            if (!result || !result.success) {
+                showNotification('Status update failed: ' + ((result && result.error) || 'unknown'), 'error');
+                return;
+            }
+            showNotification('Status updated successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } catch (err) {
+            showNotification('Status update failed: ' + (err.message || err), 'error');
+        }
+    };
+
+    /* ==================== Simulation ==================== */
+    window.openSimModal = function () {
+        const modalEl = document.getElementById('simulateModal');
+        if (!modalEl || typeof bootstrap === 'undefined') return;
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        modalEl.addEventListener('shown.bs.modal', function initOnce() {
+            modalEl.removeEventListener('shown.bs.modal', initOnce);
+            if (window._simInit) return;
+            window._simInit = true;
+
+            if (typeof google === 'undefined' || !google.maps) {
+                const el = document.getElementById('simulateMap');
+                if (el) el.innerHTML = '<div class="vp-empty" style="color: #dc2626;"><i class="fas fa-triangle-exclamation"></i>Google Maps is not loaded.</div>';
+                return;
+            }
+
+            try {
+                const center = [
+                    {{ package.current_location_lng or package.pickup_lng or 0 }},
+                    {{ package.current_location_lat or package.pickup_lat or 0 }}
+                ];
+                const map = initializeMap('simulateMap', center, 6);
+                window.simulateMap = map;
+
+                let simMarker = null;
+                map.addListener('click', function (e) {
+                    const lat = e.latLng.lat();
+                    const lng = e.latLng.lng();
+                    const latEl = document.getElementById('simLat');
+                    const lngEl = document.getElementById('simLng');
+                    if (latEl) latEl.value = lat.toFixed(6);
+                    if (lngEl) lngEl.value = lng.toFixed(6);
+
+                    if (simMarker && simMarker.setPosition) {
+                        simMarker.setPosition({ lat, lng });
+                    } else if (typeof addMarker === 'function') {
+                        simMarker = addMarker(map, [lng, lat], '#e11d2a');
+                    }
+                });
+
+                const curLat = {{ package.current_location_lat or 'null' }};
+                const curLng = {{ package.current_location_lng or 'null' }};
+                if (curLat && curLng && typeof addMarker === 'function') {
+                    addMarker(map, [curLng, curLat], '#16a34a');
+                }
+            } catch (err) {
+                console.error('Simulation map init error', err);
+            }
+        });
+    };
+
+    window.startSimulation = async function () {
+        const lat = parseFloat(document.getElementById('simLat')?.value || '0');
+        const lng = parseFloat(document.getElementById('simLng')?.value || '0');
+        const speed = parseFloat(document.getElementById('simSpeed')?.value || '60');
+        const interval = parseFloat(document.getElementById('simInterval')?.value || '5');
+
+        if (!lat || !lng) {
+            showNotification('Please pick a destination on the map or enter coordinates.', 'warning');
+            return;
+        }
+
+        try {
+            const result = await postJSON(`/admin/package/${PACKAGE_ID}/simulate-route`, {
+                lat: lat, lng: lng, speed_kmh: speed, interval: interval
+            });
+            if (!result || !result.success) {
+                showNotification('Simulation failed: ' + ((result && result.error) || 'unknown'), 'error');
+                return;
+            }
+            const inst = bootstrap.Modal.getInstance(document.getElementById('simulateModal'));
+            if (inst) inst.hide();
+            showNotification('Simulation started', 'success');
+        } catch (err) {
+            showNotification('Simulation failed: ' + (err.message || err), 'error');
+        }
+    };
+
+    window.stopSimulationConfirm = async function () {
+        if (!confirm('Stop the simulation and place the package on hold?')) return;
+        try {
+            const result = await postJSON(`/admin/package/${PACKAGE_ID}/stop-simulation`, {});
+            if (!result || !result.success) {
+                showNotification('Stop failed: ' + ((result && result.error) || 'unknown'), 'error');
+                return;
+            }
+            showNotification('Simulation stopped — package placed on hold', 'warning');
+            setTimeout(() => location.reload(), 1000);
+        } catch (err) {
+            showNotification('Stop failed: ' + (err.message || err), 'error');
+        }
+    };
+
+    window.toggleSimulation = async function () {
+        const btn = document.getElementById('toggleSimBtn');
+        if (!btn) return;
+        const currentlyActive = btn.textContent.trim().toLowerCase().includes('pause');
+        const desired = !currentlyActive;
+
+        try {
+            const result = await postJSON(`/admin/package/${PACKAGE_ID}/set-simulation`, { active: desired });
+            if (!result || !result.success) {
+                showNotification('Toggle failed: ' + ((result && result.error) || 'unknown'), 'error');
+                return;
+            }
+            if (result.simulation_active) {
+                btn.innerHTML = '<i class="fas fa-pause"></i> Pause simulation';
+                showNotification('Simulation resumed', 'success');
+            } else {
+                btn.innerHTML = '<i class="fas fa-play"></i> Resume simulation';
+                showNotification('Simulation paused', 'info');
+            }
+        } catch (err) {
+            showNotification('Toggle failed: ' + (err.message || err), 'error');
+        }
+    };
+
+    /* ==================== Live updates (Socket.IO) ==================== */
+    function updateAdminLiveEta(etaSeconds, remainingKm) {
+        const el = document.getElementById('adminLiveEta');
+        if (!el) return;
+        if (etaSeconds == null || isNaN(etaSeconds)) {
+            el.textContent = 'ETA: calculating…';
+            return;
+        }
+        const s = parseInt(etaSeconds, 10);
+        if (s <= 0) { el.textContent = 'ETA: arriving shortly'; return; }
+        const hours = Math.floor(s / 3600);
+        const minutes = Math.floor((s % 3600) / 60);
+        const parts = [];
+        if (hours > 0) parts.push(hours + 'h');
+        if (minutes > 0) parts.push(minutes + 'm');
+        if (parts.length === 0) parts.push('<1m');
+        const kmText = (typeof remainingKm !== 'undefined' && remainingKm !== null) ? ` · ${remainingKm} km away` : '';
+        el.textContent = `ETA: ${parts.join(' ')}${kmText}`;
+    }
+
+    function updateAdminEtaNext(etaSeconds, nextName) {
+        const textEl = document.getElementById('adminEtaNextText');
+        if (!textEl) return;
+        if (etaSeconds == null || isNaN(etaSeconds)) {
+            textEl.textContent = nextName ? `To ${nextName}: calculating…` : 'To next stop: calculating…';
+            return;
+        }
+        const s = parseInt(etaSeconds, 10);
+        if (s <= 0) {
+            textEl.textContent = nextName ? `To ${nextName}: arriving shortly` : 'To next stop: arriving shortly';
+            return;
+        }
+        const hours = Math.floor(s / 3600);
+        const minutes = Math.floor((s % 3600) / 60);
+        const parts = [];
+        if (hours > 0) parts.push(hours + 'h');
+        if (minutes > 0) parts.push(minutes + 'm');
+        if (parts.length === 0) parts.push('<1m');
+        const nameText = nextName ? ` to ${nextName}` : '';
+        textEl.textContent = `To next stop${nameText}: ${parts.join(' ')}`;
+    }
+
+    function initSocket() {
+        if (typeof io === 'undefined') return;
+        try {
+            const socket = io();
+            socket.on('connect', () => {
+                socket.emit('subscribe', { tracking_code: TRACKING_CODE });
+            });
+            socket.on('location_update', (data) => {
+                if (!data || data.tracking_code !== TRACKING_CODE) return;
+
+                if (data.lat != null && data.lng != null) {
+                    const coordsEl = document.getElementById('adminCoordsValue');
+                    if (coordsEl) {
+                        coordsEl.textContent =
+                            `${parseFloat(data.lat).toFixed(6)}, ${parseFloat(data.lng).toFixed(6)}`;
+                    }
+                }
+                if (typeof data.eta_seconds !== 'undefined') {
+                    updateAdminLiveEta(data.eta_seconds, data.remaining_km);
+                }
+                const nextEta = data.eta_to_next || data.next_eta_seconds || data.eta_next;
+                if (typeof nextEta !== 'undefined') {
+                    updateAdminEtaNext(nextEta, data.next_location_name);
+                }
+                if (typeof data.progress !== 'undefined') {
+                    const text = document.getElementById('adminProgressText');
+                    if (text) text.textContent = `Progress: ${data.progress}%`;
+                    const bar = document.getElementById('adminProgressBar');
+                    if (bar) {
+                        const pct = Math.max(0, Math.min(100, parseFloat(data.progress) || 0));
+                        bar.style.width = pct + '%';
+                    }
+                }
+            });
+            socket.on('status_update', (data) => {
+                if (!data || data.tracking_code !== TRACKING_CODE) return;
+                location.reload();
+            });
+        } catch (err) {
+            console.error('Admin socket error', err);
+        }
+    }
+
+    /* ==================== Init ==================== */
+    document.addEventListener('DOMContentLoaded', function () {
+        /* Hold map (current location) */
+        try {
+            const holdMapEl = document.getElementById('holdMap');
+            if (holdMapEl && typeof google !== 'undefined' && google.maps) {
+                const curLat = {{ package.current_location_lat or 'null' }};
+                const curLng = {{ package.current_location_lng or 'null' }};
+                const center = (curLat && curLng)
+                    ? [curLng, curLat]
+                    : [{{ package.pickup_lng or 0 }}, {{ package.pickup_lat or 0 }}];
+
+                const map = initializeMap('holdMap', center, 8);
+                window.holdMap = map;
+
+                if (curLat && curLng && typeof addMarker === 'function') {
+                    window.holdMapCurrentMarker = addMarker(map, [curLng, curLat], '#e11d2a');
+                }
+            }
+        } catch (err) {
+            console.error('Hold map init error', err);
+        }
+
+        initSocket();
+    });
+
+})();
+</script>
+{% endblock %}

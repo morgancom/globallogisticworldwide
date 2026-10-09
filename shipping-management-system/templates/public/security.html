@@ -1,0 +1,978 @@
+{% extends "base.html" %}
+
+{% block title %}Security Center — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — SECURITY CENTER
+   Warm neutrals + muted wine red, matching the current base.html.
+   ========================================================================= */
+
+:root {
+    --sc-surface:       #ffffff;
+    --sc-surface-alt:   #f7f6f3;
+    --sc-surface-soft:  #f0ede7;
+    --sc-line:          #e6e2db;
+    --sc-line-soft:     #eeebe5;
+    --sc-ink:           #141414;
+    --sc-text:          #2c2c2c;
+    --sc-muted:         #6b6b6b;
+    --sc-muted-2:       #9a948a;
+
+    --sc-success:       #3d7a4e;
+    --sc-success-bg:    #eff6f1;
+    --sc-warning:       #a06420;
+    --sc-warning-bg:    #faf3e8;
+
+    --sc-sh-sm: 0 1px 2px rgba(20, 20, 20, .04);
+    --sc-sh-md: 0 4px 12px -6px rgba(20, 20, 20, .10);
+
+    --sc-ease: cubic-bezier(.4, 0, .2, 1);
+    --sc-dur:  180ms;
+
+    --sc-r-sm: 4px;
+    --sc-r-md: 6px;
+    --sc-r-lg: 8px;
+    --sc-r-xl: 10px;
+    --sc-pill: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --sc-surface:      #221f1c;
+        --sc-surface-alt:  #1c1a17;
+        --sc-surface-soft: #26231f;
+        --sc-line:         #2b2823;
+        --sc-line-soft:    #24211d;
+        --sc-ink:          #f4f2ee;
+        --sc-text:         #d4cec5;
+        --sc-muted:        #9a948a;
+        --sc-muted-2:      #7a746a;
+
+        --sc-success-bg:   #16261a;
+        --sc-warning-bg:   #2a2214;
+
+        --sc-sh-sm: 0 1px 2px rgba(0, 0, 0, .4);
+        --sc-sh-md: 0 4px 12px -6px rgba(0, 0, 0, .5);
+    }
+}
+
+body { background: var(--sc-surface-alt); color: var(--sc-text); }
+
+.sc-page h1, .sc-page h2, .sc-page h3,
+.sc-page h4, .sc-page h5, .sc-page h6 {
+    color: var(--sc-ink);
+    letter-spacing: -0.015em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+.sc-hero {
+    position: relative;
+    padding: clamp(56px, 8vw, 104px) 0 clamp(48px, 6vw, 84px);
+    color: #fff;
+    overflow: hidden;
+    background:
+        linear-gradient(100deg,
+            rgba(15, 13, 11, .94) 0%,
+            rgba(15, 13, 11, .86) 40%,
+            rgba(15, 13, 11, .55) 72%,
+            rgba(15, 13, 11, .32) 100%),
+        url("https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2000&q=85") center/cover no-repeat;
+}
+.sc-hero > .container { position: relative; z-index: 1; max-width: 1280px; }
+
+.sc-hero-inner {
+    max-width: 860px;
+}
+
+.sc-hero .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    border-radius: var(--sc-pill);
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .16);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+}
+.sc-hero .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #6eaa7c;
+}
+
+.sc-hero h1 {
+    font-size: clamp(2.05rem, 4.8vw, 3.35rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin: 0 0 20px;
+}
+.sc-hero h1 em {
+    font-style: normal;
+    color: #e5c9cd;
+}
+
+.sc-hero .lead {
+    font-size: clamp(1rem, 1.25vw, 1.1rem);
+    line-height: 1.7;
+    color: #d5d1c9;
+    max-width: 720px;
+    margin: 0 0 28px;
+}
+
+.sc-hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 22px;
+    border-top: 1px dashed rgba(255, 255, 255, .12);
+}
+.sc-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: var(--sc-r-sm);
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .12);
+    color: #e8e4de;
+    font-size: .76rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+.sc-hero-badge i {
+    color: #6eaa7c;
+    font-size: .9em;
+}
+
+/* =========================================================================
+   SECTION HELPERS
+   ========================================================================= */
+.sc-section { padding: clamp(52px, 7vw, 92px) 0; }
+.sc-section--alt { background: var(--sc-surface-alt); }
+.sc-section--surface { background: var(--sc-surface); }
+
+.sc-heading {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto clamp(36px, 5vw, 56px);
+}
+.sc-heading .label {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: var(--sc-pill);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+.sc-heading h2 {
+    font-size: clamp(1.55rem, 3.4vw, 2.25rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+}
+.sc-heading p {
+    font-size: 1rem;
+    color: var(--sc-muted);
+    margin: 0;
+    line-height: 1.7;
+}
+
+/* =========================================================================
+   PILLARS GRID
+   ========================================================================= */
+.sc-pillars {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+@media (max-width: 1000px) { .sc-pillars { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px)  { .sc-pillars { grid-template-columns: 1fr; } }
+
+.sc-pillar {
+    position: relative;
+    padding: 24px 22px;
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-line);
+    border-radius: var(--sc-r-lg);
+    overflow: hidden;
+    transition: border-color var(--sc-dur) var(--sc-ease);
+}
+.sc-pillar:hover {
+    border-color: var(--sc-line-strong, #d3cec5);
+}
+
+.sc-pillar .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--sc-r-md);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: 1.15rem;
+    margin-bottom: 16px;
+}
+.sc-pillar h3 {
+    font-size: 1.02rem;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+}
+.sc-pillar p {
+    font-size: .86rem;
+    line-height: 1.65;
+    color: var(--sc-muted);
+    margin: 0 0 14px;
+}
+.sc-pillar-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.sc-pillar-tags span {
+    display: inline-flex;
+    padding: 3px 10px;
+    border-radius: var(--sc-r-sm);
+    background: var(--sc-surface-soft);
+    border: 1px solid var(--sc-line);
+    color: var(--sc-muted);
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+/* =========================================================================
+   CERTIFICATIONS
+   ========================================================================= */
+.sc-certs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+@media (max-width: 820px) { .sc-certs { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 400px) { .sc-certs { grid-template-columns: 1fr; } }
+
+.sc-cert {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-line);
+    border-radius: var(--sc-r-md);
+    transition: border-color var(--sc-dur) var(--sc-ease);
+}
+.sc-cert:hover {
+    border-color: var(--sc-line-strong, #d3cec5);
+}
+.sc-cert .icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--sc-r-sm);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: 1.05rem;
+}
+.sc-cert .meta strong {
+    display: block;
+    font-size: .88rem;
+    font-weight: 800;
+    color: var(--sc-ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
+}
+.sc-cert .meta span {
+    font-size: .76rem;
+    color: var(--sc-muted);
+    line-height: 1.4;
+}
+
+/* =========================================================================
+   BEST PRACTICES
+   ========================================================================= */
+.sc-practices {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+@media (max-width: 820px) { .sc-practices { grid-template-columns: 1fr; } }
+
+.sc-practice {
+    padding: 26px 26px;
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-line);
+    border-radius: var(--sc-r-lg);
+    transition: border-color var(--sc-dur) var(--sc-ease);
+}
+.sc-practice:hover {
+    border-color: var(--sc-line-strong, #d3cec5);
+}
+
+.sc-practice-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+    border-bottom: 1px dashed var(--sc-line);
+}
+.sc-practice-header .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--sc-r-sm);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .98rem;
+}
+.sc-practice-header h3 {
+    font-size: 1rem;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.sc-practice ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+}
+.sc-practice ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: .88rem;
+    line-height: 1.55;
+    color: var(--sc-text);
+}
+.sc-practice ul li::before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--sc-success-bg);
+    color: var(--sc-success);
+    font-size: .55rem;
+    margin-top: 3px;
+}
+
+/* =========================================================================
+   ACCORDION
+   ========================================================================= */
+.sc-accordion {
+    display: grid;
+    gap: 10px;
+}
+.sc-acc-item {
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-line);
+    border-radius: var(--sc-r-md);
+    overflow: hidden;
+    transition: border-color var(--sc-dur) var(--sc-ease);
+}
+.sc-acc-item:hover {
+    border-color: var(--sc-line-strong, #d3cec5);
+}
+
+.sc-acc-header { margin: 0; }
+
+.sc-acc-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 16px 20px;
+    border: 0;
+    background: transparent;
+    color: var(--sc-ink);
+    font-size: .95rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--sc-dur) var(--sc-ease);
+}
+.sc-acc-btn:hover { background: var(--sc-surface-alt); }
+.sc-acc-btn:focus-visible {
+    outline: 2px solid var(--primary, #a51e2b);
+    outline-offset: -4px;
+}
+.sc-acc-btn .acc-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--sc-r-sm);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .88rem;
+    flex-shrink: 0;
+}
+.sc-acc-btn .acc-chevron {
+    margin-left: auto;
+    color: var(--sc-muted);
+    transition: transform var(--sc-dur) var(--sc-ease);
+    font-size: .82rem;
+}
+.sc-acc-btn[aria-expanded="true"] .acc-chevron {
+    transform: rotate(180deg);
+    color: var(--primary, #a51e2b);
+}
+.sc-acc-btn[aria-expanded="true"] {
+    background: var(--sc-surface-alt);
+    color: var(--primary, #a51e2b);
+}
+.sc-acc-btn[aria-expanded="true"] .acc-icon {
+    background: var(--primary, #a51e2b);
+    color: #fff;
+}
+
+.sc-acc-body {
+    padding: 6px 20px 22px;
+    border-top: 1px solid var(--sc-line-soft);
+}
+.sc-acc-body-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 26px;
+    padding-top: 18px;
+}
+@media (max-width: 640px) { .sc-acc-body-grid { grid-template-columns: 1fr; } }
+
+.sc-acc-feature h4 {
+    font-size: .88rem;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+}
+.sc-acc-feature p {
+    font-size: .84rem;
+    line-height: 1.6;
+    color: var(--sc-muted);
+    margin: 0;
+}
+
+/* =========================================================================
+   REPORT CARD
+   ========================================================================= */
+.sc-report {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 26px;
+    align-items: center;
+    padding: clamp(28px, 4vw, 40px);
+    border-radius: var(--sc-r-xl);
+    background: #171512;
+    color: #fff;
+    overflow: hidden;
+    border-top: 3px solid var(--primary, #a51e2b);
+}
+@media (max-width: 820px) {
+    .sc-report { grid-template-columns: 1fr; text-align: left; }
+}
+
+.sc-report-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+}
+.sc-report-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    border-radius: var(--sc-r-md);
+    background: rgba(217, 119, 6, .12);
+    border: 1px solid rgba(217, 119, 6, .28);
+    color: #d8a24a;
+    font-size: 1.35rem;
+}
+.sc-report h3 {
+    font-size: clamp(1.1rem, 1.9vw, 1.35rem);
+    color: #fff;
+    margin: 0 0 8px;
+    letter-spacing: -0.015em;
+}
+.sc-report p {
+    font-size: .92rem;
+    line-height: 1.65;
+    color: #b8b2a7;
+    margin: 0;
+    max-width: 620px;
+}
+
+.sc-report-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 26px;
+    border-radius: var(--sc-r-md);
+    background: var(--primary, #a51e2b);
+    color: #fff;
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color var(--sc-dur) var(--sc-ease);
+    white-space: nowrap;
+}
+.sc-report-cta:hover,
+.sc-report-cta:focus-visible {
+    background: var(--primary-600, #8f1825);
+    color: #fff;
+}
+
+/* =========================================================================
+   STATS
+   ========================================================================= */
+.sc-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+@media (max-width: 900px) { .sc-stats { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .sc-stats { grid-template-columns: 1fr; } }
+
+.sc-stat {
+    position: relative;
+    padding: 22px 20px;
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-line);
+    border-radius: var(--sc-r-md);
+    overflow: hidden;
+    transition: border-color var(--sc-dur) var(--sc-ease);
+}
+.sc-stat:hover {
+    border-color: var(--sc-line-strong, #d3cec5);
+}
+
+.sc-stat-value {
+    font-size: clamp(1.4rem, 2.8vw, 1.75rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--sc-ink);
+    line-height: 1;
+    margin-bottom: 6px;
+    font-variant-numeric: tabular-nums;
+}
+.sc-stat-label {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--sc-muted);
+}
+
+/* =========================================================================
+   REDUCED MOTION
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .sc-hero-badges, .sc-report-cta,
+    .navbar, footer, .back-to-top, #cookie-consent { display: none !important; }
+    .sc-hero { background: #fff !important; color: #000 !important; padding: 30px 0 !important; border-bottom: 2px solid #000; }
+    .sc-hero h1, .sc-hero .lead { color: #000 !important; }
+    .sc-hero h1 em { color: #000 !important; }
+    .sc-pillar, .sc-cert, .sc-practice, .sc-acc-item, .sc-stat {
+        border: 1px solid #ddd !important;
+    }
+    .sc-report { background: #f5f5f5 !important; color: #000 !important; border-top-color: #000 !important; }
+    .sc-report h3, .sc-report p { color: #000 !important; }
+    .sc-report-icon { background: #eee !important; color: #000 !important; border-color: #ccc !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sc-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="sc-hero">
+        <div class="container">
+            <div class="sc-hero-inner">
+                <span class="eyebrow">Security center</span>
+                <h1>Your data and shipments, <em>protected end to end.</em></h1>
+                <p class="lead">
+                    Every shipment you send and every byte of data you share with us is protected by
+                    enterprise-grade controls, independent certifications and a global security team
+                    that monitors our systems 24 hours a day, every day of the year.
+                </p>
+                <div class="sc-hero-badges">
+                    <span class="sc-hero-badge"><i class="fas fa-circle-check"></i> ISO 27001 certified</span>
+                    <span class="sc-hero-badge"><i class="fas fa-circle-check"></i> GDPR compliant</span>
+                    <span class="sc-hero-badge"><i class="fas fa-circle-check"></i> PCI DSS level 1</span>
+                    <span class="sc-hero-badge"><i class="fas fa-circle-check"></i> SOC 2 type II</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECURITY PILLARS ==================== -->
+    <section class="sc-section">
+        <div class="container">
+            <div class="sc-heading">
+                <span class="label">Our approach</span>
+                <h2>Four layers of defence</h2>
+                <p>Every part of our platform is designed around the assumption that security is a continuous process, not a one-time check.</p>
+            </div>
+
+            <div class="sc-pillars">
+                <div class="sc-pillar">
+                    <div class="icon"><i class="fas fa-lock"></i></div>
+                    <h3>Encryption</h3>
+                    <p>
+                        All data is encrypted in transit with TLS 1.3 and at rest with AES-256.
+                        Sensitive fields are tokenised where possible to minimise exposure.
+                    </p>
+                    <div class="sc-pillar-tags">
+                        <span>TLS 1.3</span>
+                        <span>AES-256</span>
+                        <span>PFS</span>
+                    </div>
+                </div>
+
+                <div class="sc-pillar">
+                    <div class="icon"><i class="fas fa-shield-halved"></i></div>
+                    <h3>Access control</h3>
+                    <p>
+                        Role-based access control, enforced multi-factor authentication and
+                        least-privilege principles keep sensitive data visible only where it should be.
+                    </p>
+                    <div class="sc-pillar-tags">
+                        <span>RBAC</span>
+                        <span>MFA</span>
+                        <span>SSO / SAML</span>
+                    </div>
+                </div>
+
+                <div class="sc-pillar">
+                    <div class="icon"><i class="fas fa-clipboard-check"></i></div>
+                    <h3>Compliance</h3>
+                    <p>
+                        Independently audited against the standards that matter for our customers —
+                        across data protection, payment security and international trade.
+                    </p>
+                    <div class="sc-pillar-tags">
+                        <span>GDPR</span>
+                        <span>CCPA</span>
+                        <span>PCI DSS</span>
+                    </div>
+                </div>
+
+                <div class="sc-pillar">
+                    <div class="icon"><i class="fas fa-tower-broadcast"></i></div>
+                    <h3>24/7 monitoring</h3>
+                    <p>
+                        A dedicated global security operations centre watches for threats around the
+                        clock, with automated alerts and human escalation paths.
+                    </p>
+                    <div class="sc-pillar-tags">
+                        <span>24/7 SOC</span>
+                        <span>SIEM</span>
+                        <span>IDS / IPS</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CERTIFICATIONS ==================== -->
+    <section class="sc-section sc-section--alt">
+        <div class="container">
+            <div class="sc-heading">
+                <span class="label">Certifications</span>
+                <h2>Independently verified</h2>
+                <p>Our controls are audited by third parties, not just asserted by us.</p>
+            </div>
+
+            <div class="sc-certs">
+                <div class="sc-cert">
+                    <span class="icon"><i class="fas fa-certificate"></i></span>
+                    <div class="meta">
+                        <strong>ISO 27001</strong>
+                        <span>Information security management</span>
+                    </div>
+                </div>
+                <div class="sc-cert">
+                    <span class="icon"><i class="fas fa-shield-halved"></i></span>
+                    <div class="meta">
+                        <strong>SOC 2 type II</strong>
+                        <span>Security, availability, confidentiality</span>
+                    </div>
+                </div>
+                <div class="sc-cert">
+                    <span class="icon"><i class="fas fa-user-shield"></i></span>
+                    <div class="meta">
+                        <strong>GDPR compliant</strong>
+                        <span>EU data protection framework</span>
+                    </div>
+                </div>
+                <div class="sc-cert">
+                    <span class="icon"><i class="fas fa-credit-card"></i></span>
+                    <div class="meta">
+                        <strong>PCI DSS level 1</strong>
+                        <span>Payment card industry standard</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== BEST PRACTICES ==================== -->
+    <section class="sc-section sc-section--surface">
+        <div class="container">
+            <div class="sc-heading">
+                <span class="label">Best practices</span>
+                <h2>What you can do to stay secure</h2>
+                <p>Security is a shared responsibility. Here are the practices we recommend for individuals and organisations using our platform.</p>
+            </div>
+
+            <div class="sc-practices">
+                <div class="sc-practice">
+                    <div class="sc-practice-header">
+                        <span class="icon"><i class="fas fa-user-shield"></i></span>
+                        <h3>For individual users</h3>
+                    </div>
+                    <ul>
+                        <li>Use a strong, unique password of at least 12 characters — never reuse it elsewhere</li>
+                        <li>Enable two-factor authentication on your Global shippments account</li>
+                        <li>Never share your login credentials by email, phone or chat</li>
+                        <li>Always sign out of shared or public devices</li>
+                        <li>Review your account activity regularly and report anything unusual</li>
+                        <li>Keep your recovery email and phone number up to date</li>
+                    </ul>
+                </div>
+
+                <div class="sc-practice">
+                    <div class="sc-practice-header">
+                        <span class="icon"><i class="fas fa-building-shield"></i></span>
+                        <h3>For organisations</h3>
+                    </div>
+                    <ul>
+                        <li>Implement role-based access control across your Global shippments team accounts</li>
+                        <li>Schedule regular security audits and independent penetration tests</li>
+                        <li>Run security awareness training for everyone who manages shipments</li>
+                        <li>Rotate API keys at least every 90 days</li>
+                        <li>Restrict sensitive operations to whitelisted IP ranges where possible</li>
+                        <li>Enable automated threat detection and connect alerts to your SIEM</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ADVANCED FEATURES (ACCORDION) ==================== -->
+    <section class="sc-section sc-section--alt">
+        <div class="container">
+            <div class="sc-heading">
+                <span class="label">Under the hood</span>
+                <h2>Advanced security features</h2>
+                <p>A closer look at the technical controls we operate across our infrastructure.</p>
+            </div>
+
+            <div class="sc-accordion" id="securityAccordion">
+
+                <!-- Network -->
+                <div class="sc-acc-item">
+                    <h3 class="sc-acc-header">
+                        <button class="sc-acc-btn" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#accNetwork"
+                                aria-expanded="true" aria-controls="accNetwork">
+                            <span class="acc-icon"><i class="fas fa-network-wired"></i></span>
+                            Network security
+                            <i class="fas fa-chevron-down acc-chevron"></i>
+                        </button>
+                    </h3>
+                    <div id="accNetwork" class="collapse show" data-bs-parent="#securityAccordion">
+                        <div class="sc-acc-body">
+                            <div class="sc-acc-body-grid">
+                                <div class="sc-acc-feature">
+                                    <h4>Firewall protection</h4>
+                                    <p>Enterprise-grade firewalls with intrusion prevention systems monitor traffic at every layer of our infrastructure.</p>
+                                </div>
+                                <div class="sc-acc-feature">
+                                    <h4>DDoS mitigation</h4>
+                                    <p>Multi-layer DDoS protection keeps services available during volumetric and application-layer attacks.</p>
+                                </div>
+                                <div class="sc-acc-feature">
+                                    <h4>VPN access</h4>
+                                    <p>All administrative access is routed through a hardened VPN with per-session authentication.</p>
+                                </div>
+                                <div class="sc-acc-feature">
+                                    <h4>Network segmentation</h4>
+                                    <p>Strict segmentation between environments limits the potential blast radius of any incident.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data -->
+                <div class="sc-acc-item">
+                    <h3 class="sc-acc-header">
+                        <button class="sc-acc-btn collapsed" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#accData"
+                                aria-expanded="false" aria-controls="accData">
+                            <span class="acc-icon"><i class="fas fa-database"></i></span>
+                            Data protection
+                            <i class="fas fa-chevron-down acc-chevron"></i>
+                        </button>
+                    </h3>
+                    <div id="accData" class="collapse" data-bs-parent="#securityAccordion">
+                        <div class="sc-acc-body">
+                            <div class="sc-acc-body-grid">
+                                <div class="sc-acc-feature">
+                                    <h4>Encryption at rest</h4>
+                                    <p>AES-256 encryption on all stored data, including database backups and cold storage.</p>
+                                </div>
+                                <div class="sc-acc-feature">
+                                    <h4>Encryption in transit</h4>
+                                    <p>TLS 1.3 with perfect forward secrecy on every request, internal and external.</p>
+                                </div>
+                                <div class="sc-acc-feature">
+                                    <h4>Data masking</h4>
+                                    <p>Sensitive fields are automatically masked in application logs and non-production environments.</p>
+                                </div>
+                                <div class="sc-acc-feature">
+                                    <h4>Backup encryption</h4>
+                                    <p>Backups use separate key management with restricted, audited access.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Access -->
+                <div class="sc-acc-item">
+                    <h3 class="sc-acc-header">
+                        <button class="sc-acc-btn collapsed" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#accAccess"
+                                aria-expanded="false" aria-controls="accAccess">
+                            <span class="acc-icon"><i class="fas fa-user-lock"></i></span>
+                            Access management
+                            <i class="fas fa-chevron-down acc-chevron"></i>
+                        </button>
+                    </h3>
+                    <div id="accAccess" class="collapse" data-bs-parent="#securityAccordion">
+                        <div class="sc-acc-body">
+                            <div class="sc-acc-body-grid">
+                                <div class="sc-acc-feature">
+                                    <h4>Multi-factor authentication</h4>
+                                    <p>MFA is required for all administrative accounts and optional-but-recommended for customers.</p>
+                                </div>
+                                <div class="sc-acc-feature">
+                                    <h4>Single sign-on</h4>
+                                    <p>SAML 2.0 and OAuth 2.0 support for enterprise identity providers.</p>
+                                </div>
+                                <div class="sc-acc-feature">
+                                    <h4>Privileged access</h4>
+                                    <p>Just-in-time elevation with automatic approval workflows and short-lived credentials.</p>
+                                </div>
+                                <div class="sc-acc-feature">
+                                    <h4>Session management</h4>
+                                    <p>Automatic session timeout, concurrent session limits and re-authentication for sensitive actions.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== REPORT A SECURITY ISSUE ==================== -->
+    <div class="container" style="padding-bottom: clamp(52px, 7vw, 92px);">
+        <div class="sc-report">
+            <div class="sc-report-content">
+                <span class="sc-report-icon"><i class="fas fa-triangle-exclamation"></i></span>
+                <div>
+                    <h3>Report a security issue</h3>
+                    <p>
+                        If you believe you've found a vulnerability in our platform or a security issue
+                        affecting our customers, please contact our security team directly. We take every
+                        report seriously and respond to verified issues within 48 hours.
+                    </p>
+                </div>
+            </div>
+            <a href="mailto:security@Globalshippments.com" class="sc-report-cta">
+                Report now <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- ==================== STATS ==================== -->
+    <section class="sc-section sc-section--surface">
+        <div class="container">
+            <div class="sc-heading">
+                <span class="label">By the numbers</span>
+                <h2>Security performance</h2>
+                <p>Rolling figures from our most recent audit period.</p>
+            </div>
+
+            <div class="sc-stats">
+                <div class="sc-stat">
+                    <div class="sc-stat-value">99.99%</div>
+                    <div class="sc-stat-label">Platform uptime SLA</div>
+                </div>
+                <div class="sc-stat">
+                    <div class="sc-stat-value">24/7</div>
+                    <div class="sc-stat-label">Security monitoring</div>
+                </div>
+                <div class="sc-stat">
+                    <div class="sc-stat-value">&lt; 48h</div>
+                    <div class="sc-stat-label">Vulnerability response</div>
+                </div>
+                <div class="sc-stat">
+                    <div class="sc-stat-value">256-bit</div>
+                    <div class="sc-stat-label">Encryption standard</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

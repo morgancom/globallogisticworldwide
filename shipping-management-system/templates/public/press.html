@@ -1,0 +1,1031 @@
+{% extends "base.html" %}
+
+{% block title %}Press Center — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — PRESS CENTER
+   Bound to base.html tokens. Hero stays solid; content sections are
+   translucent so the base background slideshow shows through.
+   ========================================================================= */
+
+.pr-page h1, .pr-page h2, .pr-page h3,
+.pr-page h4, .pr-page h5, .pr-page h6 {
+    color: var(--text-strong);
+    letter-spacing: -0.015em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   HERO — solid so the h1 + stats stay crisp
+   ========================================================================= */
+.pr-hero {
+    position: relative;
+    padding: clamp(52px, 7vw, 88px) 0 clamp(40px, 5vw, 64px);
+    overflow: hidden;
+    background: var(--bg-elev);
+    border-bottom: 1px solid var(--border);
+}
+.pr-hero > .container { position: relative; z-index: 1; }
+
+.pr-hero .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: var(--r-md);
+    background: var(--primary-50);
+    color: var(--primary);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.pr-hero .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
+.pr-hero h1 {
+    font-size: clamp(1.85rem, 4.4vw, 2.75rem);
+    line-height: 1.08;
+    margin: 0 0 16px;
+    letter-spacing: -0.025em;
+    color: var(--text-strong);
+}
+.pr-hero h1 em {
+    font-style: normal;
+    color: var(--primary);
+}
+
+.pr-hero .lead {
+    font-size: clamp(1rem, 1.2vw, 1.08rem);
+    line-height: 1.7;
+    color: var(--muted);
+    max-width: 720px;
+    margin: 0 0 26px;
+}
+
+.pr-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 22px;
+    border-top: 1px dashed var(--border);
+}
+.pr-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    border-radius: var(--r-md);
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+}
+.pr-hero-btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+.pr-hero-btn.primary:hover,
+.pr-hero-btn.primary:focus-visible {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: #fff;
+}
+.pr-hero-btn.ghost {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border-strong);
+}
+.pr-hero-btn.ghost:hover,
+.pr-hero-btn.ghost:focus-visible {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-50);
+}
+
+/* =========================================================================
+   SECTION HELPERS
+   ========================================================================= */
+.pr-section { padding: clamp(48px, 6vw, 84px) 0; }
+.pr-section--alt {
+    background: color-mix(in srgb, var(--bg-soft) 82%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+.pr-section--surface { background: transparent; }
+
+.pr-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: clamp(28px, 4vw, 44px);
+}
+.pr-heading-text .label {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: var(--r-md);
+    background: var(--primary-50);
+    color: var(--primary);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+.pr-heading-text h2 {
+    font-size: clamp(1.45rem, 2.9vw, 2.05rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+    color: var(--text-strong);
+}
+.pr-heading-text p {
+    font-size: .96rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.65;
+}
+.pr-heading-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--primary);
+    text-decoration: none;
+    white-space: nowrap;
+}
+.pr-heading-link:hover { text-decoration: underline; }
+
+/* =========================================================================
+   STATS STRIP
+   ========================================================================= */
+.pr-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 36px;
+}
+@media (max-width: 900px) { .pr-stats { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .pr-stats { grid-template-columns: 1fr; } }
+
+.pr-stat {
+    position: relative;
+    padding: 20px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    transition: border-color var(--dur) var(--ease);
+}
+.pr-stat:hover {
+    border-color: var(--border-strong);
+}
+
+.pr-stat-value {
+    font-size: clamp(1.45rem, 2.8vw, 1.8rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--text-strong);
+    line-height: 1;
+    margin-bottom: 6px;
+    font-variant-numeric: tabular-nums;
+}
+.pr-stat-label {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+/* =========================================================================
+   NEWS GRID
+   ========================================================================= */
+.pr-news {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+@media (max-width: 1000px) { .pr-news { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px)  { .pr-news { grid-template-columns: 1fr; } }
+
+.pr-news-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.pr-news-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--sh-sm);
+}
+
+.pr-news-media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--bg-soft);
+}
+.pr-news-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.pr-news-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(20, 20, 20, 0) 55%, rgba(20, 20, 20, .35) 100%);
+    pointer-events: none;
+}
+
+.pr-news-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--r-sm);
+    background: rgba(255, 255, 255, .94);
+    color: #141414;
+    font-size: .66rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.pr-news-body {
+    padding: 20px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+.pr-news-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+.pr-news-date i { color: var(--primary); }
+.pr-news-body h3 {
+    font-size: 1.02rem;
+    line-height: 1.35;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+    color: var(--text-strong);
+    transition: color var(--dur) var(--ease);
+}
+.pr-news-card:hover .pr-news-body h3 { color: var(--primary); }
+.pr-news-body p {
+    font-size: .88rem;
+    line-height: 1.65;
+    color: var(--muted);
+    margin: 0 0 16px;
+    flex: 1 1 auto;
+}
+.pr-news-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .76rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--primary);
+    text-decoration: none;
+    align-self: flex-start;
+}
+.pr-news-link::after {
+    content: "\f061";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: .85em;
+}
+
+/* =========================================================================
+   PRESS RELEASES LIST
+   ========================================================================= */
+.pr-releases {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.pr-release {
+    display: grid;
+    grid-template-columns: 130px 1fr auto;
+    gap: 20px;
+    align-items: center;
+    padding: 18px 22px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.pr-release:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--sh-sm);
+}
+
+.pr-release-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--primary);
+    white-space: nowrap;
+}
+.pr-release-date i { font-size: .9em; }
+
+.pr-release-content h3 {
+    font-size: .98rem;
+    line-height: 1.35;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+    color: var(--text-strong);
+    transition: color var(--dur) var(--ease);
+}
+.pr-release:hover .pr-release-content h3 { color: var(--primary); }
+.pr-release-content p {
+    font-size: .84rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.55;
+}
+
+.pr-release-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--r-md);
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    text-decoration: none;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+    flex-shrink: 0;
+}
+.pr-release-action:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+@media (max-width: 720px) {
+    .pr-release {
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+    }
+    .pr-release-date {
+        grid-column: 1 / -1;
+    }
+}
+
+/* =========================================================================
+   MEDIA RESOURCES
+   ========================================================================= */
+.pr-resources {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+@media (max-width: 900px) { .pr-resources { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .pr-resources { grid-template-columns: 1fr; } }
+
+.pr-resource {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.pr-resource:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--sh-sm);
+    color: inherit;
+}
+.pr-resource .icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--r-sm);
+    background: var(--primary-50);
+    color: var(--primary);
+    font-size: 1.05rem;
+}
+.pr-resource h4 {
+    font-size: .92rem;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+    color: var(--text-strong);
+}
+.pr-resource p {
+    font-size: .82rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.55;
+}
+
+/* =========================================================================
+   PRESS CONTACT BANNER
+   ========================================================================= */
+.pr-contact {
+    position: relative;
+    padding: clamp(32px, 5vw, 48px) clamp(28px, 4vw, 48px);
+    border-radius: var(--r-lg);
+    background: #171512;
+    color: #fff;
+    overflow: hidden;
+    border-top: 3px solid var(--primary);
+}
+.pr-contact > * { position: relative; z-index: 1; }
+
+.pr-contact h2 {
+    font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+    color: #fff;
+    margin: 0 0 8px;
+    letter-spacing: -0.015em;
+}
+.pr-contact > p {
+    font-size: .92rem;
+    color: #b8b2a7;
+    max-width: 620px;
+    margin: 0 0 26px;
+    line-height: 1.65;
+}
+
+.pr-contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px 28px;
+}
+@media (max-width: 820px) { .pr-contact-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .pr-contact-grid { grid-template-columns: 1fr; } }
+
+.pr-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    min-width: 0;
+}
+.pr-contact-item .icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--r-sm);
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .12);
+    color: #e8e4de;
+    font-size: .92rem;
+}
+.pr-contact-item h5 {
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #9a948a;
+    margin: 0 0 4px;
+}
+.pr-contact-item p,
+.pr-contact-item a {
+    font-size: .88rem;
+    color: #e8e4de;
+    margin: 0;
+    line-height: 1.5;
+    text-decoration: none;
+    word-break: break-word;
+}
+.pr-contact-item a:hover { color: #fff; text-decoration: underline; }
+
+/* =========================================================================
+   ABOUT CARD
+   ========================================================================= */
+.pr-about {
+    padding: 24px 26px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--r-md);
+}
+.pr-about h3 {
+    font-size: .95rem;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+    color: var(--text-strong);
+}
+.pr-about h3 i { color: var(--primary); }
+.pr-about p {
+    font-size: .92rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 0 0 10px;
+}
+.pr-about p:last-child { margin-bottom: 0; }
+.pr-about small {
+    display: block;
+    font-size: .8rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-top: 10px;
+}
+
+/* =========================================================================
+   FOOTNOTE
+   ========================================================================= */
+.pr-footnote {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 36px;
+    padding: 16px 20px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    font-size: .8rem;
+    color: var(--muted);
+}
+.pr-footnote .date { display: inline-flex; align-items: center; gap: 8px; }
+.pr-footnote .date i { color: var(--primary); }
+@media (max-width: 560px) {
+    .pr-footnote { text-align: center; justify-content: center; }
+}
+
+/* =========================================================================
+   FALLBACK for browsers without color-mix support
+   ========================================================================= */
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+    .pr-section--alt { background: var(--bg-soft); }
+}
+
+/* =========================================================================
+   REDUCED MOTION
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .pr-hero-actions, .pr-news-link, .pr-release-action,
+    .navbar, footer, .back-to-top { display: none !important; }
+    .pr-hero { background: #fff !important; padding: 20px 0 !important; border-bottom: 2px solid #000; }
+    .pr-hero h1, .pr-hero .lead { color: #000 !important; }
+    .pr-news-card, .pr-release, .pr-resource, .pr-stat, .pr-about {
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+    .pr-contact { background: #f5f5f5 !important; color: #000 !important; border-top-color: #000 !important; }
+    .pr-contact h2, .pr-contact > p, .pr-contact-item h5 { color: #000 !important; }
+    .pr-contact-item p, .pr-contact-item a { color: #333 !important; }
+    .pr-contact-item .icon { background: #eee !important; color: #000 !important; border-color: #ccc !important; }
+    .pr-news-media { aspect-ratio: auto; height: 180px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pr-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="pr-hero">
+        <div class="container">
+            <span class="eyebrow">Press center</span>
+            <h1>News, updates and media resources <em>from Global shippments.</em></h1>
+            <p class="lead">
+                The official newsroom for journalists, editors and analysts covering Global shippments Group.
+                Here you'll find our latest announcements, press releases, and downloadable brand and
+                media assets.
+            </p>
+            <div class="pr-hero-actions">
+                <a href="#releases" class="pr-hero-btn primary">
+                    Latest releases <i class="fas fa-arrow-down"></i>
+                </a>
+                <a href="#contact" class="pr-hero-btn ghost">
+                    Press contact <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Stats -->
+            <div class="pr-stats">
+                <div class="pr-stat">
+                    <div class="pr-stat-value" data-counter data-target="220" data-suffix="+">0</div>
+                    <div class="pr-stat-label">Countries &amp; territories</div>
+                </div>
+                <div class="pr-stat">
+                    <div class="pr-stat-value" data-counter data-target="500000" data-suffix="+">0</div>
+                    <div class="pr-stat-label">Employees worldwide</div>
+                </div>
+                <div class="pr-stat">
+                    <div class="pr-stat-value">24/7</div>
+                    <div class="pr-stat-label">Global operations</div>
+                </div>
+                <div class="pr-stat">
+                    <div class="pr-stat-value">#1</div>
+                    <div class="pr-stat-label">Global logistics</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== LATEST NEWS ==================== -->
+    <section class="pr-section">
+        <div class="container">
+            <div class="pr-heading">
+                <div class="pr-heading-text">
+                    <span class="label">In the news</span>
+                    <h2>Stories and coverage</h2>
+                    <p>Recent features, campaigns and announcements from across our network.</p>
+                </div>
+                <a href="#releases" class="pr-heading-link">
+                    All press releases <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="pr-news">
+                <!-- News 1 -->
+                <article class="pr-news-card">
+                    <div class="pr-news-media">
+                        <img src="https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=800&q=80"
+                             alt="Courier delivering a package to a remote location">
+                        <span class="pr-news-badge">Feature</span>
+                    </div>
+                    <div class="pr-news-body">
+                        <span class="pr-news-date"><i class="fas fa-calendar-day"></i> March 2026</span>
+                        <h3>Reaching the last mile — wherever it is</h3>
+                        <p>
+                            From mountain villages to island communities, our teams go the distance to
+                            ensure parcels arrive — a closer look at the routes that define our
+                            last-mile network.
+                        </p>
+                        <a href="#" class="pr-news-link">Read more</a>
+                    </div>
+                </article>
+
+                <!-- News 2 -->
+                <article class="pr-news-card">
+                    <div class="pr-news-media">
+                        <img src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=800&q=80"
+                             alt="Delivery van in the city">
+                        <span class="pr-news-badge">Award</span>
+                    </div>
+                    <div class="pr-news-body">
+                        <span class="pr-news-date"><i class="fas fa-calendar-day"></i> February 2026</span>
+                        <h3>"Delivered with care" campaign wins international recognition</h3>
+                        <p>
+                            Our brand storytelling campaign has been recognised for excellence in
+                            creative communications — celebrating the people behind every shipment.
+                        </p>
+                        <a href="#" class="pr-news-link">Read more</a>
+                    </div>
+                </article>
+
+                <!-- News 3 -->
+                <article class="pr-news-card">
+                    <div class="pr-news-media">
+                        <img src="https://images.unsplash.com/photo-1494412651409-8963ce7935a7?auto=format&fit=crop&w=800&q=80"
+                             alt="Container operations at a port">
+                        <span class="pr-news-badge">Operations</span>
+                    </div>
+                    <div class="pr-news-body">
+                        <span class="pr-news-date"><i class="fas fa-calendar-day"></i> January 2026</span>
+                        <h3>Expanding capacity at our European logistics hubs</h3>
+                        <p>
+                            New investments in container handling and automated sorting increase
+                            throughput at key facilities across Germany and the Benelux region.
+                        </p>
+                        <a href="#" class="pr-news-link">Read more</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PRESS RELEASES ==================== -->
+    <section class="pr-section pr-section--alt" id="releases">
+        <div class="container">
+            <div class="pr-heading">
+                <div class="pr-heading-text">
+                    <span class="label">Official announcements</span>
+                    <h2>Press releases</h2>
+                    <p>Formal announcements from Global shippments Group. All releases are available as PDF.</p>
+                </div>
+            </div>
+
+            <div class="pr-releases">
+                <article class="pr-release">
+                    <span class="pr-release-date">
+                        <i class="fas fa-calendar-day"></i> 15 Mar 2026
+                    </span>
+                    <div class="pr-release-content">
+                        <h3>Global shippments accelerates fleet electrification with 10,000 new EVs</h3>
+                        <p>Rollout begins in Europe and North America as part of our path to net-zero operations.</p>
+                    </div>
+                    <a href="#" class="pr-release-action" aria-label="Download PDF">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </article>
+
+                <article class="pr-release">
+                    <span class="pr-release-date">
+                        <i class="fas fa-calendar-day"></i> 28 Feb 2026
+                    </span>
+                    <div class="pr-release-content">
+                        <h3>Global shippments reports strong Q4 2025 results</h3>
+                        <p>Revenue growth driven by e-commerce and international express; outlook remains positive.</p>
+                    </div>
+                    <a href="#" class="pr-release-action" aria-label="Download PDF">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </article>
+
+                <article class="pr-release">
+                    <span class="pr-release-date">
+                        <i class="fas fa-calendar-day"></i> 10 Feb 2026
+                    </span>
+                    <div class="pr-release-content">
+                        <h3>Global shippments partners with leading tech companies on smart logistics</h3>
+                        <p>New partnerships bring AI-powered supply-chain analytics and tracking to our platform.</p>
+                    </div>
+                    <a href="#" class="pr-release-action" aria-label="Download PDF">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </article>
+
+                <article class="pr-release">
+                    <span class="pr-release-date">
+                        <i class="fas fa-calendar-day"></i> 22 Jan 2026
+                    </span>
+                    <div class="pr-release-content">
+                        <h3>Global shippments unveils brand campaign: "Deliver anywhere, by any means"</h3>
+                        <p>A global campaign celebrating the reach and reliability of our logistics network.</p>
+                    </div>
+                    <a href="#" class="pr-release-action" aria-label="Download PDF">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== MEDIA RESOURCES ==================== -->
+    <section class="pr-section pr-section--surface">
+        <div class="container">
+            <div class="pr-heading">
+                <div class="pr-heading-text">
+                    <span class="label">For media</span>
+                    <h2>Media resources</h2>
+                    <p>Brand-approved assets and reference material for journalists and editors.</p>
+                </div>
+            </div>
+
+            <div class="pr-resources">
+                <a href="#" class="pr-resource">
+                    <span class="icon"><i class="fas fa-camera"></i></span>
+                    <div>
+                        <h4>Image library</h4>
+                        <p>High-resolution images of our operations, vehicles and facilities.</p>
+                    </div>
+                </a>
+
+                <a href="#" class="pr-resource">
+                    <span class="icon"><i class="fas fa-video"></i></span>
+                    <div>
+                        <h4>Video gallery</h4>
+                        <p>B-roll footage and campaign videos cleared for media use.</p>
+                    </div>
+                </a>
+
+                <a href="#" class="pr-resource">
+                    <span class="icon"><i class="fas fa-file-lines"></i></span>
+                    <div>
+                        <h4>Fact sheets</h4>
+                        <p>Company facts, figures and background information.</p>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('investor_relations') }}" class="pr-resource">
+                    <span class="icon"><i class="fas fa-chart-line"></i></span>
+                    <div>
+                        <h4>Financial reports</h4>
+                        <p>Quarterly and annual financial statements from Investor Relations.</p>
+                    </div>
+                </a>
+
+                <a href="#" class="pr-resource">
+                    <span class="icon"><i class="fas fa-tag"></i></span>
+                    <div>
+                        <h4>Brand guidelines</h4>
+                        <p>Logo usage, colour palette and brand identity resources.</p>
+                    </div>
+                </a>
+
+                <a href="#" class="pr-resource">
+                    <span class="icon"><i class="fas fa-users"></i></span>
+                    <div>
+                        <h4>Executive bios</h4>
+                        <p>Leadership profiles and photography for editorial use.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PRESS CONTACT ==================== -->
+    <div class="container">
+        <section class="pr-contact" id="contact">
+            <h2>Press contact</h2>
+            <p>For media inquiries, interview requests or press credentials, please use the details below.</p>
+
+            <div class="pr-contact-grid">
+                <div class="pr-contact-item">
+                    <span class="icon"><i class="fas fa-globe"></i></span>
+                    <div>
+                        <h5>Press portal</h5>
+                        <a href="#">press.Globalshippments.com</a>
+                    </div>
+                </div>
+
+                <div class="pr-contact-item">
+                    <span class="icon"><i class="fas fa-phone"></i></span>
+                    <div>
+                        <h5>Media hotline</h5>
+                        <a href="tel:+492284290">+49 228 429-0</a>
+                    </div>
+                </div>
+
+                <div class="pr-contact-item">
+                    <span class="icon"><i class="fas fa-envelope"></i></span>
+                    <div>
+                        <h5>Email</h5>
+                        <a href="mailto:press@Globalshippments.com">press@Globalshippments.com</a>
+                    </div>
+                </div>
+
+                <div class="pr-contact-item">
+                    <span class="icon"><i class="fas fa-location-dot"></i></span>
+                    <div>
+                        <h5>Headquarters</h5>
+                        <p>Charles-de-Gaulle-Str. 20<br>53113 Bonn, Germany</p>
+                    </div>
+                </div>
+
+                <div class="pr-contact-item">
+                    <span class="icon"><i class="fab fa-twitter"></i></span>
+                    <div>
+                        <h5>X / Twitter</h5>
+                        <a href="#">@SendExpressPress</a>
+                    </div>
+                </div>
+
+                <div class="pr-contact-item">
+                    <span class="icon"><i class="fab fa-linkedin-in"></i></span>
+                    <div>
+                        <h5>LinkedIn</h5>
+                        <a href="#">Global shippments Group</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ==================== ABOUT ==================== -->
+    <section class="pr-section">
+        <div class="container">
+            <div class="pr-about">
+                <h3><i class="fas fa-circle-info"></i> About Global shippments Group</h3>
+                <p>
+                    Global shippments is the world's leading logistics provider. Our divisions offer an
+                    unrivalled portfolio of services — from national and international parcel delivery
+                    to e-commerce fulfilment, international express, road, air and ocean transport, and
+                    industrial supply-chain management.
+                </p>
+                <p>
+                    With approximately 500,000 employees in more than 220 countries and territories,
+                    we connect people and businesses securely and reliably, enabling global sustainable
+                    trade flows.
+                </p>
+                <small>
+                    Global shippments Group generated revenues of more than €80 billion in the most recent
+                    fiscal year, and is committed to net-zero emissions by 2050.
+                </small>
+            </div>
+
+            <!-- Footnote -->
+            <div class="pr-footnote">
+                <span class="date">
+                    <i class="fas fa-calendar-check"></i>
+                    Updated March 2026
+                </span>
+                <span>© 2026 Global shippments International GmbH. All rights reserved.</span>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* ---------- Counter animation for hero stats ---------- */
+    (function () {
+        const counters = document.querySelectorAll('[data-counter]');
+        if (!counters.length) return;
+
+        function animate(el) {
+            const target = parseFloat(el.dataset.target);
+            const suffix = el.dataset.suffix || '';
+            const duration = 1400;
+            const start = performance.now();
+
+            function tick(now) {
+                const t = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - t, 3);
+                const value = target * eased;
+                el.textContent = Math.floor(value).toLocaleString() + suffix;
+                if (t < 1) requestAnimationFrame(tick);
+                else el.textContent = target.toLocaleString() + suffix;
+            }
+            requestAnimationFrame(tick);
+        }
+
+        if ('IntersectionObserver' in window) {
+            const seen = new WeakSet();
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !seen.has(entry.target)) {
+                        seen.add(entry.target);
+                        animate(entry.target);
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.4 });
+            counters.forEach(el => obs.observe(el));
+        } else {
+            counters.forEach(animate);
+        }
+    })();
+</script>
+{% endblock %}

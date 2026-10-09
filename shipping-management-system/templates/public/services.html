@@ -1,0 +1,923 @@
+{% extends "base.html" %}
+
+{% block title %}Our services — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — SERVICES PAGE
+   Bound to base.html tokens. Content sections are translucent so the
+   base background slideshow shows through; feature blocks (hero, stats,
+   CTA) keep their own solid backgrounds on purpose.
+   ========================================================================= */
+
+.sv-page h1, .sv-page h2, .sv-page h3,
+.sv-page h4, .sv-page h5, .sv-page h6 {
+    color: var(--text-strong);
+    letter-spacing: -0.015em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   HERO — solid photographic
+   ========================================================================= */
+.sv-hero {
+    position: relative;
+    padding: clamp(56px, 7vw, 96px) 0 clamp(48px, 6vw, 76px);
+    overflow: hidden;
+    background:
+        linear-gradient(100deg,
+            rgba(15, 13, 11, .94) 0%,
+            rgba(15, 13, 11, .85) 40%,
+            rgba(15, 13, 11, .55) 72%,
+            rgba(15, 13, 11, .32) 100%),
+        url("https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=2000&q=85") center/cover no-repeat;
+    color: #fff;
+}
+.sv-hero > .container { position: relative; z-index: 1; }
+
+.sv-hero .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    border-radius: var(--r-md);
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .16);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+.sv-hero .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
+.sv-hero h1 {
+    font-size: clamp(2.1rem, 4.6vw, 3.3rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin: 0 0 20px;
+    max-width: 880px;
+}
+.sv-hero h1 em {
+    font-style: normal;
+    color: #e5c9cd;
+}
+
+.sv-hero .lead {
+    font-size: clamp(1rem, 1.25vw, 1.1rem);
+    line-height: 1.65;
+    color: #d5d1c9;
+    max-width: 720px;
+    margin: 0 0 32px;
+}
+
+.sv-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.sv-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 26px;
+    border-radius: var(--r-md);
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+}
+.sv-hero-btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+.sv-hero-btn.primary:hover,
+.sv-hero-btn.primary:focus-visible {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: #fff;
+}
+.sv-hero-btn.ghost {
+    background: transparent;
+    color: #fff;
+    border-color: rgba(255, 255, 255, .35);
+}
+.sv-hero-btn.ghost:hover,
+.sv-hero-btn.ghost:focus-visible {
+    background: rgba(255, 255, 255, .08);
+    border-color: #fff;
+    color: #fff;
+}
+
+/* =========================================================================
+   TRUST STRIP — translucent glass
+   ========================================================================= */
+.sv-trust {
+    background: color-mix(in srgb, var(--bg-soft) 80%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 22px 0;
+}
+.sv-trust-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px 48px;
+}
+.sv-trust-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+.sv-trust-item i { color: var(--primary); font-size: 1rem; }
+
+/* =========================================================================
+   SECTION HEADINGS
+   ========================================================================= */
+.sv-section { padding: clamp(56px, 7vw, 92px) 0; }
+.sv-section--alt {
+    background: color-mix(in srgb, var(--bg-soft) 82%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.sv-heading {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto clamp(36px, 5vw, 60px);
+}
+.sv-heading .label {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: var(--r-md);
+    background: var(--primary-50);
+    color: var(--primary);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+.sv-heading h2 {
+    font-size: clamp(1.6rem, 3.6vw, 2.4rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+    color: var(--text-strong);
+}
+.sv-heading p {
+    font-size: 1rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.65;
+}
+
+/* =========================================================================
+   SERVICE CARDS — opaque over the slideshow
+   ========================================================================= */
+.sv-service-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+@media (max-width: 1100px) { .sv-service-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px)  { .sv-service-grid { grid-template-columns: 1fr; } }
+
+.sv-service-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    transition:
+        border-color var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease);
+}
+.sv-service-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--sh-sm);
+}
+
+.sv-service-media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--bg-soft);
+}
+.sv-service-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.sv-service-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15, 13, 11, 0) 50%, rgba(15, 13, 11, .4) 100%);
+    pointer-events: none;
+}
+
+.sv-service-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: var(--r-sm);
+    background: rgba(255, 255, 255, .94);
+    color: #141414;
+    font-size: .66rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.sv-service-badge i { color: var(--primary); font-size: .88rem; }
+
+.sv-service-body {
+    padding: 24px 24px 26px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+.sv-service-body h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+    color: var(--text-strong);
+}
+.sv-service-body p {
+    font-size: .9rem;
+    line-height: 1.65;
+    color: var(--muted);
+    margin: 0 0 16px;
+    flex: 1 1 auto;
+}
+.sv-service-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+.sv-service-tags span {
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: var(--r-sm);
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+.sv-service-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    color: var(--primary);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color var(--dur) var(--ease);
+}
+.sv-service-link::after {
+    content: "\f061";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: .82em;
+}
+.sv-service-link:hover { color: var(--primary-700); }
+
+/* =========================================================================
+   STATS — solid cinematic
+   ========================================================================= */
+.sv-stats {
+    position: relative;
+    padding: clamp(56px, 7vw, 92px) 0;
+    color: #fff;
+    overflow: hidden;
+    background:
+        linear-gradient(110deg, rgba(15, 13, 11, .93), rgba(15, 13, 11, .82)),
+        url("https://images.unsplash.com/photo-1494412651409-8963ce7935a7?auto=format&fit=crop&w=2000&q=80") center/cover no-repeat;
+}
+.sv-stats .container { position: relative; }
+
+.sv-stats-heading {
+    text-align: center;
+    margin-bottom: clamp(36px, 5vw, 52px);
+}
+.sv-stats-heading h2 {
+    font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+    color: #fff;
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+}
+.sv-stats-heading p { color: #9a948a; margin: 0; font-size: 1rem; }
+
+.sv-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+.sv-stat {
+    text-align: center;
+    padding: 15px 20px;
+    border-right: 1px solid rgba(255, 255, 255, .1);
+}
+.sv-stat:last-child { border-right: 0; }
+.sv-stat-number {
+    font-size: clamp(2rem, 4.2vw, 2.9rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: #fff;
+    margin-bottom: 12px;
+    font-variant-numeric: tabular-nums;
+}
+.sv-stat-label {
+    color: #9a948a;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+@media (max-width: 820px) {
+    .sv-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 30px 0; }
+    .sv-stat:nth-child(2),
+    .sv-stat:nth-child(4) { border-right: 0; }
+    .sv-stat:nth-child(1),
+    .sv-stat:nth-child(2) { border-bottom: 1px solid rgba(255, 255, 255, .1); padding-bottom: 30px; }
+    .sv-stat:nth-child(3),
+    .sv-stat:nth-child(4) { padding-top: 30px; }
+}
+@media (max-width: 480px) {
+    .sv-stats-grid { grid-template-columns: 1fr; gap: 0; }
+    .sv-stat {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+        padding: 24px 0;
+    }
+    .sv-stat:last-child { border-bottom: 0; }
+}
+
+/* =========================================================================
+   FEATURES
+   ========================================================================= */
+.sv-features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+@media (max-width: 900px) { .sv-features-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .sv-features-grid { grid-template-columns: 1fr; } }
+
+.sv-feature {
+    position: relative;
+    padding: 24px 22px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    transition:
+        border-color var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease);
+}
+.sv-feature:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--sh-sm);
+}
+.sv-feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: var(--r-sm);
+    background: var(--primary-50);
+    color: var(--primary);
+    font-size: 1.15rem;
+    margin-bottom: 16px;
+}
+.sv-feature h4 {
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+    color: var(--text-strong);
+}
+.sv-feature p {
+    font-size: .87rem;
+    color: var(--muted);
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* =========================================================================
+   CTA — solid dark panel
+   ========================================================================= */
+.sv-cta {
+    position: relative;
+    margin: clamp(44px, 6vw, 72px) 0 clamp(56px, 7vw, 84px);
+    padding: clamp(44px, 6vw, 72px) clamp(28px, 5vw, 56px);
+    border-radius: var(--r-lg);
+    background: #171512;
+    color: #fff;
+    overflow: hidden;
+    text-align: center;
+    border-top: 3px solid var(--primary);
+}
+.sv-cta > * { position: relative; z-index: 1; }
+
+.sv-cta .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: var(--r-md);
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .14);
+    color: #e8e4de;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+}
+.sv-cta .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+.sv-cta h2 {
+    font-size: clamp(1.6rem, 3.6vw, 2.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin: 0 auto 16px;
+    max-width: 720px;
+}
+.sv-cta p {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: #b8b2a7;
+    max-width: 620px;
+    margin: 0 auto 28px;
+}
+.sv-cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+.sv-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: var(--r-md);
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+}
+.sv-cta-btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+.sv-cta-btn.primary:hover,
+.sv-cta-btn.primary:focus-visible {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: #fff;
+}
+.sv-cta-btn.ghost {
+    background: transparent;
+    color: #e8e4de;
+    border-color: rgba(255, 255, 255, .3);
+}
+.sv-cta-btn.ghost:hover,
+.sv-cta-btn.ghost:focus-visible {
+    background: rgba(255, 255, 255, .06);
+    border-color: #fff;
+    color: #fff;
+}
+
+.sv-cta-trust {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: var(--r-md);
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 255, 255, .08);
+    color: #b8b2a7;
+    font-size: .84rem;
+    line-height: 1.5;
+    text-align: left;
+    max-width: 560px;
+}
+.sv-cta-trust i {
+    color: var(--primary);
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+.sv-cta-trust strong { color: #f4f2ee; font-weight: 700; }
+
+/* =========================================================================
+   FALLBACK for browsers without color-mix support
+   ========================================================================= */
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+    .sv-trust { background: var(--bg-soft); }
+    .sv-section--alt { background: var(--bg-soft); }
+}
+
+/* =========================================================================
+   REDUCED MOTION
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .sv-hero-actions, .sv-cta-actions, .sv-cta-trust, .share-buttons, .btn { display: none !important; }
+    .sv-hero { background: #fff !important; color: #000 !important; padding: 20px 0 !important; }
+    .sv-hero h1, .sv-hero .lead { color: #000 !important; }
+    .sv-service-card, .sv-feature, .sv-cta { box-shadow: none !important; border: 1px solid #ddd !important; background: #fff !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="sv-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="sv-hero">
+        <div class="container">
+            <h1>End-to-end logistics, <em>delivered with precision.</em></h1>
+            <p class="lead">
+                From time-critical express deliveries to complex international supply chains, Global shippments
+                operates a full portfolio of logistics services across more than 220 countries and territories —
+                backed by real-time tracking, customs expertise and 24/7 support.
+            </p>
+            <div class="sv-hero-actions">
+                <a href="{{ url_for('track_input') }}" class="sv-hero-btn primary">
+                    Track a shipment <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="{{ url_for('contact') }}" class="sv-hero-btn ghost">
+                    Talk to our team <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TRUST STRIP ==================== -->
+    <div class="sv-trust">
+        <div class="container">
+            <div class="sv-trust-inner">
+                <span class="sv-trust-item"><i class="fas fa-shield-halved"></i> ISO 9001 certified</span>
+                <span class="sv-trust-item"><i class="fas fa-leaf"></i> Carbon-neutral options</span>
+                <span class="sv-trust-item"><i class="fas fa-globe"></i> 220+ countries served</span>
+                <span class="sv-trust-item"><i class="fas fa-headset"></i> 24/7 global support</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SERVICES GRID ==================== -->
+    <section class="sv-section">
+        <div class="container">
+            <div class="sv-heading">
+                <div class="label">Logistics solutions</div>
+                <h2>Six specialised services, one trusted partner</h2>
+                <p>Each division is led by experts in its field — and all of them connect to the same worldwide network, the same tracking platform and the same service guarantee.</p>
+            </div>
+
+            <div class="sv-service-grid">
+
+                <!-- Express -->
+                <article class="sv-service-card" id="express">
+                    <div class="sv-service-media">
+                        <img src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=800&q=80"
+                             alt="Express courier delivering a package">
+                        <span class="sv-service-badge"><i class="fas fa-bolt"></i> Fastest</span>
+                    </div>
+                    <div class="sv-service-body">
+                        <h3>Express delivery</h3>
+                        <p>
+                            Time-definite, door-to-door delivery for documents and parcels with
+                            same-day and next-day options in over 100 major cities worldwide.
+                        </p>
+                        <div class="sv-service-tags">
+                            <span>Express 9:00</span>
+                            <span>Express 12:00</span>
+                            <span>Same-day</span>
+                        </div>
+                        <a href="{{ url_for('track_input') }}" class="sv-service-link">Track a shipment</a>
+                    </div>
+                </article>
+
+                <!-- Global Forwarding -->
+                <article class="sv-service-card" id="freight">
+                    <div class="sv-service-media">
+                        <img src="https://images.unsplash.com/photo-1494412651409-8963ce7935a7?auto=format&fit=crop&w=800&q=80"
+                             alt="Container ship for global freight forwarding">
+                        <span class="sv-service-badge"><i class="fas fa-ship"></i> Global</span>
+                    </div>
+                    <div class="sv-service-body">
+                        <h3>Global forwarding</h3>
+                        <p>
+                            Air, ocean, road and rail freight services tailored to your cargo —
+                            full-container, less-than-container and specialised handling for oversized shipments.
+                        </p>
+                        <div class="sv-service-tags">
+                            <span>Air</span>
+                            <span>Ocean</span>
+                            <span>Rail</span>
+                        </div>
+                        <a href="{{ url_for('contact') }}" class="sv-service-link">Request a quote</a>
+                    </div>
+                </article>
+
+                <!-- Supply Chain -->
+                <article class="sv-service-card" id="supply-chain">
+                    <div class="sv-service-media">
+                        <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=800&q=80"
+                             alt="Warehouse shelves and distribution centre">
+                        <span class="sv-service-badge"><i class="fas fa-warehouse"></i> Integrated</span>
+                    </div>
+                    <div class="sv-service-body">
+                        <h3>Supply chain management</h3>
+                        <p>
+                            Warehousing, inventory management, order fulfilment and distribution —
+                            engineered to keep your operations running smoothly and predictably.
+                        </p>
+                        <div class="sv-service-tags">
+                            <span>Warehousing</span>
+                            <span>Fulfilment</span>
+                            <span>Analytics</span>
+                        </div>
+                        <a href="{{ url_for('contact') }}" class="sv-service-link">Contact sales</a>
+                    </div>
+                </article>
+
+                <!-- eCommerce -->
+                <article class="sv-service-card" id="ecommerce">
+                    <div class="sv-service-media">
+                        <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80"
+                             alt="eCommerce online shopping and delivery">
+                        <span class="sv-service-badge"><i class="fas fa-cart-shopping"></i> Growing</span>
+                    </div>
+                    <div class="sv-service-body">
+                        <h3>eCommerce logistics</h3>
+                        <p>
+                            Scalable delivery solutions for online retailers and marketplaces —
+                            returns management, cross-border shipping and branded customer experiences.
+                        </p>
+                        <div class="sv-service-tags">
+                            <span>B2C</span>
+                            <span>Returns</span>
+                            <span>Cross-border</span>
+                        </div>
+                        <a href="{{ url_for('contact') }}" class="sv-service-link">Learn more</a>
+                    </div>
+                </article>
+
+                <!-- Post & Parcel -->
+                <article class="sv-service-card" id="post">
+                    <div class="sv-service-media">
+                        <img src="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=800&q=80"
+                             alt="Stacked parcels and mail ready for delivery">
+                        <span class="sv-service-badge"><i class="fas fa-envelope"></i> Everyday</span>
+                    </div>
+                    <div class="sv-service-body">
+                        <h3>Post &amp; parcel</h3>
+                        <p>
+                            Reliable domestic delivery for individuals and small businesses —
+                            nationwide coverage, competitive rates and convenient pickup options.
+                        </p>
+                        <div class="sv-service-tags">
+                            <span>Domestic</span>
+                            <span>Nationwide</span>
+                            <span>Pickup</span>
+                        </div>
+                        <a href="{{ url_for('contact') }}" class="sv-service-link">Learn more</a>
+                    </div>
+                </article>
+
+                <!-- Consulting -->
+                <article class="sv-service-card" id="consulting">
+                    <div class="sv-service-media">
+                        <img src="https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=800&q=80"
+                             alt="Logistics specialist reviewing delivery routes">
+                        <span class="sv-service-badge"><i class="fas fa-chart-line"></i> Advisory</span>
+                    </div>
+                    <div class="sv-service-body">
+                        <h3>Logistics consulting</h3>
+                        <p>
+                            Custom advisory and analytics services — we help you redesign networks,
+                            reduce costs and build resilient, sustainable supply chains.
+                        </p>
+                        <div class="sv-service-tags">
+                            <span>Network design</span>
+                            <span>Cost reduction</span>
+                            <span>Sustainability</span>
+                        </div>
+                        <a href="{{ url_for('contact') }}" class="sv-service-link">Book a consultation</a>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== STATS ==================== -->
+    <section class="sv-stats">
+        <div class="container">
+            <div class="sv-stats-heading">
+                <h2>A global network built on trust</h2>
+                <p>Numbers that reflect our scale, our reach and our commitment to service.</p>
+            </div>
+            <div class="sv-stats-grid">
+                <div class="sv-stat">
+                    <div class="sv-stat-number" data-target="500000">0</div>
+                    <div class="sv-stat-label">Employees worldwide</div>
+                </div>
+                <div class="sv-stat">
+                    <div class="sv-stat-number" data-target="220">0</div>
+                    <div class="sv-stat-label">Countries &amp; territories</div>
+                </div>
+                <div class="sv-stat">
+                    <div class="sv-stat-number" data-target="80">0</div>
+                    <div class="sv-stat-label">Annual revenue (€B)</div>
+                </div>
+                <div class="sv-stat">
+                    <div class="sv-stat-number" data-target="19">0</div>
+                    <div class="sv-stat-label">Daily shipments (millions)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FEATURES ==================== -->
+    <section class="sv-section sv-section--alt">
+        <div class="container">
+            <div class="sv-heading">
+                <div class="label">Included with every shipment</div>
+                <h2>Features that make shipping simpler</h2>
+                <p>Every Global shippments shipment comes with the same core features — no premium tier required.</p>
+            </div>
+
+            <div class="sv-features-grid">
+                <div class="sv-feature">
+                    <div class="sv-feature-icon"><i class="fas fa-clock"></i></div>
+                    <h4>Time-definite delivery</h4>
+                    <p>Choose your delivery window — Express 9:00, 12:00 or same-day — and we guarantee it.</p>
+                </div>
+                <div class="sv-feature">
+                    <div class="sv-feature-icon"><i class="fas fa-satellite-dish"></i></div>
+                    <h4>Real-time tracking</h4>
+                    <p>Live location updates, scan events and estimated arrival times, online or on mobile.</p>
+                </div>
+                <div class="sv-feature">
+                    <div class="sv-feature-icon"><i class="fas fa-shield-halved"></i></div>
+                    <h4>Secure handling</h4>
+                    <p>Tamper-evident packaging and end-to-end chain of custody for high-value shipments.</p>
+                </div>
+                <div class="sv-feature">
+                    <div class="sv-feature-icon"><i class="fas fa-file-signature"></i></div>
+                    <h4>Electronic customs</h4>
+                    <p>Paperless trade documentation to speed up clearance at every international border.</p>
+                </div>
+                <div class="sv-feature">
+                    <div class="sv-feature-icon"><i class="fas fa-leaf"></i></div>
+                    <h4>Carbon-neutral options</h4>
+                    <p>Offset your shipment's emissions with our GoGreen programme, available on all services.</p>
+                </div>
+                <div class="sv-feature">
+                    <div class="sv-feature-icon"><i class="fas fa-headset"></i></div>
+                    <h4>24/7 global support</h4>
+                    <p>Real people, not bots — ready to help by phone, email or live chat, wherever you are.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CTA ==================== -->
+    <div class="container">
+        <section class="sv-cta">
+            <span class="eyebrow">Get started</span>
+            <h2>Ready to ship smarter, faster and greener?</h2>
+            <p>
+                Whether you're sending a single package or managing a global supply chain,
+                our team is ready to help you move your business forward.
+            </p>
+            <div class="sv-cta-actions">
+                <a href="{{ url_for('register') }}" class="sv-cta-btn primary">
+                    Create an account <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="{{ url_for('contact') }}" class="sv-cta-btn ghost">
+                    Contact sales <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="sv-cta-trust">
+                <i class="fas fa-shield-halved"></i>
+                <div>
+                    <strong>Trusted worldwide.</strong>
+                    500,000+ employees · 220+ countries · 40+ years of logistics excellence.
+                </div>
+            </div>
+        </section>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* ---------- Stats counter animation ---------- */
+    (function () {
+        const counters = document.querySelectorAll('.sv-stat-number');
+        if (!counters.length) return;
+        let started = false;
+
+        function animateCounters() {
+            if (started) return;
+            started = true;
+            counters.forEach(counter => {
+                const target = Number(counter.dataset.target);
+                let current = 0;
+                const increment = Math.max(1, Math.ceil(target / 80));
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) { current = target; clearInterval(timer); }
+                    counter.textContent = current.toLocaleString();
+                }, 25);
+            });
+        }
+
+        const statsSection = document.querySelector('.sv-stats');
+        if (statsSection && 'IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting) {
+                    animateCounters();
+                    observer.disconnect();
+                }
+            }, { threshold: .3 });
+            observer.observe(statsSection);
+        } else {
+            animateCounters();
+        }
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,1222 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Package {{ package.tracking_code }} — Global shippments Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — EDIT PACKAGE (ADMIN)
+   Full-detail edit form for an existing shipment.
+   Uses base.html design tokens. Full dark-mode support.
+   ========================================================================= */
+
+:root {
+    --ep-surface:       #FFFFFF;
+    --ep-surface-alt:   #F8FAFC;
+    --ep-surface-soft:  #F1F5F9;
+    --ep-line:          #E6EAF0;
+    --ep-line-soft:     #EEF2F7;
+    --ep-ink:           #0B1220;
+    --ep-text:          #1E293B;
+    --ep-muted:         #64748B;
+    --ep-muted-2:       #94A3B8;
+
+    --ep-success:       #16A34A;
+    --ep-success-bg:    #ECFDF5;
+    --ep-danger:        #DC2626;
+    --ep-danger-bg:     #FEF2F2;
+    --ep-warning:       #D97706;
+    --ep-warning-bg:    #FFF7ED;
+    --ep-info:          #0EA5E9;
+    --ep-info-bg:       #EFF9FF;
+
+    --ep-sh-xs: 0 1px 2px rgba(15, 23, 42, .04);
+    --ep-sh-sm: 0 2px 8px rgba(15, 23, 42, .06);
+    --ep-sh-md: 0 12px 28px -14px rgba(15, 23, 42, .18);
+    --ep-sh-lg: 0 30px 60px -22px rgba(15, 23, 42, .28);
+
+    --ep-ease: cubic-bezier(.4, 0, .2, 1);
+    --ep-dur:  220ms;
+
+    --ep-r-sm: 8px;
+    --ep-r-md: 12px;
+    --ep-r-lg: 16px;
+    --ep-r-xl: 24px;
+    --ep-pill: 999px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --ep-surface:      #111C30;
+        --ep-surface-alt:  #0F172A;
+        --ep-surface-soft: #1A273F;
+        --ep-line:         #1E293B;
+        --ep-line-soft:    #172A45;
+        --ep-ink:          #F1F5F9;
+        --ep-text:         #CBD5E1;
+        --ep-muted:        #94A3B8;
+        --ep-muted-2:      #64748B;
+
+        --ep-success-bg:   #052E1A;
+        --ep-danger-bg:    #2E0A0D;
+        --ep-warning-bg:   #2E1A05;
+        --ep-info-bg:      #0B2A3E;
+
+        --ep-sh-xs: 0 1px 2px rgba(0, 0, 0, .4);
+        --ep-sh-sm: 0 2px 8px rgba(0, 0, 0, .5);
+        --ep-sh-md: 0 12px 28px -14px rgba(0, 0, 0, .6);
+        --ep-sh-lg: 0 30px 60px -22px rgba(0, 0, 0, .7);
+    }
+}
+
+body { background: var(--ep-surface-alt); color: var(--ep-text); }
+
+.ep-page h1, .ep-page h2, .ep-page h3,
+.ep-page h4, .ep-page h5, .ep-page h6 {
+    color: var(--ep-ink);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   PAGE HERO
+   ========================================================================= */
+.ep-hero {
+    position: relative;
+    padding: clamp(28px, 4vw, 44px) 0 clamp(24px, 3vw, 32px);
+    background:
+        radial-gradient(ellipse 60% 70% at 20% 20%, rgba(225, 29, 42, .12), transparent 60%),
+        linear-gradient(180deg, #0b1220, #1a1a2a);
+    color: #fff;
+    overflow: hidden;
+}
+.ep-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    pointer-events: none;
+}
+.ep-hero > .container { position: relative; z-index: 1; }
+
+.ep-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .82rem;
+    color: rgba(255, 255, 255, .7);
+    margin-bottom: 14px;
+    list-style: none;
+    padding: 0;
+    flex-wrap: wrap;
+}
+.ep-breadcrumb li { display: inline-flex; align-items: center; gap: 8px; }
+.ep-breadcrumb li:not(:last-child)::after {
+    content: "\f105";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: .65rem;
+    opacity: .5;
+}
+.ep-breadcrumb a {
+    color: rgba(255, 255, 255, .8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--ep-dur) var(--ep-ease);
+}
+.ep-breadcrumb a:hover { color: #fff; }
+.ep-breadcrumb .active { color: #fff; font-weight: 600; }
+
+.ep-hero-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+.ep-hero-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(1.35rem, 2.8vw, 1.8rem);
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    flex-wrap: wrap;
+}
+.ep-hero-title .hero-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--ep-r-md);
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    box-shadow: 0 10px 22px -8px rgba(225, 29, 42, .55);
+}
+.ep-hero-title code {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: var(--ep-r-sm);
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .9rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+
+.ep-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    border-radius: var(--ep-pill);
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .2);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.ep-status-pill .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, .25);
+}
+.ep-status-pill.warning .dot { background: #fbbf24; box-shadow: 0 0 0 3px rgba(251, 191, 36, .25); }
+.ep-status-pill.info    .dot { background: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, .25); }
+.ep-status-pill.danger  .dot { background: #f87171; box-shadow: 0 0 0 3px rgba(248, 113, 113, .25); }
+.ep-status-pill.muted   .dot { background: #94a3b8; box-shadow: 0 0 0 3px rgba(148, 163, 184, .25); }
+
+/* =========================================================================
+   LAYOUT
+   ========================================================================= */
+.ep-shell {
+    max-width: 1080px;
+    margin: -20px auto 0;
+    padding: 0 16px 60px;
+    position: relative;
+    z-index: 2;
+}
+
+/* =========================================================================
+   INFO / WARNING / TRACKING BANNERS
+   ========================================================================= */
+.ep-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+    background: var(--ep-info-bg);
+    border: 1px solid color-mix(in srgb, var(--ep-info) 25%, transparent);
+    border-left: 4px solid var(--ep-info);
+    border-radius: var(--ep-r-md);
+    font-size: .9rem;
+    line-height: 1.6;
+    color: var(--ep-text);
+}
+.ep-notice .icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--ep-surface);
+    color: var(--ep-info);
+    font-size: 1rem;
+    box-shadow: var(--ep-sh-xs);
+}
+@media (prefers-color-scheme: dark) {
+    .ep-notice .icon { background: rgba(255, 255, 255, .06); }
+}
+.ep-notice strong { color: var(--ep-ink); font-weight: 700; }
+.ep-notice p { margin: 0; }
+
+.ep-tracking-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+    background: var(--ep-surface);
+    border: 1px solid var(--ep-line);
+    border-left: 4px solid var(--primary, #e11d2a);
+    border-radius: var(--ep-r-md);
+    box-shadow: var(--ep-sh-sm);
+}
+.ep-tracking-banner .label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ep-muted);
+}
+.ep-tracking-banner .label i { color: var(--primary, #e11d2a); }
+.ep-tracking-banner code {
+    display: inline-block;
+    padding: 7px 14px;
+    background: var(--ep-surface-soft);
+    border: 1px solid var(--ep-line);
+    border-radius: var(--ep-r-sm);
+    color: var(--ep-ink);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .9rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+.ep-tracking-banner .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--ep-line);
+    background: var(--ep-surface);
+    border-radius: var(--ep-r-sm);
+    color: var(--ep-muted);
+    cursor: pointer;
+    transition: all var(--ep-dur) var(--ep-ease);
+}
+.ep-tracking-banner .copy-btn:hover {
+    color: var(--primary, #e11d2a);
+    border-color: var(--primary, #e11d2a);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 6%, var(--ep-surface));
+}
+
+/* =========================================================================
+   FORM CARD
+   ========================================================================= */
+.ep-card {
+    background: var(--ep-surface);
+    border: 1px solid var(--ep-line);
+    border-radius: var(--ep-r-xl);
+    box-shadow: var(--ep-sh-lg);
+    overflow: hidden;
+}
+.ep-card-body { padding: clamp(22px, 3vw, 40px); }
+
+/* =========================================================================
+   SECTION HEADERS
+   ========================================================================= */
+.ep-section {
+    padding-bottom: 32px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--ep-line-soft);
+}
+.ep-section:last-of-type {
+    padding-bottom: 0;
+    margin-bottom: 24px;
+    border-bottom: 0;
+}
+.ep-section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+.ep-section-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--ep-r-md);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: 1rem;
+}
+.ep-section-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--ep-ink);
+    letter-spacing: -0.015em;
+    margin: 0;
+    line-height: 1.3;
+}
+.ep-section-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    margin-left: auto;
+    border-radius: var(--ep-pill);
+    background: var(--ep-surface-soft);
+    border: 1px solid var(--ep-line);
+    color: var(--ep-muted);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+/* =========================================================================
+   FORM CONTROLS
+   ========================================================================= */
+.ep-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ep-muted);
+    margin-bottom: 8px;
+}
+.ep-label .req {
+    color: var(--primary, #e11d2a);
+}
+.ep-label .opt {
+    font-size: .7rem;
+    color: var(--ep-muted-2);
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: none;
+}
+
+.ep-field {
+    display: block;
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--ep-surface);
+    border: 1.5px solid var(--ep-line);
+    border-radius: var(--ep-r-md);
+    color: var(--ep-ink);
+    font-size: .92rem;
+    font-weight: 500;
+    outline: none;
+    transition: border-color var(--ep-dur) var(--ep-ease),
+                box-shadow   var(--ep-dur) var(--ep-ease),
+                background   var(--ep-dur) var(--ep-ease);
+    font-family: inherit;
+}
+.ep-field::placeholder { color: var(--ep-muted-2); font-weight: 400; }
+.ep-field:focus {
+    border-color: var(--primary, #e11d2a);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary, #e11d2a) 15%, transparent);
+}
+.ep-field[readonly] {
+    background: var(--ep-surface-soft);
+    color: var(--ep-muted);
+    cursor: not-allowed;
+}
+textarea.ep-field {
+    resize: vertical;
+    min-height: 72px;
+    line-height: 1.55;
+}
+select.ep-field {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e11d2a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px 10px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+input[type="date"].ep-field {
+    padding: 10px 14px;
+    font-family: inherit;
+}
+
+/* Validation states */
+.ep-field.is-invalid {
+    border-color: var(--ep-danger);
+    background: color-mix(in srgb, var(--ep-danger) 5%, var(--ep-surface));
+}
+.ep-field.is-invalid:focus {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--ep-danger) 18%, transparent);
+}
+.ep-field.is-valid {
+    border-color: var(--ep-success);
+}
+
+/* Input with prefix */
+.ep-input-group {
+    display: flex;
+    border: 1.5px solid var(--ep-line);
+    border-radius: var(--ep-r-md);
+    overflow: hidden;
+    background: var(--ep-surface);
+    transition: border-color var(--ep-dur) var(--ep-ease),
+                box-shadow   var(--ep-dur) var(--ep-ease);
+}
+.ep-input-group:focus-within {
+    border-color: var(--primary, #e11d2a);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary, #e11d2a) 15%, transparent);
+}
+.ep-input-group .prefix {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    background: var(--ep-surface-soft);
+    color: var(--ep-muted);
+    font-weight: 700;
+    font-size: .88rem;
+    border-right: 1px solid var(--ep-line);
+}
+.ep-input-group .ep-field {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+.ep-input-group .ep-field:focus { box-shadow: none; }
+
+.ep-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: .78rem;
+    color: var(--ep-muted-2);
+    line-height: 1.5;
+}
+
+/* =========================================================================
+   CHECKBOXES
+   ========================================================================= */
+.ep-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--ep-surface-alt);
+    border: 1px solid var(--ep-line);
+    border-radius: var(--ep-r-md);
+    cursor: pointer;
+    transition: all var(--ep-dur) var(--ep-ease);
+}
+.ep-check:hover {
+    border-color: color-mix(in srgb, var(--primary, #e11d2a) 30%, var(--ep-line));
+}
+.ep-check input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    margin: 1px 0 0;
+    border: 2px solid var(--ep-line);
+    border-radius: 5px;
+    background: var(--ep-surface);
+    cursor: pointer;
+    position: relative;
+    transition: all var(--ep-dur) var(--ep-ease);
+}
+.ep-check input[type="checkbox"]:checked {
+    background: var(--primary, #e11d2a);
+    border-color: var(--primary, #e11d2a);
+}
+.ep-check input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px; top: 1px;
+    width: 6px; height: 11px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.ep-check input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--primary, #e11d2a);
+    outline-offset: 3px;
+}
+.ep-check .body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.ep-check .title {
+    display: block;
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--ep-ink);
+    margin-bottom: 2px;
+}
+.ep-check .desc {
+    display: block;
+    font-size: .8rem;
+    color: var(--ep-muted);
+    line-height: 1.5;
+}
+
+/* =========================================================================
+   ACTIONS
+   ========================================================================= */
+.ep-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 28px;
+    margin-top: 32px;
+    border-top: 1px solid var(--ep-line-soft);
+    flex-wrap: wrap;
+}
+.ep-actions .spacer { flex: 1 1 auto; }
+
+.ep-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 13px 26px;
+    border: 1.5px solid transparent;
+    border-radius: var(--ep-pill);
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--ep-dur) var(--ep-ease);
+    white-space: nowrap;
+}
+.ep-btn:focus-visible {
+    outline: 2px solid var(--primary, #e11d2a);
+    outline-offset: 2px;
+}
+.ep-btn i { transition: transform var(--ep-dur) var(--ep-ease); }
+
+.ep-btn.primary {
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    box-shadow: 0 10px 22px -10px rgba(225, 29, 42, .55);
+}
+.ep-btn.primary:hover,
+.ep-btn.primary:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px -12px rgba(225, 29, 42, .6);
+    color: #fff;
+}
+.ep-btn.primary:hover i { transform: scale(1.05); }
+
+.ep-btn.ghost {
+    background: transparent;
+    color: var(--ep-text);
+    border-color: var(--ep-line);
+}
+.ep-btn.ghost:hover,
+.ep-btn.ghost:focus-visible {
+    border-color: var(--ep-ink);
+    color: var(--ep-ink);
+    background: var(--ep-surface-alt);
+    transform: translateY(-2px);
+}
+
+.ep-btn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* =========================================================================
+   TOASTS
+   ========================================================================= */
+.ep-toast {
+    position: fixed;
+    top: 88px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    min-width: 280px;
+    max-width: calc(100vw - 48px);
+    background: var(--ep-surface);
+    border: 1px solid var(--ep-line);
+    border-left: 4px solid var(--primary, #e11d2a);
+    border-radius: var(--ep-r-sm);
+    box-shadow: var(--ep-sh-lg);
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--ep-text);
+    animation: epToastIn 280ms var(--ep-ease);
+}
+.ep-toast i { font-size: 1.15rem; color: var(--primary, #e11d2a); flex-shrink: 0; }
+.ep-toast.success { border-left-color: var(--ep-success); }
+.ep-toast.success i { color: var(--ep-success); }
+.ep-toast.error { border-left-color: var(--ep-danger); }
+.ep-toast.error i { color: var(--ep-danger); }
+.ep-toast.warning { border-left-color: var(--ep-warning); }
+.ep-toast.warning i { color: var(--ep-warning); }
+.ep-toast.info { border-left-color: var(--ep-info); }
+.ep-toast.info i { color: var(--ep-info); }
+.ep-toast.fade-out { animation: epToastOut 280ms var(--ep-ease) forwards; }
+
+@keyframes epToastIn {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes epToastOut {
+    to { opacity: 0; transform: translateX(24px); }
+}
+@media (max-width: 576px) {
+    .ep-toast { left: 16px; right: 16px; top: 76px; min-width: auto; }
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+@media (max-width: 640px) {
+    .ep-hero-title { font-size: 1.2rem; gap: 10px; }
+    .ep-hero-title .hero-icon { width: 38px; height: 38px; font-size: 1rem; }
+    .ep-hero-title code { width: 100%; }
+    .ep-card-body { padding: 22px 20px; }
+    .ep-actions { flex-direction: column; align-items: stretch; }
+    .ep-actions .spacer { display: none; }
+    .ep-btn { width: 100%; }
+}
+
+/* Motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* Print */
+@media print {
+    .ep-hero::before, .ep-actions, .ep-toast,
+    .navbar, footer, .back-to-top { display: none !important; }
+    .ep-hero { background: #fff !important; color: #000 !important; padding: 20px 0 !important; border-bottom: 2px solid #000; }
+    .ep-hero-title, .ep-hero-title code, .ep-status-pill, .ep-breadcrumb,
+    .ep-breadcrumb a, .ep-breadcrumb .active { color: #000 !important; }
+    .ep-hero-title code { background: #f5f5f5 !important; border: 1px solid #ccc !important; }
+    .ep-status-pill { background: #f5f5f5 !important; border: 1px solid #ccc !important; }
+    .ep-shell { margin: 0 !important; }
+    .ep-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ep-page">
+
+    <!-- ==================== PAGE HERO ==================== -->
+    <section class="ep-hero">
+        <div class="container">
+            <ol class="ep-breadcrumb">
+                <li><a href="{{ url_for('admin_dashboard') }}">Admin dashboard</a></li>
+                <li><a href="{{ url_for('manage_packages') }}">Packages</a></li>
+                <li><a href="{{ url_for('view_package', package_id=package.id) }}">{{ package.tracking_code }}</a></li>
+                <li class="active">Edit</li>
+            </ol>
+
+            <div class="ep-hero-head">
+                <h1 class="ep-hero-title">
+                    <span class="hero-icon"><i class="fas fa-pen-to-square"></i></span>
+                    Edit package
+                    <code>{{ package.tracking_code }}</code>
+                </h1>
+
+                {% if package.status in ['delivered', 'cancelled', 'returned'] %}
+                    {% set pill_class = 'muted' %}
+                {% elif package.status == 'on_hold' %}
+                    {% set pill_class = 'warning' %}
+                {% elif package.status == 'in_transit' or package.status == 'out_for_delivery' %}
+                    {% set pill_class = 'info' %}
+                {% elif package.status == 'pending' or package.status == 'shipped' or package.status == 'dispatched' %}
+                    {% set pill_class = '' %}
+                {% else %}
+                    {% set pill_class = 'muted' %}
+                {% endif %}
+                <span class="ep-status-pill {{ pill_class }}">
+                    <span class="dot"></span>
+                    {{ package.status|replace('_', ' ')|title }}
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SHELL ==================== -->
+    <div class="ep-shell">
+
+        <!-- Info notice -->
+        <div class="ep-notice">
+            <span class="icon"><i class="fas fa-circle-info"></i></span>
+            <p>
+                <strong>Editing {{ package.tracking_code }}.</strong>
+                Changes made here update the package record immediately on save. The tracking code itself cannot be modified.
+            </p>
+        </div>
+
+        <!-- Tracking code banner -->
+        <div class="ep-tracking-banner">
+            <span class="label"><i class="fas fa-barcode"></i> Tracking number</span>
+            <code>{{ package.tracking_code }}</code>
+            <button type="button" class="copy-btn"
+                    onclick="copyToClipboard('{{ package.tracking_code }}')"
+                    title="Copy tracking number" aria-label="Copy tracking number">
+                <i class="fas fa-copy"></i>
+            </button>
+        </div>
+
+        <!-- Form card -->
+        <div class="ep-card">
+            <div class="ep-card-body">
+                <form method="POST"
+                      action="{{ url_for('edit_package', package_id=package.id) }}"
+                      id="editPackageForm"
+                      novalidate>
+
+                    <!-- ==================== SENDER ==================== -->
+                    <section class="ep-section">
+                        <header class="ep-section-header">
+                            <span class="ep-section-icon"><i class="fas fa-arrow-up-from-bracket"></i></span>
+                            <h2 class="ep-section-title">Sender information</h2>
+                            <span class="ep-section-pill">From</span>
+                        </header>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="ep-label" for="sender_name">Full name <span class="req">*</span></label>
+                                <input type="text" class="ep-field" id="sender_name" name="sender_name"
+                                       value="{{ package.sender_name or '' }}"
+                                       autocomplete="name"
+                                       placeholder="e.g. Jane Doe" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ep-label" for="sender_company">Company <span class="opt">optional</span></label>
+                                <input type="text" class="ep-field" id="sender_company" name="sender_company"
+                                       value="{{ package.sender_company or '' }}"
+                                       autocomplete="organization"
+                                       placeholder="e.g. Acme Logistics">
+                            </div>
+                            <div class="col-12">
+                                <label class="ep-label" for="sender_address">Address</label>
+                                <textarea class="ep-field" id="sender_address" name="sender_address"
+                                          rows="2" autocomplete="street-address"
+                                          placeholder="Street, building, apartment">{{ package.sender_address or '' }}</textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ep-label" for="sender_city">City</label>
+                                <input type="text" class="ep-field" id="sender_city" name="sender_city"
+                                       value="{{ package.sender_city or '' }}"
+                                       autocomplete="address-level2"
+                                       placeholder="e.g. Berlin">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ep-label" for="sender_state">State / region</label>
+                                <input type="text" class="ep-field" id="sender_state" name="sender_state"
+                                       value="{{ package.sender_state or '' }}"
+                                       autocomplete="address-level1"
+                                       placeholder="e.g. Berlin">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ep-label" for="sender_phone">Phone</label>
+                                <input type="tel" class="ep-field" id="sender_phone" name="sender_phone"
+                                       value="{{ package.sender_phone or '' }}"
+                                       autocomplete="tel"
+                                       placeholder="+49 30 1234567">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ep-label" for="sender_email">Email</label>
+                                <input type="email" class="ep-field" id="sender_email" name="sender_email"
+                                       value="{{ package.sender_email or '' }}"
+                                       autocomplete="email"
+                                       placeholder="sender@example.com">
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ==================== RECIPIENT ==================== -->
+                    <section class="ep-section">
+                        <header class="ep-section-header">
+                            <span class="ep-section-icon"><i class="fas fa-flag-checkered"></i></span>
+                            <h2 class="ep-section-title">Recipient information</h2>
+                            <span class="ep-section-pill">To</span>
+                        </header>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="ep-label" for="recipient_name">Full name <span class="req">*</span></label>
+                                <input type="text" class="ep-field" id="recipient_name" name="recipient_name"
+                                       value="{{ package.recipient_name or '' }}"
+                                       autocomplete="name"
+                                       placeholder="e.g. John Smith" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ep-label" for="recipient_company">Company <span class="opt">optional</span></label>
+                                <input type="text" class="ep-field" id="recipient_company" name="recipient_company"
+                                       value="{{ package.recipient_company or '' }}"
+                                       autocomplete="organization"
+                                       placeholder="e.g. Northwind Retail">
+                            </div>
+                            <div class="col-12">
+                                <label class="ep-label" for="recipient_address">Delivery address</label>
+                                <textarea class="ep-field" id="recipient_address" name="recipient_address"
+                                          rows="2" autocomplete="street-address"
+                                          placeholder="Street, building, apartment">{{ package.recipient_address or '' }}</textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ep-label" for="recipient_city">City</label>
+                                <input type="text" class="ep-field" id="recipient_city" name="recipient_city"
+                                       value="{{ package.recipient_city or '' }}"
+                                       autocomplete="address-level2"
+                                       placeholder="e.g. Paris">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ep-label" for="recipient_state">State / region</label>
+                                <input type="text" class="ep-field" id="recipient_state" name="recipient_state"
+                                       value="{{ package.recipient_state or '' }}"
+                                       autocomplete="address-level1"
+                                       placeholder="e.g. Île-de-France">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ep-label" for="recipient_phone">Phone</label>
+                                <input type="tel" class="ep-field" id="recipient_phone" name="recipient_phone"
+                                       value="{{ package.recipient_phone or '' }}"
+                                       autocomplete="tel"
+                                       placeholder="+33 1 23 45 67 89">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="ep-label" for="recipient_email">Email</label>
+                                <input type="email" class="ep-field" id="recipient_email" name="recipient_email"
+                                       value="{{ package.recipient_email or '' }}"
+                                       autocomplete="email"
+                                       placeholder="recipient@example.com">
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ==================== PACKAGE + ROUTING (split) ==================== -->
+                    <div class="row g-4">
+                        <!-- LEFT: Package details -->
+                        <div class="col-lg-6">
+                            <section class="ep-section" style="padding-bottom: 0; margin-bottom: 0; border-bottom: 0;">
+                                <header class="ep-section-header">
+                                    <span class="ep-section-icon"><i class="fas fa-box"></i></span>
+                                    <h2 class="ep-section-title">Package details</h2>
+                                </header>
+
+                                <div class="mb-3">
+                                    <label class="ep-label" for="estimated_delivery">Estimated delivery <span class="opt">optional</span></label>
+                                    <input type="date" class="ep-field" id="estimated_delivery" name="estimated_delivery"
+                                           value="{{ package.estimated_delivery.strftime('%Y-%m-%d') if package.estimated_delivery else '' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="ep-label" for="weight">Weight <span class="req">*</span></label>
+                                    <div class="ep-input-group">
+                                        <span class="prefix">kg</span>
+                                        <input type="number" step="0.01" min="0.01" class="ep-field"
+                                               id="weight" name="weight"
+                                               value="{{ package.weight or '' }}"
+                                               placeholder="0.00" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="ep-label" for="dimensions">Dimensions <span class="opt">L×W×H cm</span></label>
+                                    <input type="text" class="ep-field" id="dimensions" name="dimensions"
+                                           value="{{ package.length or '' }}x{{ package.width or '' }}x{{ package.height or '' }}"
+                                           placeholder="e.g. 30x20x15"
+                                           title="Enter dimensions separated by ×, *, comma or space">
+                                    <small class="ep-hint">Length × Width × Height in centimetres.</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="ep-label" for="package_type">Package type</label>
+                                    <select class="ep-field" id="package_type" name="package_type">
+                                        <option value="documents"   {% if package.package_type == 'documents' %}selected{% endif %}>Documents</option>
+                                        <option value="electronics" {% if package.package_type == 'electronics' %}selected{% endif %}>Electronics</option>
+                                        <option value="fragile"     {% if package.package_type == 'fragile' %}selected{% endif %}>Fragile</option>
+                                        <option value="perishable"  {% if package.package_type == 'perishable' %}selected{% endif %}>Perishable</option>
+                                        <option value="dangerous"   {% if package.package_type == 'dangerous' %}selected{% endif %}>Dangerous goods</option>
+                                        <option value="general"     {% if package.package_type == 'general' or not package.package_type %}selected{% endif %}>General</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="ep-label" for="declared_value">Declared value <span class="opt">optional</span></label>
+                                    <div class="ep-input-group">
+                                        <span class="prefix">$</span>
+                                        <input type="number" step="0.01" min="0" class="ep-field"
+                                               id="declared_value" name="declared_value"
+                                               value="{{ package.declared_value or '' }}"
+                                               placeholder="0.00">
+                                    </div>
+                                </div>
+
+                                <label class="ep-check">
+                                    <input type="checkbox" id="insurance" name="insurance"
+                                           {% if package.insurance_required %}checked{% endif %}>
+                                    <span class="body">
+                                        <span class="title">Insurance required</span>
+                                        <span class="desc">Recommended for high-value shipments.</span>
+                                    </span>
+                                </label>
+                            </section>
+                        </div>
+
+                        <!-- RIGHT: Routing + status -->
+                        <div class="col-lg-6">
+                            <section class="ep-section" style="padding-bottom: 0; margin-bottom: 0; border-bottom: 0;">
+                                <header class="ep-section-header">
+                                    <span class="ep-section-icon"><i class="fas fa-route"></i></span>
+                                    <h2 class="ep-section-title">Routing &amp; status</h2>
+                                </header>
+
+                                <div class="mb-3">
+                                    <label class="ep-label" for="shipping_method">Shipping method</label>
+                                    <select class="ep-field" id="shipping_method" name="shipping_method">
+                                        <option value="air"    {% if package.shipping_method == 'air' %}selected{% endif %}>Air</option>
+                                        <option value="ground" {% if package.shipping_method == 'ground' %}selected{% endif %}>Ground</option>
+                                        <option value="sea"    {% if package.shipping_method == 'sea' %}selected{% endif %}>Sea</option>
+                                        <option value="rail"   {% if package.shipping_method == 'rail' %}selected{% endif %}>Rail</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="ep-label" for="shipping_type">Shipping type</label>
+                                    <select class="ep-field" id="shipping_type" name="shipping_type">
+                                        <option value="express"   {% if package.shipping_type == 'express' %}selected{% endif %}>Express</option>
+                                        <option value="standard"  {% if package.shipping_type == 'standard' %}selected{% endif %}>Standard</option>
+                                        <option value="freight"   {% if package.shipping_type == 'freight' %}selected{% endif %}>Freight</option>
+                                        <option value="overnight" {% if package.shipping_type == 'overnight' %}selected{% endif %}>Overnight</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="ep-label" for="pickup_address">Pickup address</label>
+                                    <textarea class="ep-field" id="pickup_address" name="pickup_address"
+                                              rows="2"
+                                              placeholder="Where should we collect the package?">{{ package.pickup_address or '' }}</textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="ep-label" for="destination_address">Destination address</label>
+                                    <textarea class="ep-field" id="destination_address" name="destination_address"
+                                              rows="2"
+                                              placeholder="Where should we deliver the package?">{{ package.destination_address or '' }}</textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="ep-label" for="notes">Internal notes <span class="opt">optional</span></label>
+                                    <textarea class="ep-field" id="notes" name="notes"
+                                              rows="2"
+                                              placeholder="Any additional notes visible to staff">{{ package.notes or '' }}</textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="ep-label" for="status">Package status</label>
+                                    <select class="ep-field" id="status" name="status">
+                                        <option value="pending"          {% if package.status == 'pending' %}selected{% endif %}>Pending</option>
+                                        <option value="shipped"          {% if package.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                                        <option value="dispatched"       {% if package.status == 'dispatched' %}selected{% endif %}>Dispatched</option>
+                                        <option value="in_transit"       {% if package.status == 'in_transit' %}selected{% endif %}>In transit</option>
+                                        <option value="out_for_delivery" {% if package.status == 'out_for_delivery' %}selected{% endif %}>Out for delivery</option>
+                                        <option value="on_hold"          {% if package.status == 'on_hold' %}selected{% endif %}>On hold</option>
+                                        <option value="delivered"        {% if package.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                        <option value="cancelled"        {% if package.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                        <option value="returned"         {% if package.status == 'returned' %}selected{% endif %}>Returned</option>
+                                    </select>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+
+                    <!-- ==================== ACTIONS ==================== -->
+                    <div class="ep-actions">
+                        <a href="{{ url_for('view_package', package_id=package.id) }}" class="ep-btn ghost">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        <span class="spacer"></span>
+                        <button type="submit" class="ep-btn primary" id="submitBtn">
+                            <i class="fas fa-save"></i> Save changes
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    /* ==================== Toast ==================== */
+    function showNotification(message, type = 'success') {
+        const el = document.createElement('div');
+        el.className = `ep-toast ${type}`;
+        const icon = {
+            success: 'circle-check',
+            error:   'circle-exclamation',
+            warning: 'triangle-exclamation',
+            info:    'circle-info'
+        }[type] || 'circle-info';
+
+        el.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(el);
+
+        setTimeout(() => {
+            el.classList.add('fade-out');
+            setTimeout(() => el.remove(), 300);
+        }, 3400);
+    }
+    window.showNotification = showNotification;
+
+    /* ==================== Clipboard ==================== */
+    window.copyToClipboard = function (text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+                showNotification('Tracking number copied to clipboard', 'success');
+            }).catch(function () {
+                showNotification('Failed to copy tracking number', 'error');
+            });
+        } else {
+            // Fallback for older browsers / insecure contexts
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showNotification('Tracking number copied to clipboard', 'success');
+            } catch (e) {
+                showNotification('Failed to copy tracking number', 'error');
+            }
+            document.body.removeChild(ta);
+        }
+    };
+
+    /* ==================== Dimensions normalization + validation ==================== */
+    function normalizeDimensions(raw) {
+        let normalized = raw.replace(/[×,*\s]+/g, 'x');
+        normalized = normalized.replace(/x+/g, 'x').replace(/^x|x$/g, '');
+        return normalized;
+    }
+
+    function isValidDimensions(value) {
+        return /^\d+(?:\.\d+)?x\d+(?:\.\d+)?x\d+(?:\.\d+)?$/.test(value);
+    }
+
+    /* ==================== Init ==================== */
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('editPackageForm');
+        if (!form) return;
+
+        /* Live validation feedback */
+        form.querySelectorAll('.ep-field').forEach(el => {
+            el.addEventListener('blur', function () {
+                const required = this.hasAttribute('required');
+                const hasValue = (this.value || '').trim().length > 0;
+
+                if (required && !hasValue) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                } else if (hasValue) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-invalid', 'is-valid');
+                }
+            });
+        });
+
+        /* Dimensions: normalize + validate on blur */
+        const dimInput = form.querySelector('[name="dimensions"]');
+        if (dimInput) {
+            dimInput.addEventListener('blur', function () {
+                const raw = (this.value || '').trim();
+                if (!raw) {
+                    this.classList.remove('is-invalid', 'is-valid');
+                    return;
+                }
+                const normalized = normalizeDimensions(raw);
+                this.value = normalized;
+
+                if (isValidDimensions(normalized)) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                }
+            });
+        }
+
+        /* Submit: full validation + loading state */
+        form.addEventListener('submit', function (e) {
+            const requiredFields = ['sender_name', 'recipient_name', 'weight'];
+            let firstInvalid = null;
+
+            requiredFields.forEach(name => {
+                const el = form.querySelector(`[name="${name}"]`);
+                if (!el) return;
+                const hasValue = (el.value || '').trim().length > 0;
+                if (!hasValue) {
+                    el.classList.add('is-invalid');
+                    el.classList.remove('is-valid');
+                    if (!firstInvalid) firstInvalid = el;
+                }
+            });
+
+            /* Dimensions format check */
+            if (dimInput) {
+                const raw = (dimInput.value || '').trim();
+                if (raw) {
+                    const normalized = normalizeDimensions(raw);
+                    dimInput.value = normalized;
+                    if (!isValidDimensions(normalized)) {
+                        dimInput.classList.add('is-invalid');
+                        if (!firstInvalid) firstInvalid = dimInput;
+                    }
+                }
+            }
+
+            if (firstInvalid) {
+                e.preventDefault();
+                showNotification('Please fix the highlighted fields before saving.', 'error');
+                firstInvalid.focus();
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving…';
+            }
+            showNotification('Saving changes…', 'info');
+        });
+    });
+
+})();
+</script>
+{% endblock %}

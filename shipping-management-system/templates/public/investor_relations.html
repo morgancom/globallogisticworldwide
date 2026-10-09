@@ -1,0 +1,1241 @@
+{% extends "base.html" %}
+
+{% block title %}Investor Relations — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — INVESTOR RELATIONS
+   Warm neutrals + muted wine red, matching the current base.html.
+   ========================================================================= */
+
+:root {
+    --ir-surface:       #ffffff;
+    --ir-surface-alt:   #f7f6f3;
+    --ir-surface-soft:  #f0ede7;
+    --ir-line:          #e6e2db;
+    --ir-line-soft:     #eeebe5;
+    --ir-ink:           #141414;
+    --ir-text:          #2c2c2c;
+    --ir-muted:         #6b6b6b;
+    --ir-muted-2:       #9a948a;
+
+    --ir-success:       #3d7a4e;
+    --ir-success-bg:    #eff6f1;
+    --ir-danger:        #a51e2b;
+    --ir-danger-bg:     #fbf2f3;
+
+    --ir-sh-sm: 0 1px 2px rgba(20, 20, 20, .04);
+    --ir-sh-md: 0 4px 12px -6px rgba(20, 20, 20, .10);
+
+    --ir-ease: cubic-bezier(.4, 0, .2, 1);
+    --ir-dur:  180ms;
+
+    --ir-r-sm: 4px;
+    --ir-r-md: 6px;
+    --ir-lg: 8px;
+    --ir-r-xl: 10px;
+    --ir-pill: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --ir-surface:      #221f1c;
+        --ir-surface-alt:  #1c1a17;
+        --ir-surface-soft: #26231f;
+        --ir-line:         #2b2823;
+        --ir-line-soft:    #24211d;
+        --ir-ink:          #f4f2ee;
+        --ir-text:         #d4cec5;
+        --ir-muted:        #9a948a;
+        --ir-muted-2:      #7a746a;
+
+        --ir-success-bg:   #16261a;
+        --ir-danger-bg:    #2a1719;
+
+        --ir-sh-sm: 0 1px 2px rgba(0, 0, 0, .4);
+        --ir-sh-md: 0 4px 12px -6px rgba(0, 0, 0, .5);
+    }
+}
+
+body { background: var(--ir-surface-alt); color: var(--ir-text); }
+
+.ir-page h1, .ir-page h2, .ir-page h3,
+.ir-page h4, .ir-page h5, .ir-page h6 {
+    color: var(--ir-ink);
+    letter-spacing: -0.015em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+.ir-hero {
+    position: relative;
+    padding: clamp(52px, 7vw, 88px) 0 clamp(40px, 5vw, 64px);
+    overflow: hidden;
+    background: var(--ir-surface);
+    border-bottom: 1px solid var(--ir-line);
+}
+.ir-hero > .container { position: relative; z-index: 1; }
+
+.ir-hero .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: var(--ir-pill);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.ir-hero .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary, #a51e2b);
+}
+
+.ir-hero h1 {
+    font-size: clamp(1.85rem, 4.4vw, 2.75rem);
+    line-height: 1.08;
+    margin: 0 0 16px;
+    letter-spacing: -0.025em;
+}
+.ir-hero h1 em {
+    font-style: normal;
+    color: var(--primary, #a51e2b);
+}
+
+.ir-hero .lead {
+    font-size: clamp(1rem, 1.2vw, 1.08rem);
+    line-height: 1.7;
+    color: var(--ir-muted);
+    max-width: 720px;
+    margin: 0 0 26px;
+}
+
+.ir-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 22px;
+    border-top: 1px dashed var(--ir-line);
+}
+.ir-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    border-radius: var(--ir-r-md);
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color var(--ir-dur) var(--ir-ease),
+                border-color var(--ir-dur) var(--ir-ease),
+                color var(--ir-dur) var(--ir-ease);
+}
+.ir-hero-btn.primary {
+    background: var(--primary, #a51e2b);
+    border-color: var(--primary, #a51e2b);
+    color: #fff;
+}
+.ir-hero-btn.primary:hover,
+.ir-hero-btn.primary:focus-visible {
+    background: var(--primary-600, #8f1825);
+    border-color: var(--primary-600, #8f1825);
+    color: #fff;
+}
+.ir-hero-btn.ghost {
+    background: transparent;
+    color: var(--ir-ink);
+    border-color: var(--ir-line-strong, #d3cec5);
+}
+.ir-hero-btn.ghost:hover,
+.ir-hero-btn.ghost:focus-visible {
+    border-color: var(--primary, #a51e2b);
+    color: var(--primary, #a51e2b);
+    background: var(--primary-50, #fbf3f4);
+}
+
+/* =========================================================================
+   SECTION HELPERS
+   ========================================================================= */
+.ir-section { padding: clamp(48px, 6vw, 84px) 0; }
+.ir-section--alt { background: var(--ir-surface-alt); }
+.ir-section--surface { background: var(--ir-surface); }
+
+.ir-heading {
+    margin-bottom: clamp(28px, 4vw, 40px);
+    max-width: 720px;
+}
+.ir-heading .label {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: var(--ir-pill);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+.ir-heading h2 {
+    font-size: clamp(1.45rem, 2.9vw, 2.05rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+}
+.ir-heading p {
+    font-size: .96rem;
+    color: var(--ir-muted);
+    margin: 0;
+    line-height: 1.65;
+}
+
+/* =========================================================================
+   METRICS
+   ========================================================================= */
+.ir-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+}
+@media (max-width: 900px) { .ir-metrics { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .ir-metrics { grid-template-columns: 1fr; } }
+
+.ir-metric {
+    position: relative;
+    padding: 20px 20px;
+    background: var(--ir-surface);
+    border: 1px solid var(--ir-line);
+    border-radius: var(--ir-r-md);
+    transition: border-color var(--ir-dur) var(--ir-ease);
+}
+.ir-metric:hover {
+    border-color: var(--ir-line-strong, #d3cec5);
+}
+
+.ir-metric-value {
+    font-size: clamp(1.45rem, 2.8vw, 1.8rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--ir-ink);
+    line-height: 1;
+    margin-bottom: 6px;
+    font-variant-numeric: tabular-nums;
+}
+.ir-metric-label {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ir-muted);
+    margin-bottom: 10px;
+}
+.ir-metric-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: var(--ir-r-sm);
+    font-size: .72rem;
+    font-weight: 700;
+    background: var(--ir-success-bg);
+    color: var(--ir-success);
+}
+.ir-metric-trend.negative {
+    background: var(--ir-danger-bg);
+    color: var(--ir-danger);
+}
+.ir-metric-trend i { font-size: .65em; }
+
+/* =========================================================================
+   STOCK BAR
+   ========================================================================= */
+.ir-stock {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    align-items: center;
+    padding: 22px 26px;
+    background: var(--ir-surface);
+    border: 1px solid var(--ir-line);
+    border-radius: var(--ir-lg);
+    margin-bottom: 36px;
+}
+@media (max-width: 720px) { .ir-stock { grid-template-columns: 1fr; gap: 18px; } }
+
+.ir-stock-price {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.ir-stock-price .value {
+    font-size: clamp(1.6rem, 3.2vw, 2.1rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--ir-ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.ir-stock-price .change {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--ir-r-sm);
+    font-size: .82rem;
+    font-weight: 700;
+    background: var(--ir-success-bg);
+    color: var(--ir-success);
+}
+.ir-stock-price .change.negative {
+    background: var(--ir-danger-bg);
+    color: var(--ir-danger);
+}
+
+.ir-stock-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    padding-left: 28px;
+    border-left: 1px solid var(--ir-line);
+    font-size: .84rem;
+}
+@media (max-width: 720px) {
+    .ir-stock-details {
+        padding-left: 0;
+        padding-top: 16px;
+        border-left: 0;
+        border-top: 1px solid var(--ir-line);
+    }
+}
+.ir-stock-details .item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+}
+.ir-stock-details .item .k {
+    color: var(--ir-muted);
+    font-weight: 500;
+}
+.ir-stock-details .item .v {
+    color: var(--ir-ink);
+    font-weight: 700;
+}
+
+/* =========================================================================
+   FINANCIAL CALENDAR
+   ========================================================================= */
+.ir-calendar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+@media (max-width: 900px) { .ir-calendar { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .ir-calendar { grid-template-columns: 1fr; } }
+
+.ir-cal-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 18px;
+    background: var(--ir-surface);
+    border: 1px solid var(--ir-line);
+    border-radius: var(--ir-r-md);
+    transition: border-color var(--ir-dur) var(--ir-ease);
+}
+.ir-cal-item:hover {
+    border-color: var(--ir-line-strong, #d3cec5);
+}
+
+.ir-cal-date {
+    flex-shrink: 0;
+    width: 52px;
+    text-align: center;
+    padding: 8px 0;
+    background: var(--ir-surface-soft);
+    border-radius: var(--ir-r-sm);
+    transition: background-color var(--ir-dur) var(--ir-ease);
+}
+.ir-cal-item:hover .ir-cal-date {
+    background: var(--primary-50, #fbf3f4);
+}
+.ir-cal-date .day {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--primary, #a51e2b);
+}
+.ir-cal-date .month {
+    display: block;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--primary, #a51e2b);
+}
+
+.ir-cal-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.ir-cal-info h4 {
+    font-size: .92rem;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+}
+.ir-cal-info p {
+    font-size: .8rem;
+    color: var(--ir-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+.ir-cal-info p small {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--ir-surface-soft);
+    color: var(--ir-muted-2);
+    font-size: .7rem;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* =========================================================================
+   REPORTS
+   ========================================================================= */
+.ir-reports {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+@media (max-width: 820px) { .ir-reports { grid-template-columns: 1fr; } }
+
+.ir-report {
+    position: relative;
+    padding: 22px 22px 20px;
+    background: var(--ir-surface);
+    border: 1px solid var(--ir-line);
+    border-radius: var(--ir-r-md);
+    transition: border-color var(--ir-dur) var(--ir-ease);
+    overflow: hidden;
+}
+.ir-report:hover {
+    border-color: var(--ir-line-strong, #d3cec5);
+}
+
+.ir-report-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--primary, #a51e2b);
+    margin-bottom: 10px;
+}
+.ir-report h3 {
+    font-size: 1.02rem;
+    margin: 0 0 10px;
+    letter-spacing: -0.015em;
+}
+.ir-report p {
+    font-size: .88rem;
+    line-height: 1.6;
+    color: var(--ir-muted);
+    margin: 0 0 16px;
+}
+.ir-report-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.ir-report-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--ir-surface-alt);
+    border: 1px solid var(--ir-line);
+    border-radius: var(--ir-r-md);
+    font-size: .76rem;
+    font-weight: 600;
+    color: var(--ir-text);
+    text-decoration: none;
+    transition: background-color var(--ir-dur) var(--ir-ease),
+                border-color var(--ir-dur) var(--ir-ease),
+                color var(--ir-dur) var(--ir-ease);
+}
+.ir-report-link i { color: var(--primary, #a51e2b); font-size: .85em; }
+.ir-report-link:hover {
+    background: var(--primary-50, #fbf3f4);
+    border-color: var(--primary, #a51e2b);
+    color: var(--primary, #a51e2b);
+}
+
+/* Archive toggle */
+.ir-archive-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: transparent;
+    border: 1px solid var(--ir-line-strong, #d3cec5);
+    border-radius: var(--ir-r-md);
+    color: var(--ir-ink);
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color var(--ir-dur) var(--ir-ease),
+                border-color var(--ir-dur) var(--ir-ease),
+                color var(--ir-dur) var(--ir-ease);
+}
+.ir-archive-toggle:hover {
+    border-color: var(--primary, #a51e2b);
+    color: var(--primary, #a51e2b);
+    background: var(--primary-50, #fbf3f4);
+}
+.ir-archive-toggle[aria-expanded="true"] i { transform: rotate(180deg); }
+.ir-archive-toggle i { transition: transform var(--ir-dur) var(--ir-ease); }
+
+.ir-archive {
+    margin-top: 14px;
+    padding: 18px;
+    background: var(--ir-surface-alt);
+    border: 1px solid var(--ir-line);
+    border-radius: var(--ir-r-md);
+}
+
+/* =========================================================================
+   LEADERSHIP GRID
+   ========================================================================= */
+.ir-team {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+@media (max-width: 1100px) { .ir-team { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 820px)  { .ir-team { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .ir-team { grid-template-columns: 1fr; } }
+
+.ir-person {
+    padding: 20px 18px;
+    background: var(--ir-surface);
+    border: 1px solid var(--ir-line);
+    border-radius: var(--ir-r-md);
+    text-align: center;
+    transition: border-color var(--ir-dur) var(--ir-ease);
+}
+.ir-person:hover {
+    border-color: var(--ir-line-strong, #d3cec5);
+}
+.ir-person .avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    margin-bottom: 12px;
+    border-radius: 50%;
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: 1.2rem;
+}
+.ir-person h4 {
+    font-size: .95rem;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+}
+.ir-person .role {
+    display: block;
+    font-size: .8rem;
+    color: var(--ir-muted);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+.ir-person .note {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: var(--ir-r-sm);
+    background: var(--ir-surface-soft);
+    color: var(--ir-muted);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+/* =========================================================================
+   OWNERSHIP
+   ========================================================================= */
+.ir-ownership {
+    padding: 26px 24px;
+    background: var(--ir-surface);
+    border: 1px solid var(--ir-line);
+    border-radius: var(--ir-lg);
+}
+.ir-ownership-chart {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding-bottom: 22px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--ir-line);
+}
+@media (max-width: 640px) { .ir-ownership-chart { grid-template-columns: 1fr; } }
+
+.ir-own-item {
+    text-align: center;
+}
+.ir-own-percent {
+    font-size: clamp(1.6rem, 3.6vw, 2.2rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--primary, #a51e2b);
+    line-height: 1;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+}
+.ir-own-label {
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--ir-muted);
+}
+.ir-own-desc {
+    font-size: .86rem;
+    line-height: 1.65;
+    color: var(--ir-muted);
+    margin: 0;
+    text-align: center;
+}
+.ir-own-desc strong { color: var(--ir-ink); font-weight: 700; }
+
+/* =========================================================================
+   IR CONTACT BANNER
+   ========================================================================= */
+.ir-contact {
+    position: relative;
+    padding: clamp(30px, 4vw, 48px) clamp(26px, 4vw, 48px);
+    border-radius: var(--ir-r-xl);
+    background: #171512;
+    color: #fff;
+    overflow: hidden;
+    border-top: 3px solid var(--primary, #a51e2b);
+}
+.ir-contact > * { position: relative; z-index: 1; }
+
+.ir-contact h2 {
+    font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+    color: #fff;
+    margin: 0 0 8px;
+    letter-spacing: -0.015em;
+}
+.ir-contact > p {
+    font-size: .92rem;
+    color: #b8b2a7;
+    max-width: 620px;
+    margin: 0 0 26px;
+    line-height: 1.65;
+}
+
+.ir-contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px 28px;
+}
+@media (max-width: 820px) { .ir-contact-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .ir-contact-grid { grid-template-columns: 1fr; } }
+
+.ir-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    min-width: 0;
+}
+.ir-contact-item .icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--ir-r-sm);
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .12);
+    color: #e8e4de;
+    font-size: .92rem;
+}
+.ir-contact-item h5 {
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #9a948a;
+    margin: 0 0 4px;
+}
+.ir-contact-item p,
+.ir-contact-item a {
+    font-size: .88rem;
+    color: #e8e4de;
+    margin: 0;
+    line-height: 1.5;
+    text-decoration: none;
+    word-break: break-word;
+}
+.ir-contact-item a:hover { color: #fff; text-decoration: underline; }
+
+/* =========================================================================
+   ABOUT CARD
+   ========================================================================= */
+.ir-about {
+    padding: 24px 26px;
+    background: var(--ir-surface);
+    border: 1px solid var(--ir-line);
+    border-left: 3px solid var(--primary, #a51e2b);
+    border-radius: var(--ir-r-md);
+}
+.ir-about h3 {
+    font-size: .95rem;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+}
+.ir-about h3 i { color: var(--primary, #a51e2b); }
+.ir-about p {
+    font-size: .92rem;
+    line-height: 1.7;
+    color: var(--ir-text);
+    margin: 0 0 10px;
+}
+.ir-about p:last-child { margin-bottom: 0; }
+.ir-about small {
+    display: block;
+    font-size: .8rem;
+    color: var(--ir-muted);
+    line-height: 1.6;
+}
+
+/* =========================================================================
+   FOOTNOTE
+   ========================================================================= */
+.ir-footnote {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 36px;
+    padding: 16px 20px;
+    background: var(--ir-surface);
+    border: 1px solid var(--ir-line);
+    border-radius: var(--ir-r-md);
+    font-size: .8rem;
+    color: var(--ir-muted);
+}
+.ir-footnote .date { display: inline-flex; align-items: center; gap: 8px; }
+.ir-footnote .date i { color: var(--primary, #a51e2b); }
+@media (max-width: 560px) {
+    .ir-footnote { text-align: center; justify-content: center; }
+}
+
+/* =========================================================================
+   REDUCED MOTION
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .ir-hero-actions, .ir-archive-toggle, .ir-report-links,
+    .navbar, footer, .back-to-top { display: none !important; }
+    .ir-hero { background: #fff !important; padding: 20px 0 !important; border-bottom: 2px solid #000; }
+    .ir-hero h1, .ir-hero .lead { color: #000 !important; }
+    .ir-metric, .ir-report, .ir-cal-item, .ir-own-item, .ir-person {
+        border: 1px solid #ddd !important;
+    }
+    .ir-contact { background: #f5f5f5 !important; color: #000 !important; border-top-color: #000 !important; }
+    .ir-contact h2, .ir-contact > p, .ir-contact-item h5 { color: #000 !important; }
+    .ir-contact-item p, .ir-contact-item a { color: #333 !important; }
+    .ir-contact-item .icon { background: #eee !important; color: #000 !important; border-color: #ccc !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ir-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="ir-hero">
+        <div class="container">
+            <span class="eyebrow">Investor Relations</span>
+            <h1>Transparent reporting. <em>Long-term value.</em></h1>
+            <p class="lead">
+                Global shippments is the world's leading logistics group, connecting people and markets
+                across more than 220 countries. This section is the primary point of contact for
+                investors, analysts and shareholders — providing reports, financial calendar and
+                capital market information.
+            </p>
+            <div class="ir-hero-actions">
+                <a href="#reports" class="ir-hero-btn primary">
+                    Latest reports <i class="fas fa-arrow-down"></i>
+                </a>
+                <a href="#contact" class="ir-hero-btn ghost">
+                    Contact IR <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== KEY METRICS ==================== -->
+    <section class="ir-section">
+        <div class="container">
+            <div class="ir-heading">
+                <span class="label">Key figures</span>
+                <h2>Fiscal year 2025 at a glance</h2>
+                <p>Group-level results published with our Annual Report 2025.</p>
+            </div>
+
+            <div class="ir-metrics">
+                <div class="ir-metric">
+                    <div class="ir-metric-value">€82.9B</div>
+                    <div class="ir-metric-label">Revenue 2025</div>
+                    <span class="ir-metric-trend negative"><i class="fas fa-arrow-down"></i> 1.6% vs 2024</span>
+                </div>
+                <div class="ir-metric">
+                    <div class="ir-metric-value">€6.1B</div>
+                    <div class="ir-metric-label">EBIT 2025</div>
+                    <span class="ir-metric-trend"><i class="fas fa-arrow-up"></i> 3.7% vs 2024</span>
+                </div>
+                <div class="ir-metric">
+                    <div class="ir-metric-value">€3.2B</div>
+                    <div class="ir-metric-label">Free cash flow</div>
+                    <span class="ir-metric-trend"><i class="fas fa-arrow-up"></i> 8.3% vs 2024</span>
+                </div>
+                <div class="ir-metric">
+                    <div class="ir-metric-value">€3.09</div>
+                    <div class="ir-metric-label">Earnings per share</div>
+                    <span class="ir-metric-trend"><i class="fas fa-arrow-up"></i> 8.1% vs 2024</span>
+                </div>
+            </div>
+
+            <!-- Stock bar -->
+            <div class="ir-stock">
+                <div class="ir-stock-price">
+                    <span class="value">€39.74</span>
+                    <span class="change"><i class="fas fa-arrow-up"></i> +0.70%</span>
+                </div>
+                <div class="ir-stock-details">
+                    <span class="item"><span class="k">ISIN</span> <span class="v">DE0005552004</span></span>
+                    <span class="item"><span class="k">WKN</span> <span class="v">555200</span></span>
+                    <span class="item"><span class="k">Ticker</span> <span class="v">SEND</span></span>
+                    <span class="item"><span class="k">Market cap</span> <span class="v">€58.6B</span></span>
+                    <span class="item"><span class="k">Dividend</span> <span class="v">€1.85</span></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FINANCIAL CALENDAR ==================== -->
+    <section class="ir-section ir-section--alt">
+        <div class="container">
+            <div class="ir-heading">
+                <span class="label">Financial calendar</span>
+                <h2>Key dates for 2026</h2>
+                <p>Reporting dates, the Annual General Meeting and investor events.</p>
+            </div>
+
+            <div class="ir-calendar">
+                <div class="ir-cal-item">
+                    <div class="ir-cal-date">
+                        <span class="day">5</span>
+                        <span class="month">Mar</span>
+                    </div>
+                    <div class="ir-cal-info">
+                        <h4>Annual Report 2025</h4>
+                        <p>Full-year results with analyst conference call <small>07:00 CET</small></p>
+                    </div>
+                </div>
+                <div class="ir-cal-item">
+                    <div class="ir-cal-date">
+                        <span class="day">30</span>
+                        <span class="month">Apr</span>
+                    </div>
+                    <div class="ir-cal-info">
+                        <h4>Q1 2026 results</h4>
+                        <p>Quarterly statement &amp; analyst call</p>
+                    </div>
+                </div>
+                <div class="ir-cal-item">
+                    <div class="ir-cal-date">
+                        <span class="day">5</span>
+                        <span class="month">May</span>
+                    </div>
+                    <div class="ir-cal-info">
+                        <h4>Annual General Meeting</h4>
+                        <p>Dividend payment date</p>
+                    </div>
+                </div>
+                <div class="ir-cal-item">
+                    <div class="ir-cal-date">
+                        <span class="day">5</span>
+                        <span class="month">Aug</span>
+                    </div>
+                    <div class="ir-cal-info">
+                        <h4>Half-Year Report 2026</h4>
+                        <p>H1 results &amp; segment analysis</p>
+                    </div>
+                </div>
+                <div class="ir-cal-item">
+                    <div class="ir-cal-date">
+                        <span class="day">6</span>
+                        <span class="month">Nov</span>
+                    </div>
+                    <div class="ir-cal-info">
+                        <h4>Q3 2026 results</h4>
+                        <p>Nine-month statement</p>
+                    </div>
+                </div>
+                <div class="ir-cal-item">
+                    <div class="ir-cal-date">
+                        <span class="day">2</span>
+                        <span class="month">Dec</span>
+                    </div>
+                    <div class="ir-cal-info">
+                        <h4>Investor day</h4>
+                        <p>Strategy briefing &amp; management presentations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== REPORTS ==================== -->
+    <section class="ir-section ir-section--surface" id="reports">
+        <div class="container">
+            <div class="ir-heading">
+                <span class="label">Reporting</span>
+                <h2>Latest financial publications</h2>
+                <p>All reports are available to download as PDF, presentation and statbook.</p>
+            </div>
+
+            <div class="ir-reports">
+                <article class="ir-report">
+                    <span class="ir-report-date"><i class="fas fa-calendar-day"></i> Q3 2025 · November 6, 2025</span>
+                    <h3>Quarterly statement Q3 2025</h3>
+                    <p>
+                        Group earnings grew in the third quarter. EBIT rose to €1.5 billion
+                        (Q3 2024: €1.4 billion), supported by the Express and Supply Chain divisions.
+                    </p>
+                    <div class="ir-report-links">
+                        <a href="#" class="ir-report-link"><i class="fas fa-file-pdf"></i> PDF</a>
+                        <a href="#" class="ir-report-link"><i class="fas fa-chart-bar"></i> Presentation</a>
+                        <a href="#" class="ir-report-link"><i class="fas fa-file-excel"></i> Statbook</a>
+                    </div>
+                </article>
+
+                <article class="ir-report">
+                    <span class="ir-report-date"><i class="fas fa-calendar-day"></i> H1 2025 · August 5, 2025</span>
+                    <h3>Half-Year Report 2025</h3>
+                    <p>
+                        Comprehensive results for the first half of the fiscal year with detailed
+                        segment performance, cash flow statements and outlook.
+                    </p>
+                    <div class="ir-report-links">
+                        <a href="#" class="ir-report-link"><i class="fas fa-file-pdf"></i> PDF</a>
+                        <a href="#" class="ir-report-link"><i class="fas fa-chart-bar"></i> Presentation</a>
+                        <a href="#" class="ir-report-link"><i class="fas fa-file-excel"></i> Statbook</a>
+                    </div>
+                </article>
+            </div>
+
+            <!-- Archive toggle -->
+            <button class="ir-archive-toggle" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#archiveReports"
+                    aria-expanded="false" aria-controls="archiveReports">
+                <i class="fas fa-chevron-down"></i> Previous reports (2022–2024)
+            </button>
+
+            <div class="collapse" id="archiveReports">
+                <div class="ir-archive">
+                    <div class="ir-reports">
+                        <article class="ir-report">
+                            <span class="ir-report-date"><i class="fas fa-calendar-day"></i> 2024 · March 6, 2025</span>
+                            <h3>Annual Report 2024</h3>
+                            <div class="ir-report-links">
+                                <a href="#" class="ir-report-link"><i class="fas fa-file-pdf"></i> PDF</a>
+                                <a href="#" class="ir-report-link"><i class="fas fa-leaf"></i> ESG Report</a>
+                            </div>
+                        </article>
+                        <article class="ir-report">
+                            <span class="ir-report-date"><i class="fas fa-calendar-day"></i> 2023 · March 6, 2024</span>
+                            <h3>Annual Report 2023</h3>
+                            <div class="ir-report-links">
+                                <a href="#" class="ir-report-link"><i class="fas fa-file-pdf"></i> PDF</a>
+                                <a href="#" class="ir-report-link"><i class="fas fa-leaf"></i> ESG Report</a>
+                            </div>
+                        </article>
+                        <article class="ir-report">
+                            <span class="ir-report-date"><i class="fas fa-calendar-day"></i> 2022 · March 9, 2023</span>
+                            <h3>Annual Report 2022</h3>
+                            <div class="ir-report-links">
+                                <a href="#" class="ir-report-link"><i class="fas fa-file-pdf"></i> PDF</a>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EXECUTIVE COMMITTEE ==================== -->
+    <section class="ir-section ir-section--alt">
+        <div class="container">
+            <div class="ir-heading">
+                <span class="label">Leadership</span>
+                <h2>Group Executive Committee</h2>
+                <p>The team responsible for the operational and strategic management of Global shippments Group.</p>
+            </div>
+
+            <div class="ir-team">
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user-tie"></i></div>
+                    <h4>Tobias Meyer</h4>
+                    <span class="role">Chief Executive Officer</span>
+                    <span class="note">Since 2023</span>
+                </div>
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user-tie"></i></div>
+                    <h4>Melanie Kreis</h4>
+                    <span class="role">Chief Financial Officer</span>
+                    <span class="note">Since 2016</span>
+                </div>
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user-tie"></i></div>
+                    <h4>Thomas Ogilvie</h4>
+                    <span class="role">HR &amp; Labour Director</span>
+                    <span class="note">Board member</span>
+                </div>
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user-tie"></i></div>
+                    <h4>Martin Ziegenbalg</h4>
+                    <span class="role">Head of Investor Relations</span>
+                    <span class="note">IR contact</span>
+                </div>
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user-tie"></i></div>
+                    <h4>John Pearson</h4>
+                    <span class="role">CEO, Express division</span>
+                    <span class="note">Divisional CEO</span>
+                </div>
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user-tie"></i></div>
+                    <h4>Oscar de Bok</h4>
+                    <span class="role">CEO, Supply chain</span>
+                    <span class="note">Divisional CEO</span>
+                </div>
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user-tie"></i></div>
+                    <h4>Pablo Ciano</h4>
+                    <span class="role">CEO, eCommerce</span>
+                    <span class="note">Divisional CEO</span>
+                </div>
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user-tie"></i></div>
+                    <h4>Tim Scharwath</h4>
+                    <span class="role">CEO, Global forwarding</span>
+                    <span class="note">Divisional CEO</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SUPERVISORY BOARD ==================== -->
+    <section class="ir-section ir-section--surface">
+        <div class="container">
+            <div class="ir-heading">
+                <span class="label">Governance</span>
+                <h2>Supervisory Board</h2>
+                <p>The Supervisory Board monitors and advises the Executive Committee on the management of the Group.</p>
+            </div>
+
+            <div class="ir-team">
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <h4>Dr. Katrin Suder</h4>
+                    <span class="role">Chair of the Supervisory Board</span>
+                    <span class="note">Since 2025</span>
+                </div>
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <h4>Prof. Ann-Kristin Achleitner</h4>
+                    <span class="role">Vice Chair</span>
+                    <span class="note">HR Committee Chair</span>
+                </div>
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <h4>Dr. Hans-Ulrich Engel</h4>
+                    <span class="role">Audit Committee Chair</span>
+                    <span class="note">Finance expert</span>
+                </div>
+                <div class="ir-person">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <h4>Andrea Kocsis</h4>
+                    <span class="role">Employee Representative</span>
+                    <span class="note">Deputy Chair</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== OWNERSHIP ==================== -->
+    <section class="ir-section ir-section--alt">
+        <div class="container">
+            <div class="ir-heading">
+                <span class="label">Shareholder structure</span>
+                <h2>Who owns Global shippments</h2>
+                <p>Based on the most recent shareholder identification survey.</p>
+            </div>
+
+            <div class="ir-ownership">
+                <div class="ir-ownership-chart">
+                    <div class="ir-own-item">
+                        <div class="ir-own-percent">79.8%</div>
+                        <div class="ir-own-label">Retail investors</div>
+                    </div>
+                    <div class="ir-own-item">
+                        <div class="ir-own-percent">13.3%</div>
+                        <div class="ir-own-label">Institutional</div>
+                    </div>
+                    <div class="ir-own-item">
+                        <div class="ir-own-percent">6.9%</div>
+                        <div class="ir-own-label">Other</div>
+                    </div>
+                </div>
+                <p class="ir-own-desc">
+                    <strong>Top institutional holders:</strong>
+                    iShares (4.07%), The Vanguard Group (2.41%), DWS Investment (1.78%), BlackRock (1.14%).
+                    The remainder is held by retail investors and other institutions.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== IR CONTACT ==================== -->
+    <div class="container">
+        <section class="ir-contact" id="contact">
+            <h2>Investor Relations contact</h2>
+            <p>Our IR team is available to answer questions from shareholders, analysts and prospective investors.</p>
+
+            <div class="ir-contact-grid">
+                <div class="ir-contact-item">
+                    <span class="icon"><i class="fas fa-envelope"></i></span>
+                    <div>
+                        <h5>Email</h5>
+                        <a href="mailto:ir@Globalshippments.com">ir@Globalshippments.com</a>
+                    </div>
+                </div>
+                <div class="ir-contact-item">
+                    <span class="icon"><i class="fas fa-phone"></i></span>
+                    <div>
+                        <h5>Phone</h5>
+                        <a href="tel:+492284290">+49 228 429-0</a>
+                    </div>
+                </div>
+                <div class="ir-contact-item">
+                    <span class="icon"><i class="fas fa-user-tie"></i></span>
+                    <div>
+                        <h5>Head of IR</h5>
+                        <p>Martin Ziegenbalg</p>
+                    </div>
+                </div>
+                <div class="ir-contact-item">
+                    <span class="icon"><i class="fas fa-location-dot"></i></span>
+                    <div>
+                        <h5>Address</h5>
+                        <p>Charles-de-Gaulle-Str. 20<br>53113 Bonn, Germany</p>
+                    </div>
+                </div>
+                <div class="ir-contact-item">
+                    <span class="icon"><i class="fab fa-linkedin-in"></i></span>
+                    <div>
+                        <h5>LinkedIn</h5>
+                        <a href="#" rel="noopener">Global shippments Investor Relations</a>
+                    </div>
+                </div>
+                <div class="ir-contact-item">
+                    <span class="icon"><i class="fas fa-globe"></i></span>
+                    <div>
+                        <h5>Reporting hub</h5>
+                        <a href="#" rel="noopener">ir.Globalshippments.com</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ==================== ABOUT ==================== -->
+    <section class="ir-section">
+        <div class="container">
+            <div class="ir-about">
+                <h3><i class="fas fa-circle-info"></i> About Global shippments Group</h3>
+                <p>
+                    Global shippments Group is the world's leading logistics provider. We connect people and
+                    markets and enable global trade. Our strategy is built around three priorities:
+                    being the first choice for customers, employees and investors; leading in green
+                    logistics; and accelerating digital transformation across every division.
+                </p>
+                <p>
+                    We focus on profitable growth in our core logistics businesses and disciplined
+                    capital allocation. With approximately 500,000 employees in over 220 countries
+                    and territories, we generate revenues of more than €80 billion annually.
+                </p>
+                <small>
+                    The Group is organised into five operating divisions: Express, Global Forwarding &amp; Freight,
+                    Supply Chain, eCommerce, and Post &amp; Parcel.
+                </small>
+            </div>
+
+            <!-- Footnote -->
+            <div class="ir-footnote">
+                <span class="date">
+                    <i class="fas fa-calendar-check"></i>
+                    Data as of December 2025
+                </span>
+                <span>© 2026 Global shippments International GmbH. All rights reserved.</span>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

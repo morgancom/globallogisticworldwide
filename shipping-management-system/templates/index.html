@@ -1,0 +1,1245 @@
+{% extends "base.html" %}
+
+{% block title %}Track your shipment — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ==========================================================
+       PAGE-SPECIFIC STYLES
+       Sections are transparent so the base.html background
+       slideshow shows through. Feature blocks (hero, stats, CTA)
+       keep their own solid/gradient backgrounds on purpose.
+       ========================================================== */
+
+    /* ---------- HERO ---------- */
+    .hero {
+        position: relative;
+        min-height: min(660px, 88vh);
+        display: flex;
+        align-items: center;
+        padding: clamp(56px, 7vw, 96px) 0;
+        color: #fff;
+        overflow: hidden;
+        background:
+            linear-gradient(100deg,
+                rgba(15, 13, 11, .94) 0%,
+                rgba(15, 13, 11, .85) 40%,
+                rgba(15, 13, 11, .55) 72%,
+                rgba(15, 13, 11, .32) 100%),
+            url("https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=2000&q=85") center/cover no-repeat;
+    }
+    .hero > .container { position: relative; z-index: 1; }
+    .hero-content { max-width: 720px; padding: 12px 0; }
+
+    .hero-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 14px;
+        border-radius: var(--r-pill);
+        background: rgba(255, 255, 255, .08);
+        border: 1px solid rgba(255, 255, 255, .16);
+        color: #fff;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        margin-bottom: 22px;
+    }
+    .hero-label::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--primary);
+    }
+
+    .hero h1 {
+        font-size: clamp(2.35rem, 5.2vw, 4rem);
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+        color: #fff;
+        margin-bottom: 20px;
+    }
+    .hero h1 span { display: block; color: #e5c9cd; }
+    .hero-text {
+        font-size: clamp(1rem, 1.3vw, 1.1rem);
+        max-width: 600px;
+        color: #d5d1c9;
+        margin-bottom: 32px;
+        line-height: 1.65;
+    }
+
+    /* ---------- TRACKING CARD ---------- */
+    .tracking-card {
+        width: min(700px, 100%);
+        padding: clamp(20px, 3vw, 28px);
+        background: #ffffff;
+        border-radius: var(--r-lg);
+        box-shadow: 0 24px 48px -24px rgba(0, 0, 0, .6);
+    }
+    .tracking-title {
+        color: #141414;
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        margin-bottom: 4px;
+    }
+    .tracking-subtitle { color: #6b6b6b; font-size: .85rem; margin-bottom: 16px; }
+    .tracking-form { display: flex; gap: 8px; }
+    .tracking-form input {
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 50px;
+        border: 1px solid #d3cec5;
+        border-radius: var(--r-md);
+        padding: 0 16px;
+        outline: 0;
+        color: #141414;
+        font-size: .95rem;
+        background: #fff;
+        transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+    }
+    .tracking-form input::placeholder { color: #9a948a; }
+    .tracking-form input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .track-btn {
+        flex: 0 0 auto;
+        min-width: 150px;
+        height: 50px;
+        border: 1px solid var(--primary);
+        border-radius: var(--r-md);
+        background: var(--primary);
+        color: #fff;
+        font-weight: 700;
+        font-size: .8rem;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+    }
+    .track-btn:hover { background: var(--primary-600); border-color: var(--primary-600); }
+    .track-message {
+        display: none;
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: var(--r-sm);
+        font-size: .875rem;
+        font-weight: 500;
+    }
+    .track-message.show { display: block; }
+    .track-message.error { background: #fbf2f3; color: #8b1c27; border: 1px solid #ecd0d3; }
+    @media (max-width: 560px) {
+        .tracking-form { flex-direction: column; }
+        .track-btn { width: 100%; }
+    }
+
+    /* ---------- TRUST BAR (translucent so slideshow shows through) ---------- */
+    .trust-bar {
+        background: color-mix(in srgb, var(--bg-soft) 78%, transparent);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border);
+        padding: 24px 0;
+    }
+    .trust-bar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(20px, 4vw, 52px);
+        flex-wrap: wrap;
+    }
+    .trust-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: .8rem;
+        font-weight: 600;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+    .trust-item i { color: var(--primary); font-size: 1.05rem; }
+
+    /* ---------- DIVISIONS ---------- */
+    .division-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .division-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-elev);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        overflow: hidden;
+        transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+    }
+    .division-card:hover { border-color: var(--border-strong); box-shadow: var(--sh-sm); }
+    .division-media {
+        position: relative;
+        aspect-ratio: 16 / 10;
+        overflow: hidden;
+        background: var(--bg-soft);
+    }
+    .division-media img { width: 100%; height: 100%; object-fit: cover; }
+    .division-media::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(15, 13, 11, 0) 45%, rgba(15, 13, 11, .45) 100%);
+        pointer-events: none;
+    }
+    .division-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: var(--r-sm);
+        background: rgba(255, 255, 255, .94);
+        color: #141414;
+        font-size: .68rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+    .division-badge i { color: var(--primary); font-size: .9rem; }
+    .division-body { padding: 22px 22px 26px; display: flex; flex-direction: column; flex: 1 1 auto; }
+    .division-body h3 { font-size: 1.08rem; margin-bottom: 8px; color: var(--text-strong); letter-spacing: -0.01em; }
+    .division-body p { color: var(--muted); font-size: .9rem; line-height: 1.6; flex: 1 1 auto; margin-bottom: 14px; }
+    .division-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary);
+        font-size: .78rem;
+        font-weight: 700;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        transition: color var(--dur) var(--ease);
+    }
+    .division-link:hover { color: var(--primary-700); }
+    .division-link::after {
+        content: "\f061";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-size: .8em;
+    }
+    @media (max-width: 980px) { .division-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 620px) { .division-grid { grid-template-columns: 1fr; } }
+
+    /* ---------- WHY CHOOSE US (translucent panel, glass-like) ---------- */
+    .why-us {
+        position: relative;
+        padding: clamp(60px, 7vw, 100px) 0;
+        background: color-mix(in srgb, var(--bg-soft) 82%, transparent);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+    }
+    .why-us-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 5vw, 72px); align-items: center; }
+    .why-us-media {
+        position: relative;
+        aspect-ratio: 4 / 3;
+        border-radius: var(--r-lg);
+        overflow: hidden;
+        box-shadow: var(--sh-sm);
+    }
+    .why-us-media img { width: 100%; height: 100%; object-fit: cover; }
+    .why-us-stat-float {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        padding: 16px 22px;
+        background: #fff;
+        border-radius: var(--r-md);
+        box-shadow: 0 12px 28px -12px rgba(0, 0, 0, .35);
+        border-left: 3px solid var(--primary);
+        max-width: 220px;
+    }
+    @media (prefers-color-scheme: dark) {
+        .why-us-stat-float { background: #221f1c; }
+    }
+    .why-us-stat-float .num {
+        display: block;
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--primary);
+        letter-spacing: -0.02em;
+        line-height: 1;
+        margin-bottom: 6px;
+    }
+    .why-us-stat-float .lbl { font-size: .75rem; color: var(--muted); font-weight: 600; }
+    .why-us-content .section-label { margin-bottom: 12px; }
+    .why-us-content h2 { font-size: clamp(1.6rem, 3.2vw, 2.3rem); line-height: 1.18; letter-spacing: -0.02em; margin-bottom: 16px; }
+    .why-us-content > p { color: var(--muted); font-size: 1rem; margin-bottom: 26px; }
+    .why-us-list { list-style: none; padding: 0; margin: 0 0 28px; display: grid; gap: 12px; }
+    .why-us-list li { display: flex; align-items: flex-start; gap: 12px; font-size: .92rem; color: var(--text); }
+    .why-us-list li::before {
+        content: "\f00c";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        flex: 0 0 20px;
+        width: 20px;
+        height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--primary-50);
+        color: var(--primary);
+        font-size: .6rem;
+        margin-top: 3px;
+    }
+    @media (max-width: 900px) {
+        .why-us-grid { grid-template-columns: 1fr; }
+        .why-us-media { aspect-ratio: 16 / 10; }
+    }
+
+    /* ---------- PROCESS ---------- */
+    .process-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; position: relative; }
+    .process-grid::before {
+        content: "";
+        position: absolute;
+        top: 32px;
+        left: 12%;
+        right: 12%;
+        height: 1px;
+        background: var(--border-strong);
+        z-index: 0;
+    }
+    .process-item { position: relative; z-index: 1; text-align: center; padding: 0 12px; }
+    .process-number {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--bg-elev);
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        font-size: 1.05rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+    .process-item h3 { font-size: 1rem; margin-bottom: 8px; color: var(--text-strong); }
+    .process-item p { color: var(--muted); font-size: .86rem; line-height: 1.6; }
+    @media (max-width: 820px) {
+        .process-grid { grid-template-columns: repeat(2, 1fr); gap: 36px 20px; }
+        .process-grid::before { display: none; }
+    }
+    @media (max-width: 480px) { .process-grid { grid-template-columns: 1fr; } }
+
+    /* ---------- STATS (keeps its own dark cinematic background) ---------- */
+    .stats {
+        position: relative;
+        color: #fff;
+        padding: clamp(64px, 8vw, 100px) 0;
+        overflow: hidden;
+        background:
+            linear-gradient(110deg, rgba(15, 13, 11, .93), rgba(15, 13, 11, .82)),
+            url("https://images.unsplash.com/photo-1494412651409-8963ce7935a7?auto=format&fit=crop&w=2000&q=80") center/cover no-repeat;
+    }
+    .stats .container { position: relative; }
+    .stats-heading { text-align: center; margin-bottom: clamp(36px, 5vw, 52px); }
+    .stats-heading h2 { font-size: clamp(1.6rem, 3.2vw, 2.2rem); color: #fff; margin-bottom: 10px; }
+    .stats-heading p { color: #9a948a; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .stat { text-align: center; padding: 15px 20px; border-right: 1px solid rgba(255, 255, 255, .1); }
+    .stat:last-child { border-right: 0; }
+    .stat-number {
+        font-size: clamp(2.1rem, 4.4vw, 3rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        color: #fff;
+        margin-bottom: 12px;
+        font-variant-numeric: tabular-nums;
+    }
+    .stat-label { color: #9a948a; font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+    @media (max-width: 820px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 30px 0; }
+        .stat:nth-child(2),
+        .stat:nth-child(4) { border-right: 0; }
+        .stat:nth-child(1),
+        .stat:nth-child(2) { border-bottom: 1px solid rgba(255, 255, 255, .1); padding-bottom: 30px; }
+        .stat:nth-child(3),
+        .stat:nth-child(4) { padding-top: 30px; }
+    }
+    @media (max-width: 480px) {
+        .stats-grid { grid-template-columns: 1fr; gap: 0; }
+        .stat { border-right: 0; border-bottom: 1px solid rgba(255, 255, 255, .1); padding: 24px 0; }
+        .stat:last-child { border-bottom: 0; }
+        .stat:nth-child(1),
+        .stat:nth-child(2) { padding-bottom: 24px; }
+        .stat:nth-child(3),
+        .stat:nth-child(4) { padding-top: 24px; }
+    }
+
+    /* ---------- REVIEWS (transparent so slideshow is visible behind cards) ---------- */
+    .reviews-section { background: transparent; }
+
+    .reviews-summary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin: -20px auto 34px;
+        padding: 12px 20px;
+        max-width: fit-content;
+        background: color-mix(in srgb, var(--bg-elev) 92%, transparent);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+    }
+    .reviews-summary-stars { display: inline-flex; gap: 3px; color: #f4b400; font-size: .95rem; }
+    .reviews-summary-text { color: var(--muted); font-size: .86rem; }
+    .reviews-summary-text strong { color: var(--text-strong); font-weight: 700; }
+
+    .reviews-viewport {
+        position: relative;
+        min-height: 440px;
+    }
+
+    .reviews-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+        transition: opacity 300ms var(--ease);
+    }
+    .reviews-grid.is-fading { opacity: 0; }
+
+    .review-card {
+        flex: 0 0 calc((100% - 32px) / 3);
+        max-width: calc((100% - 32px) / 3);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 18px 18px 16px;
+        background: var(--bg-elev);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+        animation: reviewEnter 480ms var(--ease) both;
+        animation-delay: calc(var(--i, 0) * 70ms);
+    }
+    .review-card:hover { border-color: var(--border-strong); box-shadow: var(--sh-sm); }
+
+    @keyframes reviewEnter {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .review-stars {
+        display: inline-flex;
+        gap: 2px;
+        color: #f4b400;
+        font-size: .78rem;
+        line-height: 1;
+    }
+    .review-stars .fa-regular { color: #d6d0c6; }
+
+    .review-text {
+        color: var(--text);
+        font-size: .855rem;
+        line-height: 1.55;
+        flex: 1 1 auto;
+        margin: 0;
+    }
+
+    .review-client {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+    }
+    .review-client img {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        border: 1px solid var(--border);
+    }
+    .review-client strong {
+        display: block;
+        color: var(--text-strong);
+        font-size: .8rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+    .review-client span {
+        display: block;
+        color: var(--muted);
+        font-size: .7rem;
+        line-height: 1.3;
+        margin-top: 2px;
+    }
+
+    @media (max-width: 900px) {
+        .review-card { flex-basis: calc((100% - 16px) / 2); max-width: calc((100% - 16px) / 2); }
+        .reviews-viewport { min-height: 700px; }
+    }
+    @media (max-width: 640px) {
+        .review-card { flex-basis: 100%; max-width: 100%; }
+        .reviews-viewport { min-height: 1180px; }
+    }
+
+    /* Controls */
+    .reviews-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 30px;
+    }
+    .reviews-arrow {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid var(--border-strong);
+        background: var(--bg-elev);
+        color: var(--text);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: .8rem;
+        transition: all var(--dur) var(--ease);
+    }
+    .reviews-arrow:hover,
+    .reviews-arrow:focus-visible {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+    }
+
+    .reviews-dots { display: inline-flex; gap: 8px; align-items: center; }
+    .reviews-dot {
+        width: 8px;
+        height: 8px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: var(--border-strong);
+        cursor: pointer;
+        transition: all var(--dur) var(--ease);
+    }
+    .reviews-dot:hover { background: var(--muted); }
+    .reviews-dot.active {
+        width: 22px;
+        border-radius: 4px;
+        background: var(--primary);
+    }
+
+    /* Progress bar */
+    .reviews-progress {
+        width: 100%;
+        max-width: 320px;
+        height: 2px;
+        margin: 22px auto 8px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    .reviews-progress-bar {
+        width: 0;
+        height: 100%;
+        background: var(--primary);
+    }
+    .reviews-progress-label {
+        text-align: center;
+        font-size: .78rem;
+        color: var(--muted);
+        margin-bottom: 8px;
+        letter-spacing: .02em;
+    }
+    .reviews-progress-label span { color: var(--primary); font-weight: 700; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .review-card { animation: none; }
+        .reviews-progress-bar { transition: none !important; }
+    }
+
+    /* ---------- CTA (own cinematic background) ---------- */
+    .cta {
+        position: relative;
+        padding: clamp(64px, 8vw, 100px) 0;
+        color: #fff;
+        text-align: center;
+        overflow: hidden;
+        background:
+            linear-gradient(110deg, rgba(15, 13, 11, .93), rgba(15, 13, 11, .88)),
+            url("https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1800&q=80") center/cover;
+    }
+    .cta .container { position: relative; }
+    .cta h2 {
+        font-size: clamp(1.7rem, 4.2vw, 2.75rem);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        color: #fff;
+        margin-bottom: 16px;
+    }
+    .cta p { max-width: 600px; margin: 0 auto 30px; color: #d5d1c9; font-size: 1rem; }
+    .cta-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px 30px;
+        border-radius: var(--r-md);
+        background: var(--primary);
+        color: #fff;
+        font-weight: 700;
+        font-size: .85rem;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        transition: background-color var(--dur) var(--ease);
+    }
+    .cta-button:hover,
+    .cta-button:focus-visible { background: var(--primary-600); color: #fff; }
+    .cta-button::after {
+        content: "\f061";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-size: .85em;
+    }
+
+    /* ---------- NEWSLETTER (translucent glass panel) ---------- */
+    .newsletter {
+        background: color-mix(in srgb, var(--bg-soft) 80%, transparent);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: clamp(48px, 6vw, 72px) 0;
+        border-top: 1px solid var(--border);
+    }
+    .newsletter-inner { display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center; }
+    .newsletter h2 { font-size: clamp(1.25rem, 2.2vw, 1.6rem); margin-bottom: 6px; color: var(--text-strong); }
+    .newsletter p { color: var(--muted); font-size: .92rem; }
+    .newsletter-form {
+        display: flex;
+        gap: 6px;
+        padding: 6px;
+        background: var(--bg-elev);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--r-md);
+        min-width: 0;
+        width: 100%;
+        max-width: 500px;
+    }
+    .newsletter-form input {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 12px 18px;
+        border: 0;
+        background: transparent;
+        color: var(--text);
+        font-size: .92rem;
+        outline: none;
+    }
+    .newsletter-form input::placeholder { color: var(--muted); }
+    .newsletter-form button {
+        flex: 0 0 auto;
+        padding: 12px 24px;
+        border: 1px solid var(--primary);
+        border-radius: var(--r-sm);
+        background: var(--primary);
+        color: #fff;
+        font-weight: 700;
+        font-size: .78rem;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+    }
+    .newsletter-form button:hover { background: var(--primary-600); border-color: var(--primary-600); }
+    @media (max-width: 900px) {
+        .newsletter-inner { grid-template-columns: 1fr; gap: 22px; }
+        .newsletter-form { max-width: none; }
+    }
+    @media (max-width: 480px) {
+        .newsletter-form { flex-direction: column; padding: 8px; }
+        .newsletter-form button { width: 100%; padding: 14px; }
+    }
+
+    /* ---------- SHAKE ---------- */
+    .shake { animation: shake 0.5s ease-in-out; }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    /* ---------- Fallback for browsers without color-mix support ---------- */
+    @supports not (background: color-mix(in srgb, red 50%, transparent)) {
+        .trust-bar { background: var(--bg-soft); }
+        .why-us { background: var(--bg-soft); }
+        .newsletter { background: var(--bg-soft); }
+        .reviews-summary { background: var(--bg-soft); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="track">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-label">Global Logistics Network</div>
+            <h1>Delivering the world,<span>one shipment at a time.</span></h1>
+            <p class="hero-text">
+                For over four decades, Global shippments has connected businesses, families and communities
+                across more than 220 countries and territories — with the reliability, speed and care
+                that global trade depends on.
+            </p>
+
+            <div class="tracking-card">
+                <div class="tracking-title">Track your shipment</div>
+                <div class="tracking-subtitle">Enter your tracking number to see real-time status and delivery updates.</div>
+                <form class="tracking-form" id="trackingForm" action="{{ url_for('track_input') }}" method="POST">
+                    <input type="text" name="tracking_code" id="trackingNumber" placeholder="e.g. SE26A7K3P9Q2M4X8Z5B1" autocomplete="off" required>
+                    <button type="submit" class="track-btn">Track shipment</button>
+                </form>
+                <div id="trackMessage" class="track-message"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ TRUST BAR ============ -->
+<div class="trust-bar">
+    <div class="container">
+        <div class="trust-bar-inner">
+            <span class="trust-item"><i class="fas fa-shield-halved"></i> ISO 9001 certified</span>
+            <span class="trust-item"><i class="fas fa-leaf"></i> Carbon-neutral shipping</span>
+            <span class="trust-item"><i class="fas fa-globe"></i> 220+ countries served</span>
+            <span class="trust-item"><i class="fas fa-headset"></i> 24/7 global support</span>
+        </div>
+    </div>
+</div>
+
+<!-- ============ SERVICES / DIVISIONS ============ -->
+<section class="section" id="services">
+    <div class="container">
+        <div class="section-heading">
+            <div class="section-label">Our services</div>
+            <h2>Logistics solutions for every need</h2>
+            <p>From time-critical express deliveries to complex supply-chain operations, our specialised divisions deliver end-to-end solutions across the globe.</p>
+        </div>
+
+        <div class="division-grid">
+            <article class="division-card">
+                <div class="division-media">
+                    <img src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=800&q=80" alt="Express courier delivering a package">
+                    <span class="division-badge"><i class="fas fa-bolt"></i> Fastest</span>
+                </div>
+                <div class="division-body">
+                    <h3>Express delivery</h3>
+                    <p>Time-definite, door-to-door delivery for documents and parcels. Priority handling with same-day and next-day options in over 100 major cities worldwide.</p>
+                    <a href="{{ url_for('services') }}#express" class="division-link">Explore express</a>
+                </div>
+            </article>
+
+            <article class="division-card">
+                <div class="division-media">
+                    <img src="https://images.unsplash.com/photo-1494412651409-8963ce7935a7?auto=format&fit=crop&w=800&q=80" alt="Container ship for global freight forwarding">
+                    <span class="division-badge"><i class="fas fa-ship"></i> Global</span>
+                </div>
+                <div class="division-body">
+                    <h3>Global forwarding</h3>
+                    <p>Air, ocean, road and rail freight services tailored to your cargo. Full-container, less-than-container and specialised handling for oversized shipments.</p>
+                    <a href="{{ url_for('services') }}#freight" class="division-link">Explore forwarding</a>
+                </div>
+            </article>
+
+            <article class="division-card">
+                <div class="division-media">
+                    <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=800&q=80" alt="Warehouse shelves and distribution centre">
+                    <span class="division-badge"><i class="fas fa-warehouse"></i> Integrated</span>
+                </div>
+                <div class="division-body">
+                    <h3>Supply chain</h3>
+                    <p>Warehousing, inventory management, order fulfilment and distribution — engineered to keep your operations running smoothly and predictably.</p>
+                    <a href="{{ url_for('services') }}#supply-chain" class="division-link">Explore supply chain</a>
+                </div>
+            </article>
+
+            <article class="division-card">
+                <div class="division-media">
+                    <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80" alt="eCommerce online shopping and delivery">
+                    <span class="division-badge"><i class="fas fa-cart-shopping"></i> Growing</span>
+                </div>
+                <div class="division-body">
+                    <h3>eCommerce logistics</h3>
+                    <p>Scalable delivery solutions for online retailers and marketplaces. Returns management, cross-border shipping and branded customer experiences.</p>
+                    <a href="{{ url_for('services') }}#ecommerce" class="division-link">Explore eCommerce</a>
+                </div>
+            </article>
+
+            <article class="division-card">
+                <div class="division-media">
+                    <img src="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=800&q=80" alt="Stacked parcels and mail ready for delivery">
+                    <span class="division-badge"><i class="fas fa-envelope"></i> Everyday</span>
+                </div>
+                <div class="division-body">
+                    <h3>Post &amp; parcel</h3>
+                    <p>Reliable domestic delivery for individuals and small businesses. Nationwide coverage, competitive rates and convenient pickup options.</p>
+                    <a href="{{ url_for('services') }}#post" class="division-link">Explore post &amp; parcel</a>
+                </div>
+            </article>
+
+            <article class="division-card">
+                <div class="division-media">
+                    <img src="https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=800&q=80" alt="Logistics specialist reviewing delivery routes">
+                    <span class="division-badge"><i class="fas fa-chart-line"></i> Advisory</span>
+                </div>
+                <div class="division-body">
+                    <h3>Logistics consulting</h3>
+                    <p>Custom advisory and analytics services. We help you redesign networks, reduce costs and build resilient, sustainable supply chains.</p>
+                    <a href="{{ url_for('services') }}#consulting" class="division-link">Explore consulting</a>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- ============ WHY CHOOSE US ============ -->
+<section class="why-us">
+    <div class="container">
+        <div class="why-us-grid">
+            <div class="why-us-media">
+                <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=80" alt="Modern Global shippments logistics facility">
+                <div class="why-us-stat-float">
+                    <span class="num">99.4%</span>
+                    <span class="lbl">On-time delivery rate worldwide</span>
+                </div>
+            </div>
+            <div class="why-us-content">
+                <div class="section-label">Why Global shippments</div>
+                <h2>A logistics partner you can rely on</h2>
+                <p>
+                    Businesses across six continents trust Global shippments because we combine global reach
+                    with local expertise — and back it with cutting-edge technology and a commitment to
+                    service that never wavers.
+                </p>
+                <ul class="why-us-list">
+                    <li>Real-time tracking and proactive delivery notifications</li>
+                    <li>Dedicated account managers for business customers</li>
+                    <li>Carbon-neutral shipping options across all divisions</li>
+                    <li>Customs and compliance experts in every major market</li>
+                    <li>24/7 customer support in 15 languages</li>
+                </ul>
+                <a href="{{ url_for('about') }}" class="btn btn-primary">Learn more about us</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ PROCESS / TRACKING STEPS ============ -->
+<section class="section section--soft" id="tracking-process">
+    <div class="container">
+        <div class="section-heading">
+            <div class="section-label">Shipment journey</div>
+            <h2>Every step, fully tracked</h2>
+            <p>From the moment your shipment is registered to the moment it arrives, you'll have complete visibility — online, on mobile or by SMS.</p>
+        </div>
+
+        <div class="process-grid">
+            <div class="process-item">
+                <div class="process-number">01</div>
+                <h3>Shipment created</h3>
+                <p>Your shipment is registered in our system and a unique tracking number is issued instantly.</p>
+            </div>
+            <div class="process-item">
+                <div class="process-number">02</div>
+                <h3>In transit</h3>
+                <p>Your package moves through our network with scan updates at every hub and handover point.</p>
+            </div>
+            <div class="process-item">
+                <div class="process-number">03</div>
+                <h3>Out for delivery</h3>
+                <p>Your shipment arrives at the local delivery facility and is assigned to a courier.</p>
+            </div>
+            <div class="process-item">
+                <div class="process-number">04</div>
+                <h3>Delivered</h3>
+                <p>Delivery is completed and confirmed with electronic proof of receipt at the destination.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="stats">
+    <div class="container">
+        <div class="stats-heading">
+            <h2>A global network built on trust</h2>
+            <p>Numbers that reflect our scale, our reach and our commitment to service.</p>
+        </div>
+        <div class="stats-grid">
+            <div class="stat">
+                <div class="stat-number" data-target="500000">0</div>
+                <div class="stat-label">Employees worldwide</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" data-target="220">0</div>
+                <div class="stat-label">Countries &amp; territories</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" data-target="80">0</div>
+                <div class="stat-label">Annual revenue (€B)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" data-target="19">0</div>
+                <div class="stat-label">Daily shipments (millions)</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ REVIEWS (rotating) ============ -->
+<section class="section reviews-section" id="about">
+    <div class="container">
+        <div class="section-heading">
+            <div class="section-label">Customer stories</div>
+            <h2>Trusted by businesses worldwide</h2>
+            <p>From growing retailers to global manufacturers, our customers count on Global shippments to keep their supply chains moving.</p>
+        </div>
+
+        <div class="reviews-summary" aria-label="Average customer rating">
+            <div class="reviews-summary-stars" aria-hidden="true">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="reviews-summary-text">
+                <strong>4.9</strong> out of 5 · <strong>1,247</strong> verified reviews
+            </div>
+        </div>
+
+        <div class="reviews-viewport">
+            <div class="reviews-grid" id="reviewsGrid" aria-live="polite" aria-atomic="true"></div>
+        </div>
+
+        <div class="reviews-controls">
+            <button class="reviews-arrow" id="reviewsPrev" type="button" aria-label="Previous set of reviews">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="reviews-dots" id="reviewsDots" role="tablist" aria-label="Review pages"></div>
+            <button class="reviews-arrow" id="reviewsNext" type="button" aria-label="Next set of reviews">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="reviews-progress" aria-hidden="true">
+            <div class="reviews-progress-bar" id="reviewsProgressBar"></div>
+        </div>
+        <div class="reviews-progress-label">
+            Next set of reviews in <span id="reviewsCountdown">30</span>s
+        </div>
+    </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta" id="contact">
+    <div class="container">
+        <h2>Ready to move your business forward?</h2>
+        <p>
+            Whether you're sending a single package or managing an international supply chain,
+            our team is ready to help you ship smarter, faster and greener.
+        </p>
+        <a href="{{ url_for('contact') }}" class="cta-button">Talk to our team</a>
+    </div>
+</section>
+
+<!-- ============ NEWSLETTER ============ -->
+<section class="newsletter">
+    <div class="container newsletter-inner">
+        <div>
+            <h2>Stay informed</h2>
+            <p>Monthly logistics insights, shipping updates and industry news — straight to your inbox.</p>
+        </div>
+        <form class="newsletter-form" id="newsletterForm" action="{{ url_for('subscribe') }}" method="POST">
+            <input type="email" name="email" placeholder="Enter your email address" required>
+            <button type="submit">Subscribe</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* ---------- Tracking form validation ---------- */
+    (function () {
+        const form = document.getElementById('trackingForm');
+        if (!form) return;
+        form.addEventListener('submit', function (e) {
+            const input = document.getElementById('trackingNumber');
+            const message = document.getElementById('trackMessage');
+            if (!input.value.trim()) {
+                e.preventDefault();
+                message.className = 'track-message show error';
+                message.textContent = 'Please enter your tracking number.';
+                input.classList.add('shake');
+                setTimeout(() => input.classList.remove('shake'), 500);
+            }
+        });
+    })();
+
+    /* ---------- Stats counter animation ---------- */
+    (function () {
+        const counters = document.querySelectorAll('.stat-number');
+        let started = false;
+
+        function animateCounters() {
+            if (started) return;
+            started = true;
+            counters.forEach(counter => {
+                const target = Number(counter.dataset.target);
+                let current = 0;
+                const increment = Math.max(1, Math.ceil(target / 80));
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) { current = target; clearInterval(timer); }
+                    counter.textContent = current.toLocaleString();
+                }, 25);
+            });
+        }
+
+        const statsSection = document.querySelector('.stats');
+        if (statsSection && 'IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting) {
+                    animateCounters();
+                    observer.disconnect();
+                }
+            }, { threshold: .3 });
+            observer.observe(statsSection);
+        } else {
+            animateCounters();
+        }
+    })();
+
+    /* ---------- Newsletter validation ---------- */
+    (function () {
+        const form = document.getElementById('newsletterForm');
+        if (!form) return;
+        form.addEventListener('submit', function (e) {
+            const email = this.querySelector("input[type='email']");
+            if (!email.value.trim()) {
+                e.preventDefault();
+                alert('Please enter a valid email address.');
+            }
+        });
+    })();
+
+    /* =========================================================
+       ROTATING REVIEWS
+       30 reviews · 5 per page · auto-advance every 30s
+       ========================================================= */
+    (function () {
+        const REVIEWS = [
+            { name: 'Daniel Martin',   role: 'Director of Operations',  company: 'Northwind Retail',      avatar: 'men/32',    stars: 5, text: 'Since we switched to Global shippments, our delivery delays have dropped by 40%. Their team treats every shipment as if it were their own.' },
+            { name: 'Maria Garcia',    role: 'Head of Logistics',       company: 'Lumière Cosmetics',     avatar: 'women/44',  stars: 5, text: 'The real-time tracking system transformed how we communicate with our customers. They always know where their order is — and so do we.' },
+            { name: 'James Wong',      role: 'Supply Chain Manager',    company: 'Apex Manufacturing',    avatar: 'men/46',    stars: 5, text: 'We ship to 34 countries and Global shippments handles every customs detail flawlessly. Their global network and local expertise are unmatched.' },
+            { name: 'Sophie Laurent',  role: 'Founder',                 company: 'Maison Belle',          avatar: 'women/68',  stars: 5, text: 'Reliable, fast and genuinely helpful. Our boutique orders arrive intact and on time — every single week. Could not ask for more.' },
+            { name: 'Ahmed Hassan',    role: 'Procurement Lead',        company: 'Nile Trading Co.',      avatar: 'men/85',    stars: 4, text: 'Strong service overall. Their Middle East routes are efficient and the account team responds within minutes during business hours.' },
+
+            { name: 'Elena Petrova',   role: 'E-commerce Director',     company: 'Urban Threads',         avatar: 'women/22',  stars: 5, text: 'Integration with our store was seamless. Returns handling alone has saved us hours every week. Truly a modern logistics partner.' },
+            { name: 'Marcus Johnson',  role: 'Chief Operating Officer', company: 'Vertex Electronics',    avatar: 'men/11',    stars: 5, text: 'We consolidated three carriers into Global shippments and cut costs by 22% in the first quarter. Their analytics dashboard is superb.' },
+            { name: 'Yuki Tanaka',     role: 'Operations Manager',      company: 'Sakura Foods',          avatar: 'women/65',  stars: 5, text: 'Temperature-controlled shipments arrive in perfect condition. Their cold-chain team clearly knows what they are doing.' },
+            { name: 'Priya Sharma',    role: 'Logistics Head',          company: 'Sunrise Textiles',      avatar: 'women/52',  stars: 4, text: 'Very dependable on our South Asia routes. Documentation is always clean, which keeps customs delays to a minimum.' },
+            { name: 'Lucas Oliveira',  role: 'Chief Executive',         company: 'Amazonia Coffee',       avatar: 'men/29',    stars: 5, text: 'Our beans travel thousands of miles and arrive fresh. Global shippments treats our cargo with a level of care we have not seen elsewhere.' },
+
+            { name: 'Anna Kowalski',   role: 'Supply Chain Director',   company: 'Baltic Furniture',      avatar: 'women/9',   stars: 5, text: 'Oversized freight handled beautifully. Their team coordinated warehouse pickup, sea freight and final-mile delivery without a hitch.' },
+            { name: 'David Chen',      role: 'Founder',                 company: 'MetroParts',            avatar: 'men/14',    stars: 5, text: 'We ship urgent auto parts overnight to workshops. Delivery success rate has been effectively perfect over eighteen months.' },
+            { name: 'Fatima Al-Rashid',role: 'Head of Fulfilment',      company: 'Noor Beauty',           avatar: 'women/18',  stars: 5, text: 'From packaging to last-mile, everything feels considered. Our customers frequently mention the delivery experience in reviews.' },
+            { name: 'Roberto Bianchi', role: 'Logistics Manager',       company: 'Toscana Wines',         avatar: 'men/41',    stars: 4, text: 'Fragile wine shipments need care, and Global shippments delivers. We have reduced breakage to nearly zero since switching.' },
+            { name: 'Hannah Berg',     role: 'Operations Lead',         company: 'Nordic Outdoor',        avatar: 'women/73',  stars: 5, text: 'Their Nordic network is excellent. Even remote deliveries to small towns arrive within the promised window. Impressive consistency.' },
+
+            { name: 'Kwame Osei',      role: 'Founder',                 company: 'Accra Fresh Exports',   avatar: 'men/23',    stars: 5, text: 'Perishables need speed, and Global shippments delivers. Our mango shipments reach European buyers in under 48 hours.' },
+            { name: 'Isabella Rossi',  role: 'E-commerce Manager',      company: 'Milano Fashion',        avatar: 'women/35',  stars: 5, text: 'Peak season used to be chaos. Now our fulfilment scales smoothly, and our team can actually focus on selling.' },
+            { name: 'Thomas Müller',   role: 'Supply Chain Lead',       company: 'Bavaria Auto Parts',    avatar: 'men/48',    stars: 5, text: 'Our just-in-time production depends on their reliability. Global shippments has never let us down in three years of partnership.' },
+            { name: 'Sarah Thompson',  role: 'VP Operations',           company: 'Coastal Seafoods',      avatar: 'women/28',  stars: 4, text: 'Cold-chain performance is excellent. Their IoT monitoring gives us complete visibility throughout transit.' },
+            { name: 'Ravi Patel',      role: 'Director',                company: 'Mumbai Pharma Logistics',avatar: 'men/58',   stars: 5, text: 'Compliance-heavy shipments are their forte. Every regulatory box is ticked before we even ask. Highly recommended.' },
+
+            { name: 'Camila Silva',    role: 'Founder',                 company: 'Rio Activewear',        avatar: 'women/11',  stars: 5, text: 'Our D2C orders now reach customers across Brazil in two days. Global shippments made nationwide delivery feel effortless.' },
+            { name: 'Oliver Schmidt',  role: 'Chief Operating Officer', company: 'Alpine Sports',         avatar: 'men/62',    stars: 5, text: 'Peak ski season is unforgiving. Their team planned capacity with us months ahead — not a single delayed consignment.' },
+            { name: 'Aisha Bello',     role: 'Logistics Head',          company: 'Lagos Fashion Week',    avatar: 'women/79',  stars: 5, text: 'They handled hundreds of designer pieces across continents for our event. Every item arrived on schedule and in perfect condition.' },
+            { name: 'Jean-Pierre Dubois',role:'Operations Manager',     company: 'Provence Organic',      avatar: 'men/39',    stars: 4, text: 'Dependable and transparent pricing. Their customer portal makes monitoring our shipments genuinely easy.' },
+            { name: 'Min-Jun Park',    role: 'Supply Chain Manager',    company: 'Seoul Tech Components', avatar: 'men/90',    stars: 5, text: 'Electronics demand precision. Their handling procedures and packaging standards are among the best we have worked with.' },
+
+            { name: 'Rebecca Foster',  role: 'Founder',                 company: 'Bloom & Co.',           avatar: 'women/41',  stars: 5, text: 'Flowers cannot wait. Global shippments understands urgency better than any carrier we have used. Same-day options are a lifesaver.' },
+            { name: 'Diego Fernández', role: 'Logistics Director',      company: 'Barcelona Ceramics',    avatar: 'men/67',    stars: 5, text: 'Fragile, heavy and slow-moving — the hardest cargo. Yet our breakage rate has fallen below 0.2% since partnering with them.' },
+            { name: 'Linda Johansson', role: 'E-commerce Lead',         company: 'Nordic Home',           avatar: 'women/60',  stars: 5, text: 'Their branded tracking experience matches our storefront perfectly. Customers frequently compliment the delivery updates.' },
+            { name: 'Michael O\u2019Brien',role:'Chief Executive',      company: 'Dublin Brewing Co.',    avatar: 'men/54',    stars: 5, text: 'Exporting to twelve countries requires a partner we trust. Global shippments has been that partner from day one.' },
+            { name: 'Nadia Rahman',    role: 'Operations Director',     company: 'Dhaka Textiles',        avatar: 'women/73',  stars: 5, text: 'They scaled with us through a 4x growth year without a single missed shipment. That is the definition of a real partner.' }
+        ];
+
+        const PAGE_SIZE  = 5;
+        const ROTATE_MS  = 30000;
+        const FADE_MS    = 300;
+
+        const grid         = document.getElementById('reviewsGrid');
+        const dotsWrap     = document.getElementById('reviewsDots');
+        const prevBtn      = document.getElementById('reviewsPrev');
+        const nextBtn      = document.getElementById('reviewsNext');
+        const progressBar  = document.getElementById('reviewsProgressBar');
+        const countdownEl  = document.getElementById('reviewsCountdown');
+        const viewport     = document.querySelector('.reviews-viewport');
+
+        if (!grid || !dotsWrap) return;
+
+        const totalPages = Math.ceil(REVIEWS.length / PAGE_SIZE);
+        let currentPage  = 0;
+        let rotateTimer  = null;
+        let countdownInt = null;
+        let paused       = false;
+
+        function starsHTML(n) {
+            let out = '';
+            for (let i = 1; i <= 5; i++) {
+                out += `<i class="${i <= n ? 'fas' : 'fa-regular'} fa-star"></i>`;
+            }
+            return out;
+        }
+
+        function cardHTML(r, i) {
+            return `
+                <article class="review-card" style="--i:${i}">
+                    <div class="review-stars" aria-label="${r.stars} out of 5 stars">${starsHTML(r.stars)}</div>
+                    <p class="review-text">${r.text}</p>
+                    <div class="review-client">
+                        <img src="https://randomuser.me/api/portraits/${r.avatar}.jpg" alt="${r.name}" loading="lazy">
+                        <div>
+                            <strong>${r.name}</strong>
+                            <span>${r.role}, ${r.company}</span>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function buildDots() {
+            dotsWrap.innerHTML = '';
+            for (let i = 0; i < totalPages; i++) {
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.className = 'reviews-dot' + (i === 0 ? ' active' : '');
+                dot.setAttribute('role', 'tab');
+                dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+                dot.setAttribute('aria-label', `Show reviews page ${i + 1} of ${totalPages}`);
+                dot.addEventListener('click', () => {
+                    if (i === currentPage) return;
+                    goToPage(i, true);
+                });
+                dotsWrap.appendChild(dot);
+            }
+        }
+
+        function updateDots() {
+            dotsWrap.querySelectorAll('.reviews-dot').forEach((d, i) => {
+                const active = i === currentPage;
+                d.classList.toggle('active', active);
+                d.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+        }
+
+        function render(page) {
+            const slice = REVIEWS.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+            grid.innerHTML = slice.map((r, i) => cardHTML(r, i)).join('');
+        }
+
+        function goToPage(page, animate) {
+            currentPage = ((page % totalPages) + totalPages) % totalPages;
+            stopTimers();
+
+            if (animate && grid.children.length) {
+                grid.classList.add('is-fading');
+                setTimeout(() => {
+                    render(currentPage);
+                    grid.classList.remove('is-fading');
+                    updateDots();
+                    if (!paused) restartCycle();
+                }, FADE_MS);
+            } else {
+                render(currentPage);
+                grid.classList.remove('is-fading');
+                updateDots();
+                if (!paused) restartCycle();
+            }
+        }
+
+        function stopTimers() {
+            if (rotateTimer)  { clearTimeout(rotateTimer);  rotateTimer = null; }
+            if (countdownInt) { clearInterval(countdownInt); countdownInt = null; }
+            progressBar.style.transition = 'none';
+            progressBar.style.width = '0%';
+        }
+
+        function restartCycle() {
+            if (paused) return;
+            stopTimers();
+
+            void progressBar.offsetWidth;
+            progressBar.style.transition = `width ${ROTATE_MS}ms linear`;
+            progressBar.style.width = '100%';
+
+            const start = Date.now();
+            countdownEl.textContent = Math.round(ROTATE_MS / 1000);
+            countdownInt = setInterval(() => {
+                const remaining = Math.max(0, Math.round((ROTATE_MS - (Date.now() - start)) / 1000));
+                countdownEl.textContent = remaining;
+            }, 500);
+
+            rotateTimer = setTimeout(() => {
+                goToPage(currentPage + 1, true);
+            }, ROTATE_MS);
+        }
+
+        prevBtn.addEventListener('click', () => goToPage(currentPage - 1, true));
+        nextBtn.addEventListener('click', () => goToPage(currentPage + 1, true));
+
+        if (viewport) {
+            viewport.addEventListener('mouseenter', () => {
+                paused = true;
+                stopTimers();
+                progressBar.style.transition = 'none';
+                countdownEl.textContent = '\u2013';
+            });
+            viewport.addEventListener('mouseleave', () => {
+                paused = false;
+                restartCycle();
+            });
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                paused = true;
+                stopTimers();
+            } else {
+                paused = false;
+                restartCycle();
+            }
+        });
+
+        buildDots();
+        render(0);
+        updateDots();
+        restartCycle();
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,1737 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics — Global shippments Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — ANALYTICS DASHBOARD (ADMIN)
+   KPI overview + charts + recent shipments.
+   Uses base.html design tokens. Full dark-mode support.
+   ========================================================================= */
+
+:root {
+    --an-surface:       #FFFFFF;
+    --an-surface-alt:   #F8FAFC;
+    --an-surface-soft:  #F1F5F9;
+    --an-line:          #E6EAF0;
+    --an-line-soft:     #EEF2F7;
+    --an-ink:           #0B1220;
+    --an-text:          #1E293B;
+    --an-muted:         #64748B;
+    --an-muted-2:       #94A3B8;
+
+    --an-success:       #16A34A;
+    --an-success-bg:    #ECFDF5;
+    --an-danger:        #DC2626;
+    --an-danger-bg:     #FEF2F2;
+    --an-warning:       #D97706;
+    --an-warning-bg:    #FFF7ED;
+    --an-info:          #0EA5E9;
+    --an-info-bg:       #EFF9FF;
+    --an-purple:        #8B5CF6;
+    --an-teal:          #14B8A6;
+    --an-neutral:       #475569;
+    --an-neutral-bg:    #F1F5F9;
+
+    --an-sh-xs: 0 1px 2px rgba(15, 23, 42, .04);
+    --an-sh-sm: 0 2px 8px rgba(15, 23, 42, .06);
+    --an-sh-md: 0 12px 28px -14px rgba(15, 23, 42, .18);
+    --an-sh-lg: 0 30px 60px -22px rgba(15, 23, 42, .28);
+
+    --an-ease: cubic-bezier(.4, 0, .2, 1);
+    --an-dur:  220ms;
+
+    --an-r-sm: 8px;
+    --an-r-md: 12px;
+    --an-r-lg: 16px;
+    --an-r-xl: 24px;
+    --an-pill: 999px;
+
+    /* Chart palette — matches the visuals used in the template */
+    --chart-red:    #e11d2a;
+    --chart-green:  #16a34a;
+    --chart-amber:  #d97706;
+    --chart-blue:   #0ea5e9;
+    --chart-purple: #8b5cf6;
+    --chart-teal:   #14b8a6;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --an-surface:      #111C30;
+        --an-surface-alt:  #0F172A;
+        --an-surface-soft: #1A273F;
+        --an-line:         #1E293B;
+        --an-line-soft:    #172A45;
+        --an-ink:          #F1F5F9;
+        --an-text:         #CBD5E1;
+        --an-muted:        #94A3B8;
+        --an-muted-2:      #64748B;
+
+        --an-success-bg:   #052E1A;
+        --an-danger-bg:    #2E0A0D;
+        --an-warning-bg:   #2E1A05;
+        --an-info-bg:      #0B2A3E;
+        --an-neutral-bg:   #1E293B;
+
+        --an-sh-xs: 0 1px 2px rgba(0, 0, 0, .4);
+        --an-sh-sm: 0 2px 8px rgba(0, 0, 0, .5);
+        --an-sh-md: 0 12px 28px -14px rgba(0, 0, 0, .6);
+        --an-sh-lg: 0 30px 60px -22px rgba(0, 0, 0, .7);
+    }
+}
+
+body { background: var(--an-surface-alt); color: var(--an-text); }
+
+.an-page h1, .an-page h2, .an-page h3,
+.an-page h4, .an-page h5, .an-page h6 {
+    color: var(--an-ink);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   PAGE HERO
+   ========================================================================= */
+.an-hero {
+    position: relative;
+    padding: clamp(28px, 4vw, 44px) 0 clamp(24px, 3vw, 32px);
+    background:
+        radial-gradient(ellipse 60% 70% at 20% 20%, rgba(225, 29, 42, .12), transparent 60%),
+        linear-gradient(180deg, #0b1220, #1a1a2a);
+    color: #fff;
+    overflow: hidden;
+}
+.an-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    pointer-events: none;
+}
+.an-hero > .container { position: relative; z-index: 1; max-width: 1440px; }
+
+.an-hero-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 22px;
+}
+
+.an-hero-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 8px;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+}
+.an-hero-title .hero-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: var(--an-r-md);
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+    box-shadow: 0 10px 22px -8px rgba(225, 29, 42, .55);
+}
+.an-hero-sub {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: .92rem;
+    color: rgba(255, 255, 255, .78);
+    margin: 0;
+}
+.an-hero-sub .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: var(--an-pill);
+    background: rgba(74, 222, 128, .12);
+    border: 1px solid rgba(74, 222, 128, .25);
+    color: #4ade80;
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.an-hero-sub .live-pill .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, .25);
+}
+
+/* Period selector */
+.an-period {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 8px 8px 18px;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: var(--an-pill);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.an-period label {
+    font-size: .74rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .75);
+    white-space: nowrap;
+}
+.an-period select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 8px 36px 8px 14px;
+    border: 0;
+    border-radius: var(--an-pill);
+    background:
+        url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e11d2a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") no-repeat right 14px center / 14px 10px,
+        #fff;
+    color: #0b1220;
+    font-size: .85rem;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    transition: box-shadow var(--an-dur) var(--an-ease);
+}
+.an-period select:focus-visible {
+    box-shadow: 0 0 0 3px rgba(225, 29, 42, .35);
+}
+
+/* =========================================================================
+   SHELL
+   ========================================================================= */
+.an-shell {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: clamp(20px, 3vw, 32px) 16px 60px;
+}
+
+/* =========================================================================
+   KPI CARDS
+   ========================================================================= */
+.an-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 22px;
+}
+@media (max-width: 1000px) { .an-kpis { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .an-kpis { grid-template-columns: 1fr; } }
+
+.an-kpi {
+    position: relative;
+    padding: 22px 24px;
+    background: var(--an-surface);
+    border: 1px solid var(--an-line);
+    border-left: 4px solid var(--an-muted-2);
+    border-radius: var(--an-r-lg);
+    box-shadow: var(--an-sh-xs);
+    overflow: hidden;
+    transition: all var(--an-dur) var(--an-ease);
+}
+.an-kpi:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--an-sh-md);
+}
+
+.an-kpi.primary { border-left-color: var(--primary, #e11d2a); }
+.an-kpi.success { border-left-color: var(--an-success); }
+.an-kpi.info    { border-left-color: var(--an-info); }
+.an-kpi.warning { border-left-color: var(--an-warning); }
+
+.an-kpi-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+.an-kpi-label {
+    display: block;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--an-muted);
+    margin-bottom: 8px;
+}
+.an-kpi-value {
+    display: block;
+    font-size: clamp(1.7rem, 3vw, 2.15rem);
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    color: var(--an-ink);
+    line-height: 1;
+    margin-bottom: 12px;
+    font-variant-numeric: tabular-nums;
+}
+.an-kpi-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--an-r-md);
+    font-size: 1.15rem;
+    background: var(--an-surface-soft);
+    color: var(--an-muted);
+    transition: all var(--an-dur) var(--an-ease);
+}
+.an-kpi.primary .an-kpi-icon { background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent); color: var(--primary, #e11d2a); }
+.an-kpi.success .an-kpi-icon { background: var(--an-success-bg); color: var(--an-success); }
+.an-kpi.info    .an-kpi-icon { background: var(--an-info-bg);    color: var(--an-info); }
+.an-kpi.warning .an-kpi-icon { background: var(--an-warning-bg); color: var(--an-warning); }
+.an-kpi:hover .an-kpi-icon { transform: scale(1.05) rotate(-4deg); }
+.an-kpi.primary:hover .an-kpi-icon { background: var(--primary, #e11d2a); color: #fff; }
+.an-kpi.success:hover .an-kpi-icon { background: var(--an-success); color: #fff; }
+.an-kpi.info:hover    .an-kpi-icon { background: var(--an-info);    color: #fff; }
+.an-kpi.warning:hover .an-kpi-icon { background: var(--an-warning); color: #fff; }
+
+.an-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: var(--an-pill);
+    font-size: .74rem;
+    font-weight: 700;
+    background: var(--an-success-bg);
+    color: var(--an-success);
+}
+.an-delta.down   { background: var(--an-danger-bg);  color: var(--an-danger); }
+.an-delta.neutral{ background: var(--an-neutral-bg); color: var(--an-neutral); }
+.an-delta i { font-size: .8em; }
+.an-delta-note {
+    margin-left: 8px;
+    font-size: .75rem;
+    color: var(--an-muted);
+    font-weight: 500;
+}
+
+/* =========================================================================
+   CHART CARDS
+   ========================================================================= */
+.an-grid {
+    display: grid;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+.an-grid--8-4 { grid-template-columns: 2fr 1fr; }
+.an-grid--6-6 { grid-template-columns: 1fr 1fr; }
+.an-grid--4-4-4 { grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width: 1100px) {
+    .an-grid--8-4,
+    .an-grid--6-6,
+    .an-grid--4-4-4 { grid-template-columns: 1fr; }
+}
+
+.an-card {
+    background: var(--an-surface);
+    border: 1px solid var(--an-line);
+    border-radius: var(--an-r-lg);
+    box-shadow: var(--an-sh-xs);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow var(--an-dur) var(--an-ease), border-color var(--an-dur) var(--an-ease);
+}
+.an-card:hover {
+    box-shadow: var(--an-sh-md);
+    border-color: color-mix(in srgb, var(--primary, #e11d2a) 18%, var(--an-line));
+}
+.an-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--an-line-soft);
+    flex-wrap: wrap;
+}
+.an-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .9rem;
+    font-weight: 800;
+    color: var(--an-ink);
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-transform: uppercase;
+}
+.an-card-title .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--an-r-sm);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: .82rem;
+    flex-shrink: 0;
+}
+.an-card-body {
+    padding: 20px;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Small action buttons in card headers */
+.an-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border: 1px solid var(--an-line);
+    border-radius: var(--an-pill);
+    background: var(--an-surface);
+    color: var(--an-text);
+    font-size: .76rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--an-dur) var(--an-ease);
+}
+.an-action:hover {
+    border-color: var(--primary, #e11d2a);
+    color: var(--primary, #e11d2a);
+    transform: translateY(-1px);
+}
+.an-action i { font-size: .9em; }
+
+/* =========================================================================
+   CHART CONTAINERS
+   ========================================================================= */
+.an-chart {
+    position: relative;
+    width: 100%;
+    height: 340px;
+    min-height: 200px;
+}
+.an-chart--tall { height: 380px; }
+.an-chart--sm   { height: 200px; }
+.an-chart--xs   { height: 140px; }
+
+.an-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px 20px;
+    margin-top: 16px;
+    font-size: .82rem;
+    color: var(--an-muted);
+}
+.an-chart-legend span { display: inline-flex; align-items: center; gap: 8px; }
+.an-chart-legend i { font-size: .7rem; }
+
+/* =========================================================================
+   STATUS LEGEND LIST (doughnut side panel)
+   ========================================================================= */
+.an-status-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.an-status-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 12px;
+    background: var(--an-surface-alt);
+    border: 1px solid var(--an-line);
+    border-radius: var(--an-r-sm);
+    font-size: .85rem;
+}
+.an-status-list .label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--an-text);
+    font-weight: 600;
+}
+.an-status-list .swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+.an-status-list .count {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.an-status-list .count strong {
+    color: var(--an-ink);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+.an-status-list .count small {
+    color: var(--an-muted);
+    font-size: .76rem;
+    font-weight: 600;
+}
+
+/* =========================================================================
+   PERFORMANCE PANEL (on-time / delayed / early)
+   ========================================================================= */
+.an-perf {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.an-perf-item {
+    padding: 14px 12px;
+    background: var(--an-surface-alt);
+    border: 1px solid var(--an-line);
+    border-radius: var(--an-r-md);
+    text-align: center;
+}
+.an-perf-item .value {
+    display: block;
+    font-size: 1.65rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 6px;
+    font-variant-numeric: tabular-nums;
+}
+.an-perf-item .label {
+    display: block;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--an-muted);
+}
+.an-perf-item.success .value { color: var(--an-success); }
+.an-perf-item.warning .value { color: var(--an-warning); }
+.an-perf-item.info    .value { color: var(--an-info); }
+
+.an-progress {
+    display: flex;
+    height: 26px;
+    border-radius: var(--an-pill);
+    overflow: hidden;
+    background: var(--an-surface-soft);
+    margin-bottom: 18px;
+}
+.an-progress-segment {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: .74rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    transition: width var(--an-dur) var(--an-ease);
+    white-space: nowrap;
+    overflow: hidden;
+}
+.an-progress-segment.success { background: linear-gradient(135deg, var(--an-success), #15803D); }
+.an-progress-segment.warning { background: linear-gradient(135deg, var(--an-warning), #B45309); }
+.an-progress-segment.info    { background: linear-gradient(135deg, var(--an-info),    #0369A1); }
+
+/* =========================================================================
+   VALUE / WEIGHT / GEO PANELS
+   ========================================================================= */
+.an-value-hero {
+    text-align: center;
+    padding: 8px 0 20px;
+    border-bottom: 1px solid var(--an-line-soft);
+    margin-bottom: 20px;
+}
+.an-value-hero .value {
+    display: block;
+    font-size: clamp(1.8rem, 3.6vw, 2.5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--an-success);
+    line-height: 1;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+}
+.an-value-hero .sub {
+    display: block;
+    font-size: .85rem;
+    color: var(--an-muted);
+}
+.an-value-hero .sub strong {
+    color: var(--primary, #e11d2a);
+    font-weight: 800;
+}
+
+.an-mini-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+.an-mini-item {
+    padding: 12px 14px;
+    background: var(--an-surface-alt);
+    border: 1px solid var(--an-line);
+    border-radius: var(--an-r-sm);
+    text-align: center;
+}
+.an-mini-item .label {
+    display: block;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--an-muted);
+    margin-bottom: 6px;
+}
+.an-mini-item .value {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--an-ink);
+    letter-spacing: -0.015em;
+    font-variant-numeric: tabular-nums;
+}
+.an-mini-item.info    .value { color: var(--an-info); }
+.an-mini-item.warning .value { color: var(--an-warning); }
+
+.an-triple {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 14px;
+}
+.an-triple .item {
+    padding: 12px 10px;
+    text-align: center;
+    background: var(--an-surface-alt);
+    border: 1px solid var(--an-line);
+    border-radius: var(--an-r-sm);
+}
+.an-triple .label {
+    display: block;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--an-muted);
+    margin-bottom: 4px;
+}
+.an-triple .value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--an-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.an-double {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+}
+.an-double .item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--an-surface-alt);
+    border: 1px solid var(--an-line);
+    border-radius: var(--an-r-sm);
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--an-text);
+}
+.an-double .item .count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 12px;
+    border-radius: var(--an-pill);
+    background: var(--an-surface-soft);
+    color: var(--an-ink);
+    font-weight: 800;
+    font-size: .8rem;
+    font-variant-numeric: tabular-nums;
+}
+.an-double .item.primary .count { background: color-mix(in srgb, var(--primary, #e11d2a) 12%, transparent); color: var(--primary, #e11d2a); }
+.an-double .item.info    .count { background: var(--an-info-bg);    color: var(--an-info); }
+
+/* =========================================================================
+   RECENT PACKAGES TABLE
+   ========================================================================= */
+.an-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.an-table thead th {
+    padding: 12px 20px;
+    background: var(--an-surface-soft);
+    color: var(--an-muted);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-align: left;
+    border-bottom: 1px solid var(--an-line);
+    white-space: nowrap;
+}
+.an-table tbody td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--an-line-soft);
+    font-size: .88rem;
+    color: var(--an-text);
+    vertical-align: middle;
+}
+.an-table tbody tr { transition: background var(--an-dur) var(--an-ease); }
+.an-table tbody tr:hover {
+    background: color-mix(in srgb, var(--primary, #e11d2a) 3%, var(--an-surface));
+}
+.an-table tbody tr:last-child td { border-bottom: 0; }
+
+.an-table code {
+    display: inline-block;
+    padding: 3px 8px;
+    background: var(--an-surface-soft);
+    border: 1px solid var(--an-line);
+    border-radius: var(--an-r-sm);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--an-ink);
+    letter-spacing: .01em;
+}
+
+.an-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: var(--an-pill);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+.an-badge.success   { background: var(--an-success-bg); color: var(--an-success); border-color: color-mix(in srgb, var(--an-success) 25%, transparent); }
+.an-badge.warning   { background: var(--an-warning-bg); color: var(--an-warning); border-color: color-mix(in srgb, var(--an-warning) 25%, transparent); }
+.an-badge.info      { background: var(--an-info-bg);    color: var(--an-info);    border-color: color-mix(in srgb, var(--an-info) 25%, transparent); }
+.an-badge.secondary { background: var(--an-neutral-bg); color: var(--an-neutral); border-color: color-mix(in srgb, var(--an-neutral) 20%, transparent); }
+.an-badge.danger    { background: var(--an-danger-bg);  color: var(--an-danger);  border-color: color-mix(in srgb, var(--an-danger) 25%, transparent); }
+
+.an-table .service {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .85rem;
+}
+.an-table .service i { color: var(--primary, #e11d2a); }
+
+.an-table .muted { color: var(--an-muted-2); }
+
+/* =========================================================================
+   TOASTS
+   ========================================================================= */
+.an-toast {
+    position: fixed;
+    top: 88px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    min-width: 280px;
+    max-width: calc(100vw - 48px);
+    background: var(--an-surface);
+    border: 1px solid var(--an-line);
+    border-left: 4px solid var(--primary, #e11d2a);
+    border-radius: var(--an-r-sm);
+    box-shadow: var(--an-sh-lg);
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--an-text);
+    animation: anToastIn 280ms var(--an-ease);
+}
+.an-toast i { font-size: 1.15rem; color: var(--primary, #e11d2a); flex-shrink: 0; }
+.an-toast.success { border-left-color: var(--an-success); }
+.an-toast.success i { color: var(--an-success); }
+.an-toast.error   { border-left-color: var(--an-danger); }
+.an-toast.error   i { color: var(--an-danger); }
+.an-toast.warning { border-left-color: var(--an-warning); }
+.an-toast.warning i { color: var(--an-warning); }
+.an-toast.info    { border-left-color: var(--an-info); }
+.an-toast.info    i { color: var(--an-info); }
+.an-toast.fade-out { animation: anToastOut 280ms var(--an-ease) forwards; }
+
+@keyframes anToastIn {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes anToastOut {
+    to { opacity: 0; transform: translateX(24px); }
+}
+@media (max-width: 576px) {
+    .an-toast { left: 16px; right: 16px; top: 76px; min-width: auto; }
+}
+
+/* =========================================================================
+   RESPONSIVE TABLE
+   ========================================================================= */
+@media (max-width: 900px) {
+    .an-table thead { display: none; }
+    .an-table,
+    .an-table tbody,
+    .an-table tr,
+    .an-table td { display: block; width: 100%; }
+    .an-table tbody tr {
+        margin-bottom: 14px;
+        background: var(--an-surface);
+        border: 1px solid var(--an-line);
+        border-radius: var(--an-r-md);
+        overflow: hidden;
+    }
+    .an-table tbody tr:last-child { margin-bottom: 0; }
+    .an-table tbody td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 18px;
+        text-align: right;
+        border-bottom: 1px solid var(--an-line-soft);
+    }
+    .an-table tbody td::before {
+        content: attr(data-label);
+        flex: 0 0 auto;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--an-muted);
+        text-align: left;
+    }
+    .an-table tbody td:last-child { border-bottom: 0; }
+}
+
+@media (max-width: 640px) {
+    .an-hero-inner { flex-direction: column; align-items: stretch; }
+    .an-period { align-self: stretch; justify-content: space-between; }
+    .an-card-body { padding: 18px; }
+    .an-chart { height: 280px; }
+    .an-chart--tall { height: 320px; }
+    .an-triple { grid-template-columns: 1fr 1fr 1fr; }
+    .an-perf { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .an-perf-item { padding: 10px 8px; }
+    .an-perf-item .value { font-size: 1.3rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+@media print {
+    .an-hero::before, .an-period, .an-action, .an-toast,
+    .navbar, footer, .back-to-top { display: none !important; }
+    .an-hero { background: #fff !important; color: #000 !important; padding: 20px 0 !important; border-bottom: 2px solid #000; }
+    .an-hero-title, .an-hero-sub, .an-hero-sub .live-pill { color: #000 !important; }
+    .an-hero-sub .live-pill { background: #f5f5f5 !important; border-color: #ccc !important; }
+    .an-card, .an-kpi { box-shadow: none !important; border: 1px solid #ddd !important; }
+    .an-badge, .an-table code { border: 1px solid #000; color: #000 !important; background: transparent !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="an-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="an-hero">
+        <div class="container">
+            <div class="an-hero-inner">
+                <div>
+                    <h1 class="an-hero-title">
+                        <span class="hero-icon"><i class="fas fa-chart-line"></i></span>
+                        Analytics dashboard
+                    </h1>
+                    <p class="an-hero-sub">
+                        Real-time performance data across your Global shippments operations.
+                        <span class="live-pill"><span class="dot"></span> <span id="lastUpdated">Updated just now</span></span>
+                    </p>
+                </div>
+
+                <div class="an-period">
+                    <label for="periodSelector">Period</label>
+                    <select id="periodSelector" onchange="changePeriod(this.value)">
+                        <option value="today">Today</option>
+                        <option value="week" selected>This week</option>
+                        <option value="month">This month</option>
+                        <option value="quarter">This quarter</option>
+                        <option value="year">This year</option>
+                        <option value="all">All time</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SHELL ==================== -->
+    <div class="an-shell">
+
+        <!-- ==================== KPI CARDS ==================== -->
+        <section class="an-kpis" aria-label="Key performance indicators">
+            <div class="an-kpi primary">
+                <div class="an-kpi-row">
+                    <div>
+                        <span class="an-kpi-label">Total packages</span>
+                        <span class="an-kpi-value" id="totalPackages">{{ total_packages }}</span>
+                    </div>
+                    <div class="an-kpi-icon"><i class="fas fa-box"></i></div>
+                </div>
+                <div>
+                    <span class="an-delta" id="totalPackagesTrend">
+                        <i class="fas fa-arrow-up"></i> {{ total_packages_trend }}%
+                    </span>
+                    <span class="an-delta-note">vs last period</span>
+                </div>
+            </div>
+
+            <div class="an-kpi success">
+                <div class="an-kpi-row">
+                    <div>
+                        <span class="an-kpi-label">On-time delivery</span>
+                        <span class="an-kpi-value" id="onTimeRate">{{ on_time_rate }}%</span>
+                    </div>
+                    <div class="an-kpi-icon"><i class="fas fa-clock"></i></div>
+                </div>
+                <div>
+                    <span class="an-delta" id="onTimeTrend">
+                        <i class="fas fa-arrow-up"></i> {{ on_time_trend }}%
+                    </span>
+                    <span class="an-delta-note">vs target</span>
+                </div>
+            </div>
+
+            <div class="an-kpi info">
+                <div class="an-kpi-row">
+                    <div>
+                        <span class="an-kpi-label">Avg. delivery time</span>
+                        <span class="an-kpi-value" id="avgDeliveryTime">{{ avg_delivery_time }} d</span>
+                    </div>
+                    <div class="an-kpi-icon"><i class="fas fa-truck-fast"></i></div>
+                </div>
+                <div>
+                    <span class="an-delta" id="avgTimeTrend">
+                        <i class="fas fa-arrow-down"></i> {{ avg_time_trend }}%
+                    </span>
+                    <span class="an-delta-note">improvement</span>
+                </div>
+            </div>
+
+            <div class="an-kpi warning">
+                <div class="an-kpi-row">
+                    <div>
+                        <span class="an-kpi-label">Active shipments</span>
+                        <span class="an-kpi-value" id="activeShipments">{{ active_shipments }}</span>
+                    </div>
+                    <div class="an-kpi-icon"><i class="fas fa-shipping-fast"></i></div>
+                </div>
+                <div>
+                    <span class="an-delta neutral" id="activeTrend">
+                        <i class="fas fa-minus"></i> {{ active_trend }}%
+                    </span>
+                    <span class="an-delta-note">of total</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ROW 1: DAILY TREND + STATUS ==================== -->
+        <div class="an-grid an-grid--8-4">
+            <div class="an-card">
+                <div class="an-card-header">
+                    <h2 class="an-card-title">
+                        <span class="icon"><i class="fas fa-chart-line"></i></span>
+                        Daily shipments trend
+                    </h2>
+                    <button type="button" class="an-action" onclick="exportChart('daily')">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+                <div class="an-card-body">
+                    <div class="an-chart an-chart--tall">
+                        <canvas id="dailyShipmentsChart"></canvas>
+                    </div>
+                    <div class="an-chart-legend">
+                        <span><i class="fas fa-circle" style="color: var(--chart-red);"></i> Shipments</span>
+                        <span><i class="fas fa-circle" style="color: var(--chart-green);"></i> Deliveries</span>
+                        <span><i class="fas fa-circle" style="color: var(--chart-amber);"></i> Holds</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="an-card">
+                <div class="an-card-header">
+                    <h2 class="an-card-title">
+                        <span class="icon"><i class="fas fa-chart-pie"></i></span>
+                        Status distribution
+                    </h2>
+                </div>
+                <div class="an-card-body">
+                    <div class="an-chart an-chart--sm">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+
+                    <ul class="an-status-list" id="statusLegend">
+                        {% for status, count in packages_by_status %}
+                        <li>
+                            <span class="label">
+                                <span class="swatch" style="background-color: {{ status_colors[loop.index0] }};"></span>
+                                {{ status|title }}
+                            </span>
+                            <span class="count">
+                                <strong>{{ count }}</strong>
+                                <small>{{ "%.1f"|format(count / total_packages * 100) }}%</small>
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ROW 2: METHOD + TYPE ==================== -->
+        <div class="an-grid an-grid--6-6">
+            <div class="an-card">
+                <div class="an-card-header">
+                    <h2 class="an-card-title">
+                        <span class="icon"><i class="fas fa-truck"></i></span>
+                        Shipments by method
+                    </h2>
+                </div>
+                <div class="an-card-body">
+                    <div class="an-chart">
+                        <canvas id="methodChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="an-card">
+                <div class="an-card-header">
+                    <h2 class="an-card-title">
+                        <span class="icon"><i class="fas fa-box"></i></span>
+                        Package types
+                    </h2>
+                </div>
+                <div class="an-card-body">
+                    <div class="an-chart">
+                        <canvas id="typeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ROW 3: HOLDS + PERFORMANCE ==================== -->
+        <div class="an-grid an-grid--6-6">
+            <div class="an-card">
+                <div class="an-card-header">
+                    <h2 class="an-card-title">
+                        <span class="icon"><i class="fas fa-pause"></i></span>
+                        Hold reasons
+                    </h2>
+                </div>
+                <div class="an-card-body">
+                    <div class="an-chart">
+                        <canvas id="holdReasonsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="an-card">
+                <div class="an-card-header">
+                    <h2 class="an-card-title">
+                        <span class="icon"><i class="fas fa-gauge-high"></i></span>
+                        Performance metrics
+                    </h2>
+                </div>
+                <div class="an-card-body">
+                    <div class="an-perf">
+                        <div class="an-perf-item success">
+                            <span class="value" id="onTimeCount">{{ on_time_count }}</span>
+                            <span class="label">On time</span>
+                        </div>
+                        <div class="an-perf-item warning">
+                            <span class="value" id="delayedCount">{{ delayed_count }}</span>
+                            <span class="label">Delayed</span>
+                        </div>
+                        <div class="an-perf-item info">
+                            <span class="value" id="earlyCount">{{ early_count }}</span>
+                            <span class="label">Early</span>
+                        </div>
+                    </div>
+
+                    <div class="an-progress" role="img" aria-label="Performance breakdown">
+                        <div class="an-progress-segment success" style="width: {{ on_time_rate }}%">
+                            {% if on_time_rate >= 12 %}{{ on_time_rate }}%{% endif %}
+                        </div>
+                        <div class="an-progress-segment warning" style="width: {{ delay_rate }}%">
+                            {% if delay_rate >= 12 %}{{ delay_rate }}%{% endif %}
+                        </div>
+                        <div class="an-progress-segment info" style="width: {{ early_rate }}%">
+                            {% if early_rate >= 12 %}{{ early_rate }}%{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="an-chart an-chart--xs">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ROW 4: VALUE + WEIGHT + GEO ==================== -->
+        <div class="an-grid an-grid--4-4-4">
+            <div class="an-card">
+                <div class="an-card-header">
+                    <h2 class="an-card-title">
+                        <span class="icon"><i class="fas fa-dollar-sign"></i></span>
+                        Declared value
+                    </h2>
+                </div>
+                <div class="an-card-body">
+                    <div class="an-value-hero">
+                        <span class="value" id="totalValue">${{ "%.2f"|format(total_value) }}</span>
+                        <span class="sub">
+                            Average per package: <strong>${{ "%.2f"|format(avg_value) }}</strong>
+                        </span>
+                    </div>
+
+                    <div class="an-mini-grid">
+                        <div class="an-mini-item info">
+                            <span class="label">Highest value</span>
+                            <span class="value">${{ "%.2f"|format(max_value) }}</span>
+                        </div>
+                        <div class="an-mini-item warning">
+                            <span class="label">Insured packages</span>
+                            <span class="value">{{ insured_count }} ({{ "%.1f"|format(insured_count / total_packages * 100) }}%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="an-card">
+                <div class="an-card-header">
+                    <h2 class="an-card-title">
+                        <span class="icon"><i class="fas fa-weight-hanging"></i></span>
+                        Weight distribution
+                    </h2>
+                </div>
+                <div class="an-card-body">
+                    <div class="an-chart an-chart--sm">
+                        <canvas id="weightChart"></canvas>
+                    </div>
+                    <div class="an-triple">
+                        <div class="item">
+                            <span class="label">Light</span>
+                            <span class="value" id="lightCount">{{ light_count }}</span>
+                        </div>
+                        <div class="item">
+                            <span class="label">Medium</span>
+                            <span class="value" id="mediumCount">{{ medium_count }}</span>
+                        </div>
+                        <div class="item">
+                            <span class="label">Heavy</span>
+                            <span class="value" id="heavyCount">{{ heavy_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="an-card">
+                <div class="an-card-header">
+                    <h2 class="an-card-title">
+                        <span class="icon"><i class="fas fa-globe"></i></span>
+                        Geographic distribution
+                    </h2>
+                </div>
+                <div class="an-card-body">
+                    <div class="an-chart an-chart--sm">
+                        <canvas id="geoChart"></canvas>
+                    </div>
+                    <div class="an-double">
+                        <div class="item primary">
+                            Domestic
+                            <span class="count" id="domesticCount">{{ domestic_count }}</span>
+                        </div>
+                        <div class="item info">
+                            International
+                            <span class="count" id="internationalCount">{{ international_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== RECENT PACKAGES ==================== -->
+        <div class="an-card">
+            <div class="an-card-header">
+                <h2 class="an-card-title">
+                    <span class="icon"><i class="fas fa-clock-rotate-left"></i></span>
+                    Recent packages
+                </h2>
+                <a href="{{ url_for('manage_packages') }}" class="an-action">
+                    View all <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="an-table" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Tracking code</th>
+                            <th>Recipient</th>
+                            <th>Status</th>
+                            <th>Method</th>
+                            <th>Created</th>
+                            <th>Est. delivery</th>
+                            <th>Value</th>
+                            <th>Transit days</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for package in recent_packages %}
+                        <tr>
+                            <td data-label="Tracking code">
+                                <code>{{ package.tracking_code }}</code>
+                                <a href="{{ url_for('view_package', package_id=package.id) }}"
+                                   class="ms-2" style="color: var(--primary, #e11d2a);"
+                                   title="Open package" aria-label="Open package">
+                                    <i class="fas fa-arrow-up-right-from-square" style="font-size: .78em;"></i>
+                                </a>
+                            </td>
+                            <td data-label="Recipient">{{ package.recipient_name or '—' }}</td>
+                            <td data-label="Status">
+                                {% if package.status == 'in_transit' %}
+                                    <span class="an-badge success">In transit</span>
+                                {% elif package.status == 'on_hold' %}
+                                    <span class="an-badge warning">On hold</span>
+                                {% elif package.status == 'delivered' %}
+                                    <span class="an-badge info">Delivered</span>
+                                {% elif package.status == 'pending' %}
+                                    <span class="an-badge secondary">Pending</span>
+                                {% elif package.status == 'cancelled' %}
+                                    <span class="an-badge danger">Cancelled</span>
+                                {% elif package.status %}
+                                    <span class="an-badge secondary">{{ package.status|replace('_', ' ')|title }}</span>
+                                {% else %}
+                                    <span class="an-badge secondary">—</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="Method">
+                                <span class="service">
+                                    <i class="fas fa-{{ 'plane' if package.shipping_method == 'air' else 'truck' if package.shipping_method == 'ground' else 'ship' if package.shipping_method == 'sea' else 'train' }}"></i>
+                                    {{ package.shipping_method|upper if package.shipping_method else '—' }}
+                                </span>
+                            </td>
+                            <td data-label="Created">
+                                <span class="local-time"
+                                      data-iso="{{ package.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                                      data-format="date">
+                                    {{ package.created_at.strftime('%Y-%m-%d') }}
+                                </span>
+                            </td>
+                            <td data-label="Est. delivery">
+                                {% if package.estimated_delivery %}
+                                    <span class="local-time"
+                                          data-iso="{{ package.estimated_delivery.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                                          data-format="date">
+                                        {{ package.estimated_delivery.strftime('%Y-%m-%d') }}
+                                    </span>
+                                {% else %}
+                                    <span class="muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="Value">${{ "%.2f"|format(package.declared_value or 0) }}</td>
+                            <td data-label="Transit days">
+                                {% if package.status == 'delivered' and package.actual_delivery %}
+                                    {{ ((package.actual_delivery - package.created_at).days) }} d
+                                {% elif package.status != 'delivered' %}
+                                    {{ ((now - package.created_at).days) }} d
+                                {% else %}
+                                    <span class="muted">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js is already included in base.html -->
+<script>
+(function () {
+    'use strict';
+
+    /* ==================== Config ==================== */
+    const CONFIG = {
+        refreshIntervalMs: 300000,   // 5 minutes
+        toastDuration: 3400
+    };
+
+    const PALETTE = {
+        red:    '#e11d2a',
+        green:  '#16a34a',
+        amber:  '#d97706',
+        blue:   '#0ea5e9',
+        purple: '#8b5cf6',
+        teal:   '#14b8a6'
+    };
+
+    const PALETTE_ARRAY = [
+        PALETTE.red, PALETTE.green, PALETTE.amber,
+        PALETTE.blue, PALETTE.purple, PALETTE.teal
+    ];
+
+    const CHART_DEFAULTS = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(11, 18, 32, .95)',
+                titleColor: '#fff',
+                bodyColor: '#cbd5e1',
+                padding: 12,
+                cornerRadius: 8,
+                displayColors: false
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { color: '#94a3b8', font: { size: 11 } }
+            },
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(148, 163, 184, .12)' },
+                ticks: { color: '#94a3b8', font: { size: 11 }, precision: 0 }
+            }
+        }
+    };
+
+    /* ==================== Toast ==================== */
+    function showNotification(message, type = 'info') {
+        const el = document.createElement('div');
+        el.className = `an-toast ${type}`;
+        const icon = {
+            success: 'circle-check',
+            error:   'circle-exclamation',
+            warning: 'triangle-exclamation',
+            info:    'circle-info'
+        }[type] || 'circle-info';
+
+        el.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(el);
+
+        setTimeout(() => {
+            el.classList.add('fade-out');
+            setTimeout(() => el.remove(), 300);
+        }, CONFIG.toastDuration);
+    }
+    window.showNotification = showNotification;
+
+    /* ==================== Timestamp ==================== */
+    function updateLastUpdated() {
+        const el = document.getElementById('lastUpdated');
+        if (!el) return;
+        const now = new Date();
+        el.textContent = `Updated ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
+    /* ==================== Chart builders ==================== */
+    // Preserve datasets as Jinja is template-only
+    const DATA = {
+        daily: {
+            labels:   [{% for date, count, deliveries, holds in daily_data %}'{{ date }}',{% endfor %}],
+            shipments:[{% for date, count, deliveries, holds in daily_data %}{{ count }},{% endfor %}],
+            deliveries:[{% for date, count, deliveries, holds in daily_data %}{{ deliveries }},{% endfor %}],
+            holds:    [{% for date, count, deliveries, holds in daily_data %}{{ holds }},{% endfor %}]
+        },
+        status: {
+            labels: [{% for status, count in packages_by_status %}'{{ status|title }}',{% endfor %}],
+            values: [{% for status, count in packages_by_status %}{{ count }},{% endfor %}]
+        },
+        method: {
+            labels: [{% for method, count in packages_by_method %}'{{ method|upper }}',{% endfor %}],
+            values: [{% for method, count in packages_by_method %}{{ count }},{% endfor %}]
+        },
+        type: {
+            labels: [{% for type, count in packages_by_type %}'{{ type|title }}',{% endfor %}],
+            values: [{% for type, count in packages_by_type %}{{ count }},{% endfor %}]
+        },
+        holdReasons: {
+            labels: [{% for reason, count in hold_reasons %}'{{ reason|title }}',{% endfor %}],
+            values: [{% for reason, count in hold_reasons %}{{ count }},{% endfor %}]
+        },
+        performance: {
+            values: [{{ on_time_count }}, {{ delayed_count }}, {{ early_count }}]
+        },
+        weight: {
+            values: [{{ light_count }}, {{ medium_count }}, {{ heavy_count }}]
+        },
+        geo: {
+            values: [{{ domestic_count }}, {{ international_count }}]
+        }
+    };
+
+    const CHARTS = {};
+
+    function buildDailyChart() {
+        const el = document.getElementById('dailyShipmentsChart');
+        if (!el) return;
+        CHARTS.daily = new Chart(el.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: DATA.daily.labels,
+                datasets: [
+                    {
+                        label: 'Shipments',
+                        data: DATA.daily.shipments,
+                        borderColor: PALETTE.red,
+                        backgroundColor: 'rgba(225, 29, 42, .12)',
+                        tension: 0.35,
+                        fill: true,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: PALETTE.red,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 5
+                    },
+                    {
+                        label: 'Deliveries',
+                        data: DATA.daily.deliveries,
+                        borderColor: PALETTE.green,
+                        backgroundColor: 'rgba(22, 163, 74, .1)',
+                        tension: 0.35,
+                        fill: true,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: PALETTE.green,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 5
+                    },
+                    {
+                        label: 'Holds',
+                        data: DATA.daily.holds,
+                        borderColor: PALETTE.amber,
+                        backgroundColor: 'rgba(217, 119, 6, .1)',
+                        tension: 0.35,
+                        fill: true,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: PALETTE.amber,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 5
+                    }
+                ]
+            },
+            options: Object.assign({}, CHART_DEFAULTS)
+        });
+    }
+
+    function buildDoughnut(id, values, palette, cutout = '68%') {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        return new Chart(el.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['A', 'B', 'C', 'D', 'E', 'F'],
+                datasets: [{
+                    data: values,
+                    backgroundColor: palette,
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: CHART_DEFAULTS.plugins.tooltip
+                }
+            }
+        });
+    }
+
+    function buildBar(id, labels, values, color) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        return new Chart(el.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: color + 'cc',
+                    borderColor: color,
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    maxBarThickness: 48
+                }]
+            },
+            options: Object.assign({}, CHART_DEFAULTS)
+        });
+    }
+
+    function buildHorizontalBar(id, labels, values, color) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        return new Chart(el.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: color + 'cc',
+                    borderColor: color,
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    maxBarThickness: 32
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: CHART_DEFAULTS.plugins.tooltip
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(148, 163, 184, .12)' },
+                        ticks: { color: '#94a3b8', font: { size: 11 }, precision: 0 }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8', font: { size: 11 } }
+                    }
+                }
+            }
+        });
+    }
+
+    function buildPie(id, labels, values, palette) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        return new Chart(el.getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: palette,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#94a3b8',
+                            font: { size: 11 },
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 12
+                        }
+                    },
+                    tooltip: CHART_DEFAULTS.plugins.tooltip
+                }
+            }
+        });
+    }
+
+    function initCharts() {
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js not loaded — analytics charts will not render');
+            return;
+        }
+
+        // Global defaults for dark-mode-friendly axis labels
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+
+        buildDailyChart();
+        CHARTS.status      = buildDoughnut('statusChart',      DATA.status.values,      PALETTE_ARRAY, '68%');
+        CHARTS.method      = buildBar('methodChart',           DATA.method.labels,      DATA.method.values, PALETTE.red);
+        CHARTS.type        = buildPie('typeChart',             DATA.type.labels,        DATA.type.values,   PALETTE_ARRAY);
+        CHARTS.holdReasons = buildHorizontalBar('holdReasonsChart', DATA.holdReasons.labels, DATA.holdReasons.values, PALETTE.amber);
+        CHARTS.performance = buildDoughnut('performanceChart', DATA.performance.values, [PALETTE.green, PALETTE.amber, PALETTE.blue], '60%');
+        CHARTS.weight      = buildPie('weightChart',           ['Light (<2 kg)', 'Medium (2–10 kg)', 'Heavy (>10 kg)'], DATA.weight.values, [PALETTE.red, PALETTE.green, PALETTE.blue]);
+        CHARTS.geo         = buildPie('geoChart',              ['Domestic', 'International'], DATA.geo.values, [PALETTE.red, PALETTE.blue]);
+    }
+
+    /* ==================== Period change ==================== */
+    window.changePeriod = function (period) {
+        showNotification(`Loading ${period} data…`, 'info');
+
+        fetch(`/admin/analytics/data?period=${encodeURIComponent(period)}`, {
+            credentials: 'same-origin',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (!data || !data.success) {
+                showNotification('Could not load data for this period', 'error');
+                return;
+            }
+            applyNewData(data);
+            updateLastUpdated();
+            showNotification('Data updated', 'success');
+        })
+        .catch(err => {
+            console.error('Analytics fetch failed', err);
+            showNotification('Could not load data for this period', 'error');
+        });
+    };
+
+    function applyNewData(data) {
+        // Update KPI values
+        setText('totalPackages', data.total_packages);
+        setText('onTimeRate',    data.on_time_rate + '%');
+        setText('avgDeliveryTime', data.avg_delivery_time + ' d');
+        setText('activeShipments', data.active_shipments);
+
+        // Update charts
+        if (CHARTS.daily && data.daily_data) {
+            const labels = data.daily_data.map(r => r[0]);
+            CHARTS.daily.data.labels = labels;
+            CHARTS.daily.data.datasets[0].data = data.daily_data.map(r => r[1]);
+            CHARTS.daily.data.datasets[1].data = data.daily_data.map(r => r[2]);
+            CHARTS.daily.data.datasets[2].data = data.daily_data.map(r => r[3]);
+            CHARTS.daily.update();
+        }
+        if (CHARTS.status && data.packages_by_status) {
+            CHARTS.status.data.datasets[0].data = data.packages_by_status.map(r => r[1]);
+            CHARTS.status.update();
+        }
+        if (CHARTS.method && data.packages_by_method) {
+            CHARTS.method.data.datasets[0].data = data.packages_by_method.map(r => r[1]);
+            CHARTS.method.update();
+        }
+        if (CHARTS.type && data.packages_by_type) {
+            CHARTS.type.data.datasets[0].data = data.packages_by_type.map(r => r[1]);
+            CHARTS.type.update();
+        }
+        if (CHARTS.holdReasons && data.hold_reasons) {
+            CHARTS.holdReasons.data.datasets[0].data = data.hold_reasons.map(r => r[1]);
+            CHARTS.holdReasons.update();
+        }
+        if (CHARTS.performance) {
+            CHARTS.performance.data.datasets[0].data = [
+                data.on_time_count, data.delayed_count, data.early_count
+            ];
+            CHARTS.performance.update();
+        }
+    }
+
+    function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el && typeof value !== 'undefined' && value !== null) {
+            el.textContent = value;
+        }
+    }
+
+    /* ==================== Chart export ==================== */
+    window.exportChart = function (chartKey) {
+        const el = document.getElementById(chartKey + 'Chart');
+        if (!el) return;
+        try {
+            const link = document.createElement('a');
+            link.download = `Globalshippments-analytics-${chartKey}-${Date.now()}.png`;
+            link.href = el.toDataURL('image/png');
+            link.click();
+            showNotification('Chart exported', 'success');
+        } catch (err) {
+            showNotification('Could not export chart', 'error');
+        }
+    };
+
+    /* ==================== Auto refresh ==================== */
+    let refreshTimer = null;
+    function setupAutoRefresh() {
+        if (refreshTimer) clearInterval(refreshTimer);
+        refreshTimer = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                const sel = document.getElementById('periodSelector');
+                if (sel) changePeriod(sel.value);
+            }
+        }, CONFIG.refreshIntervalMs);
+    }
+
+    /* ==================== Init ==================== */
+    document.addEventListener('DOMContentLoaded', function () {
+        updateLastUpdated();
+        initCharts();
+        setupAutoRefresh();
+    });
+
+})();
+</script>
+{% endblock %}

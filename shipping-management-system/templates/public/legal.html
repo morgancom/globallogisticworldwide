@@ -1,0 +1,1157 @@
+{% extends "base.html" %}
+
+{% block title %}Legal Notice — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — LEGAL NOTICE
+   Warm neutrals + muted wine red, matching base.html.
+   Sticky sidebar + structured legal sections.
+   ========================================================================= */
+
+:root {
+    --ln-surface:       #ffffff;
+    --ln-surface-alt:   #f7f6f3;
+    --ln-surface-soft:  #f0ede7;
+    --ln-line:          #e6e2db;
+    --ln-line-soft:     #eeebe5;
+    --ln-ink:           #141414;
+    --ln-text:          #2c2c2c;
+    --ln-muted:         #6b6b6b;
+    --ln-muted-2:       #9a948a;
+
+    --ln-warning:       #a06420;
+    --ln-warning-bg:    #faf3e8;
+
+    --ln-sh-sm: 0 1px 2px rgba(20, 20, 20, .04);
+    --ln-sh-md: 0 4px 12px -6px rgba(20, 20, 20, .10);
+
+    --ln-ease: cubic-bezier(.4, 0, .2, 1);
+    --ln-dur:  180ms;
+
+    --ln-r-sm: 4px;
+    --ln-r-md: 6px;
+    --ln-r-lg: 8px;
+    --ln-pill: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --ln-surface:      #221f1c;
+        --ln-surface-alt:  #1c1a17;
+        --ln-surface-soft: #26231f;
+        --ln-line:         #2b2823;
+        --ln-line-soft:    #24211d;
+        --ln-ink:          #f4f2ee;
+        --ln-text:         #d4cec5;
+        --ln-muted:        #9a948a;
+        --ln-muted-2:      #7a746a;
+
+        --ln-warning-bg:   #2a2214;
+
+        --ln-sh-sm: 0 1px 2px rgba(0, 0, 0, .4);
+        --ln-sh-md: 0 4px 12px -6px rgba(0, 0, 0, .5);
+    }
+}
+
+body { background: var(--ln-surface-alt); color: var(--ln-text); }
+
+.ln-page h1, .ln-page h2, .ln-page h3,
+.ln-page h4, .ln-page h5, .ln-page h6 {
+    color: var(--ln-ink);
+    letter-spacing: -0.015em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+.ln-hero {
+    position: relative;
+    padding: clamp(52px, 7vw, 88px) 0 clamp(40px, 5vw, 64px);
+    overflow: hidden;
+    background: var(--ln-surface);
+    border-bottom: 1px solid var(--ln-line);
+}
+.ln-hero > .container { position: relative; z-index: 1; }
+
+.ln-hero .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: var(--ln-pill);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.ln-hero .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary, #a51e2b);
+}
+
+.ln-hero h1 {
+    font-size: clamp(1.85rem, 4.4vw, 2.75rem);
+    line-height: 1.08;
+    margin: 0 0 16px;
+    letter-spacing: -0.025em;
+}
+.ln-hero h1 em {
+    font-style: normal;
+    color: var(--primary, #a51e2b);
+}
+
+.ln-hero .lead {
+    font-size: clamp(1rem, 1.2vw, 1.08rem);
+    line-height: 1.7;
+    color: var(--ln-muted);
+    max-width: 720px;
+    margin: 0 0 22px;
+}
+
+.ln-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
+    padding-top: 22px;
+    border-top: 1px dashed var(--ln-line);
+    font-size: .84rem;
+    color: var(--ln-muted);
+}
+.ln-hero-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.ln-hero-meta span i { color: var(--primary, #a51e2b); }
+.ln-hero-meta span strong { color: var(--ln-ink); font-weight: 700; }
+
+/* =========================================================================
+   LAYOUT
+   ========================================================================= */
+.ln-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: clamp(28px, 4vw, 52px);
+    padding: clamp(36px, 5vw, 64px) 0;
+    align-items: start;
+}
+@media (max-width: 992px) {
+    .ln-layout { grid-template-columns: 1fr; }
+}
+
+/* =========================================================================
+   SIDEBAR
+   ========================================================================= */
+.ln-sidebar {
+    position: sticky;
+    top: calc(var(--nav-h, 68px) + 24px);
+    max-height: calc(100vh - var(--nav-h, 68px) - 48px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+@media (max-width: 992px) {
+    .ln-sidebar {
+        position: static;
+        max-height: none;
+        overflow: visible;
+        margin-bottom: 28px;
+    }
+}
+
+.ln-nav-card {
+    padding: 20px 18px;
+    background: var(--ln-surface);
+    border: 1px solid var(--ln-line);
+    border-radius: var(--ln-r-md);
+}
+.ln-nav-card h6 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--ln-line-soft);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ln-muted);
+}
+.ln-nav-card h6 i { color: var(--primary, #a51e2b); }
+
+.ln-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.ln-nav-list li a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    font-size: .84rem;
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--ln-text);
+    text-decoration: none;
+    border-radius: var(--ln-r-sm);
+    border-left: 2px solid transparent;
+    transition: color var(--ln-dur) var(--ln-ease),
+                background-color var(--ln-dur) var(--ln-ease),
+                border-color var(--ln-dur) var(--ln-ease);
+}
+.ln-nav-list li a i {
+    font-size: .62rem;
+    opacity: .5;
+    color: var(--ln-muted);
+}
+.ln-nav-list li a:hover,
+.ln-nav-list li a:focus-visible {
+    background: var(--ln-surface-alt);
+    color: var(--primary, #a51e2b);
+    border-left-color: var(--primary, #a51e2b);
+}
+.ln-nav-list li a:hover i,
+.ln-nav-list li a:focus-visible i {
+    opacity: 1;
+    color: var(--primary, #a51e2b);
+}
+.ln-nav-list li a.active {
+    color: var(--primary, #a51e2b);
+    background: var(--primary-50, #fbf3f4);
+    border-left-color: var(--primary, #a51e2b);
+    font-weight: 700;
+}
+.ln-nav-list li a.active i { opacity: 1; color: var(--primary, #a51e2b); }
+
+@media (max-width: 992px) {
+    .ln-nav-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2px;
+    }
+}
+@media (max-width: 560px) {
+    .ln-nav-list { grid-template-columns: 1fr; }
+}
+
+/* =========================================================================
+   CONTENT
+   ========================================================================= */
+.ln-content {
+    min-width: 0;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--ln-text);
+}
+
+.ln-section {
+    scroll-margin-top: calc(var(--nav-h, 68px) + 32px);
+    padding: 24px 26px;
+    margin-bottom: 16px;
+    background: var(--ln-surface);
+    border: 1px solid var(--ln-line);
+    border-left: 3px solid var(--ln-line);
+    border-radius: var(--ln-r-md);
+    transition: border-left-color var(--ln-dur) var(--ln-ease);
+}
+.ln-section:hover {
+    border-left-color: var(--primary, #a51e2b);
+}
+@media (max-width: 640px) {
+    .ln-section { padding: 20px 18px; }
+}
+
+.ln-section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+.ln-section-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--ln-r-md);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .85rem;
+    font-weight: 800;
+    margin-top: 2px;
+}
+.ln-section h2 {
+    font-size: clamp(1.1rem, 1.7vw, 1.3rem);
+    line-height: 1.3;
+    margin: 0;
+    letter-spacing: -0.015em;
+}
+
+.ln-content p {
+    margin: 0 0 14px;
+    line-height: 1.75;
+    color: var(--ln-text);
+}
+.ln-content p:last-child { margin-bottom: 0; }
+.ln-content strong { color: var(--ln-ink); font-weight: 700; }
+
+.ln-content a {
+    color: var(--primary, #a51e2b);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color var(--ln-dur) var(--ln-ease);
+}
+.ln-content a:hover { color: var(--primary-700, #77141f); }
+
+.ln-content h3 {
+    font-size: 1rem;
+    margin: 22px 0 12px;
+    letter-spacing: -0.01em;
+}
+.ln-content h3:first-of-type { margin-top: 0; }
+
+.ln-content h4 {
+    font-size: .92rem;
+    margin: 18px 0 8px;
+    letter-spacing: -0.01em;
+}
+
+.ln-content ul,
+.ln-content ol {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px;
+}
+.ln-content ul li,
+.ln-content ol li {
+    position: relative;
+    padding: 8px 0 8px 28px;
+    line-height: 1.65;
+    color: var(--ln-text);
+    border-bottom: 1px dashed var(--ln-line);
+}
+.ln-content ul li:last-child,
+.ln-content ol li:last-child { border-bottom: 0; padding-bottom: 0; }
+.ln-content ul li::before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .55rem;
+}
+.ln-content ol {
+    counter-reset: ln-item;
+}
+.ln-content ol li {
+    counter-increment: ln-item;
+}
+.ln-content ol li::before {
+    content: counter(ln-item) ".";
+    font-family: inherit;
+    font-weight: 800;
+    background: none;
+    width: auto;
+    height: auto;
+    color: var(--primary, #a51e2b);
+    font-size: .85rem;
+    top: 8px;
+}
+
+/* Trademark list pill row */
+.ln-trademarks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 12px 0 16px;
+}
+.ln-trademarks span {
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: var(--ln-r-sm);
+    background: var(--ln-surface-alt);
+    border: 1px solid var(--ln-line);
+    color: var(--ln-text);
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Note / callout */
+.ln-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 16px 0;
+    padding: 14px 16px;
+    background: var(--ln-warning-bg);
+    border: 1px solid color-mix(in srgb, var(--ln-warning) 22%, transparent);
+    border-left: 3px solid var(--ln-warning);
+    border-radius: var(--ln-r-sm);
+    font-size: .88rem;
+    line-height: 1.65;
+    color: var(--ln-text);
+}
+.ln-note i {
+    color: var(--ln-warning);
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+.ln-note strong { color: var(--ln-ink); }
+
+/* Info callout (neutral) */
+.ln-note--info {
+    background: var(--ln-surface-alt);
+    border-color: var(--ln-line);
+    border-left-color: var(--primary, #a51e2b);
+}
+.ln-note--info i { color: var(--primary, #a51e2b); }
+
+/* Contact grid */
+.ln-contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+}
+@media (max-width: 640px) {
+    .ln-contact-grid { grid-template-columns: 1fr; }
+}
+.ln-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--ln-surface-alt);
+    border: 1px solid var(--ln-line);
+    border-radius: var(--ln-r-sm);
+    transition: border-color var(--ln-dur) var(--ln-ease);
+}
+.ln-contact-item:hover {
+    border-color: var(--ln-line-strong, #d3cec5);
+}
+.ln-contact-item i {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--ln-r-sm);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .85rem;
+}
+.ln-contact-item h6 {
+    margin: 0 0 4px;
+    font-size: .82rem;
+    font-weight: 800;
+    color: var(--ln-ink);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+.ln-contact-item p {
+    margin: 0;
+    font-size: .85rem;
+    color: var(--ln-muted);
+    line-height: 1.5;
+}
+.ln-contact-item p a {
+    color: var(--primary, #a51e2b);
+    text-decoration: none;
+    font-weight: 600;
+}
+.ln-contact-item p a:hover { text-decoration: underline; }
+
+/* Footnote */
+.ln-footnote {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 28px;
+    padding: 16px 20px;
+    background: var(--ln-surface);
+    border: 1px solid var(--ln-line);
+    border-radius: var(--ln-r-md);
+    font-size: .8rem;
+    color: var(--ln-muted);
+}
+.ln-footnote .date { display: inline-flex; align-items: center; gap: 8px; }
+.ln-footnote .date i { color: var(--primary, #a51e2b); }
+@media (max-width: 560px) {
+    .ln-footnote { text-align: center; justify-content: center; }
+}
+
+/* =========================================================================
+   REDUCED MOTION
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .ln-sidebar, .navbar, footer, .back-to-top, #cookie-consent { display: none !important; }
+    .ln-layout { grid-template-columns: 1fr; gap: 0; padding: 0; }
+    body { background: #fff !important; color: #000 !important; }
+    .ln-hero { background: #fff !important; padding: 20px 0 !important; border-bottom: 2px solid #000; }
+    .ln-hero h1, .ln-hero .lead, .ln-hero-meta { color: #000 !important; }
+    .ln-section, .ln-contact-item {
+        page-break-inside: avoid;
+        border: 1px solid #ddd !important;
+    }
+    .ln-content a { color: #000; text-decoration: underline; }
+    .ln-section-num { background: #eee !important; color: #000 !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ln-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="ln-hero">
+        <div class="container">
+            <span class="eyebrow">Legal</span>
+            <h1>Legal Notice</h1>
+            <p class="lead">
+                Important legal information about Global shippments Group, our services, websites and the
+                use of our online platforms. This page contains the legal framework governing your
+                relationship with Global shippments.
+            </p>
+            <div class="ln-hero-meta">
+                <span><i class="fas fa-calendar-check"></i> <strong>Last updated:</strong> March 2026</span>
+                <span><i class="fas fa-file-shield"></i> <strong>Version 4.2</strong></span>
+                <span><i class="fas fa-globe"></i> <strong>Applies to:</strong> Global shippments Group entities</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== LAYOUT ==================== -->
+    <div class="container">
+        <div class="ln-layout">
+
+            <!-- ============ SIDEBAR ============ -->
+            <aside class="ln-sidebar" aria-label="Legal notice navigation">
+                <div class="ln-nav-card">
+                    <h6><i class="fas fa-list"></i> On this page</h6>
+                    <ul class="ln-nav-list">
+                        <li><a href="#company-info"><i class="fas fa-chevron-right"></i> Company information</a></li>
+                        <li><a href="#terms-of-use"><i class="fas fa-chevron-right"></i> Terms of use</a></li>
+                        <li><a href="#copyright"><i class="fas fa-chevron-right"></i> Copyright &amp; trademarks</a></li>
+                        <li><a href="#disclaimer"><i class="fas fa-chevron-right"></i> Disclaimer of warranties</a></li>
+                        <li><a href="#liability"><i class="fas fa-chevron-right"></i> Limitation of liability</a></li>
+                        <li><a href="#data-protection"><i class="fas fa-chevron-right"></i> Data protection</a></li>
+                        <li><a href="#export-control"><i class="fas fa-chevron-right"></i> Export control</a></li>
+                        <li><a href="#dispute-resolution"><i class="fas fa-chevron-right"></i> Dispute resolution</a></li>
+                        <li><a href="#contact"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                        <li><a href="#supervisory"><i class="fas fa-chevron-right"></i> Supervisory authorities</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- ============ CONTENT ============ -->
+            <div class="ln-content">
+
+                <!-- 1. Company Information -->
+                <section id="company-info" class="ln-section">
+                    <div class="ln-section-header">
+                        <span class="ln-section-num">01</span>
+                        <h2>Company information</h2>
+                    </div>
+
+                    <p>
+                        <strong>Global shippments International GmbH</strong><br>
+                        Charles-de-Gaulle-Str. 20<br>
+                        53113 Bonn, Germany
+                    </p>
+
+                    <p>
+                        <strong>Commercial register:</strong> Local Court of Bonn, HRB 14120<br>
+                        <strong>VAT ID:</strong> DE 164 899 706<br>
+                        <strong>Phone:</strong> <a href="tel:+492284290">+49 228 429-0</a><br>
+                        <strong>Email:</strong> <a href="mailto:info@Globalshippments.com">info@Globalshippments.com</a>
+                    </p>
+
+                    <h3>Legal representatives</h3>
+                    <p>
+                        The company is represented by its Managing Directors, authorised to represent
+                        the company jointly.
+                    </p>
+
+                    <h3>Responsible for content</h3>
+                    <p>
+                        Pursuant to § 5 TMG (German Telemedia Act) and § 55 RStV (German Interstate
+                        Broadcasting Treaty): Global shippments International GmbH, Charles-de-Gaulle-Str. 20,
+                        53113 Bonn, Germany.
+                    </p>
+                </section>
+
+                <!-- 2. Terms of Use -->
+                <section id="terms-of-use" class="ln-section">
+                    <div class="ln-section-header">
+                        <span class="ln-section-num">02</span>
+                        <h2>Terms of use</h2>
+                    </div>
+
+                    <h3>Scope and acceptance</h3>
+                    <p>
+                        These Terms of Use govern your use of Global shippments online applications, websites
+                        and services ("Online Applications"). By using our Online Applications, you enter
+                        into a contract with Global shippments regarding these services. If you do not accept
+                        these Terms, you may only use the Online Applications as a guest user with limited
+                        capabilities.
+                    </p>
+
+                    <div class="ln-note ln-note--info">
+                        <i class="fas fa-circle-info"></i>
+                        <div>
+                            All transportation services provided by Global shippments are governed by the
+                            applicable Global shippments Terms and Conditions of Carriage, which may be
+                            subject to separate acceptance.
+                        </div>
+                    </div>
+
+                    <h3>Registration and account</h3>
+                    <p>To use all features, you must have an active account and accept these Terms. You are responsible for:</p>
+                    <ul>
+                        <li>Maintaining the confidentiality of your login credentials</li>
+                        <li>All activities that occur under your account</li>
+                        <li>Providing accurate and complete registration information</li>
+                        <li>Updating your information to keep it current</li>
+                    </ul>
+
+                    <h3>Acceptable use</h3>
+                    <p>You agree to use our Online Applications lawfully and in good faith. You shall not:</p>
+                    <ul>
+                        <li>Cause any damage or harm to Global shippments or third parties</li>
+                        <li>Violate applicable laws or these Terms</li>
+                        <li>Attempt to gain unauthorised access to our systems</li>
+                        <li>Use automated systems to access or scrape our content</li>
+                        <li>Reverse engineer or decompile our software</li>
+                    </ul>
+
+                    <h3>Suspension and termination</h3>
+                    <p>Global shippments may suspend or limit your account access immediately upon notice if:</p>
+                    <ul>
+                        <li>There is misuse, fraudulent or illegal activity</li>
+                        <li>You materially breach these Terms</li>
+                        <li>There is reasonable suspicion of a security incident</li>
+                        <li>Required by law or governmental request</li>
+                    </ul>
+                </section>
+
+                <!-- 3. Copyright & Trademarks -->
+                <section id="copyright" class="ln-section">
+                    <div class="ln-section-header">
+                        <span class="ln-section-num">03</span>
+                        <h2>Copyright and trademarks</h2>
+                    </div>
+
+                    <h3>Copyright</h3>
+                    <p>
+                        The copyright in all content on Global shippments websites and applications is owned
+                        by Global shippments International GmbH. All rights reserved.
+                    </p>
+
+                    <h3>Authorisation to reproduce</h3>
+                    <p>Any person may reproduce material from these web pages subject to the following conditions:</p>
+                    <ul>
+                        <li>The material may be used for information and non-commercial purposes only</li>
+                        <li>It may not be modified in any way</li>
+                        <li>No unauthorised copy is made of any Global shippments trademark</li>
+                        <li>Any copy must include the copyright notice: <em>"Copyright © Global shippments International GmbH. All rights reserved."</em></li>
+                    </ul>
+
+                    <h3>Trademarks</h3>
+                    <p>
+                        The following are trademarks of Global shippments International GmbH, registered in at
+                        least one jurisdiction:
+                    </p>
+
+                    <div class="ln-trademarks">
+                        <span>GLOBAL SHIPPMENTS</span>
+                        <span>Global shippments Worldwide</span>
+                        <span>Global shippments Easy</span>
+                        <span>Global shippments Express</span>
+                        <span>Global shippments Parcel</span>
+                        <span>Global shippments eCommerce</span>
+                        <span>Global shippments Freight</span>
+                        <span>Global shippments Supply Chain</span>
+                        <span>Global shippments Global Forwarding</span>
+                        <span>Jumbo Box</span>
+                        <span>Global shippments Economy Select</span>
+                        <span>Send ExpressJetline</span>
+                        <span>Global shippments Sprintline</span>
+                        <span>Global shippments Secureline</span>
+                        <span>Global shippments Connect</span>
+                        <span>EasyShip</span>
+                    </div>
+
+                    <p>
+                        No licence to use any of these trademarks is granted or implied. They may not be
+                        copied, downloaded, reproduced, used, modified or distributed in any way without
+                        prior written permission.
+                    </p>
+
+                    <h3>Other trademarks</h3>
+                    <p>
+                        All other trademarks or trade names referred to in these materials are the
+                        property of their respective owners.
+                    </p>
+                </section>
+
+                <!-- 4. Disclaimer of Warranties -->
+                <section id="disclaimer" class="ln-section">
+                    <div class="ln-section-header">
+                        <span class="ln-section-num">04</span>
+                        <h2>Disclaimer of warranties</h2>
+                    </div>
+
+                    <p>
+                        The services, content and information on Global shippments websites are provided on an
+                        <strong>"as is"</strong> basis. To the fullest extent permitted by law, Global shippments
+                        disclaims all warranties, whether express, implied, statutory or otherwise,
+                        including the implied warranties of merchantability, non-infringement of
+                        third-party rights, and fitness for a particular purpose.
+                    </p>
+
+                    <p>
+                        Global shippments, its affiliates and licensors make no representations or warranties
+                        about the accuracy, completeness, security or timeliness of the services, content
+                        or information provided on or through Global shippments websites or systems. No
+                        information obtained via Global shippments systems or websites creates any warranty not
+                        expressly stated in these terms and conditions.
+                    </p>
+
+                    <div class="ln-note">
+                        <i class="fas fa-scale-balanced"></i>
+                        <div>
+                            <strong>Consumer note.</strong>
+                            Some jurisdictions do not allow limitations of implied warranties, so the
+                            limitations and exclusions in this section may not apply to you. If you are
+                            dealing as a consumer, these provisions do not affect statutory rights that
+                            cannot be waived.
+                        </div>
+                    </div>
+
+                    <h3>Accuracy of information</h3>
+                    <p>
+                        These web pages may contain inadvertent inaccuracies or typographical errors.
+                        These will be corrected at Global shippments's discretion as they are found. The
+                        information on these web pages is updated regularly, but inaccuracies may remain
+                        or occur where changes take place between updates. The internet is maintained
+                        independently at multiple sites around the world, and some of the information
+                        accessed through these web pages may originate outside Global shippments. Global shippments
+                        excludes any obligation or responsibility for such content.
+                    </p>
+
+                    <h3>Viruses</h3>
+                    <p>
+                        Global shippments makes every reasonable effort to exclude viruses from these web
+                        pages, but cannot guarantee their exclusion, and no liability is accepted for
+                        viruses. Please take all appropriate safeguards before downloading information
+                        from these web pages.
+                    </p>
+                </section>
+
+                <!-- 5. Limitation of Liability -->
+                <section id="liability" class="ln-section">
+                    <div class="ln-section-header">
+                        <span class="ln-section-num">05</span>
+                        <h2>Limitation of liability</h2>
+                    </div>
+
+                    <p>
+                        To the extent permitted by law, in no event shall Global shippments, its affiliates or
+                        licensors, or any third parties mentioned on the Global shippments website, be liable
+                        for any incidental, indirect, exemplary, punitive or consequential damages, lost
+                        profits, or damages resulting from lost data or business interruption arising out
+                        of or in connection with the use of, or inability to use, the Global shippments website
+                        and Global shippments systems, services, content or information — whether based on
+                        warranty, contract, tort, delict or any other legal theory, and whether or not
+                        Global shippments has been advised of the possibility of such damages.
+                    </p>
+
+                    <p>
+                        Without limiting the foregoing, and to the extent permitted by applicable law, you
+                        agree that in no event shall Global shippments's total liability for any damages (direct
+                        or otherwise) or loss — regardless of the form of action or claim, whether in
+                        contract, tort or otherwise — exceed <strong>EUR 100.00</strong>.
+                    </p>
+
+                    <p>
+                        To the extent permitted by law, the remedies stated for you in these terms and
+                        conditions are exclusive and are limited to those expressly provided for in these
+                        terms and conditions.
+                    </p>
+                </section>
+
+                <!-- 6. Data Protection -->
+                <section id="data-protection" class="ln-section">
+                    <div class="ln-section-header">
+                        <span class="ln-section-num">06</span>
+                        <h2>Data protection overview</h2>
+                    </div>
+
+                    <p>
+                        Strict data protection standards are an integral part of the Global shippments Group's
+                        brand and, like the security of our IT systems, are of the utmost importance for
+                        our business. As a global company whose business model entails connecting people
+                        and exchanging sensitive data, we believe we have a special responsibility in this
+                        regard.
+                    </p>
+
+                    <h3>Data controller</h3>
+                    <p>
+                        The competent controller within the meaning of the General Data Protection
+                        Regulation (GDPR) is Global shippments International GmbH, Charles-de-Gaulle-Str. 20,
+                        53113 Bonn, Germany.
+                    </p>
+
+                    <h3>Data Protection Officer</h3>
+                    <p>
+                        Global shippments International GmbH<br>
+                        Gabriela Krader, LL.M<br>
+                        53250 Bonn, Germany<br>
+                        Email: <a href="mailto:datenschutz@Globalshippments.com">datenschutz@Globalshippments.com</a>
+                    </p>
+
+                    <h3>Categories of data processed</h3>
+                    <p>We process various categories of personal data depending on your relationship with us:</p>
+                    <ul>
+                        <li><strong>Contact data:</strong> name, address, phone number, email address</li>
+                        <li><strong>Shipment data:</strong> shipment details, tracking information, delivery preferences</li>
+                        <li><strong>Identification data:</strong> ID details where required for customs or delivery</li>
+                        <li><strong>Financial information:</strong> payment details, billing information</li>
+                        <li><strong>Profile data:</strong> account preferences, order history</li>
+                        <li><strong>Telecommunications data:</strong> chat transcripts, call recordings where applicable</li>
+                    </ul>
+
+                    <h3>Purposes of processing</h3>
+                    <p>We process your data for purposes including:</p>
+                    <ul>
+                        <li>Fulfilling contracts and providing services</li>
+                        <li>Ensuring website functionality and security</li>
+                        <li>Sending tailored advertising (where permitted)</li>
+                        <li>Customer service and support</li>
+                        <li>Complying with legal obligations</li>
+                        <li>Security requirements and crime prevention</li>
+                        <li>Statistical analysis and quality assurance</li>
+                    </ul>
+
+                    <h3>Your rights as a data subject</h3>
+                    <p>Under applicable data protection law, you have the right to:</p>
+                    <ul>
+                        <li>Access information about your stored data</li>
+                        <li>Rectify inaccurate data</li>
+                        <li>Request erasure of data no longer required</li>
+                        <li>Restrict processing where applicable</li>
+                        <li>Data portability</li>
+                        <li>Object to processing based on legitimate interests</li>
+                        <li>Withdraw consent at any time</li>
+                        <li>Lodge a complaint with supervisory authorities</li>
+                    </ul>
+
+                    <p>
+                        To exercise your rights, please contact us at the address in the Contact section
+                        below. See our <a href="{{ url_for('privacy') }}">Privacy Policy</a> for full details.
+                    </p>
+
+                    <h3>Duration of storage</h3>
+                    <p>
+                        Data is stored as long as necessary, considering statutory retention periods
+                        (e.g., German Commercial Code, Fiscal Code). In the absence of statutory periods,
+                        data is stored for contract fulfilment and evidence purposes until applicable
+                        liability periods expire.
+                    </p>
+
+                    <h3>Cookies and web tracking</h3>
+                    <p>
+                        Our websites use cookies and similar technologies. When you access our website, a
+                        Privacy Preference Center informs you about technically necessary cookies and
+                        requests your consent for analytical cookies.
+                    </p>
+                    <p>
+                        Technically necessary cookies are based on our legitimate interest (Art. 6(1)(f)
+                        GDPR). Other technologies are used only with your prior consent (Art. 6(1)(a) GDPR).
+                    </p>
+                </section>
+
+                <!-- 7. Export Control and Sanctions -->
+                <section id="export-control" class="ln-section">
+                    <div class="ln-section-header">
+                        <span class="ln-section-num">07</span>
+                        <h2>Export control and sanctions</h2>
+                    </div>
+
+                    <p>
+                        Export control, economic sanctions, and customs laws and regulations apply to
+                        Global shippments services and your use of online applications.
+                    </p>
+
+                    <p>
+                        You agree to comply fully with applicable trade regulations, including those of
+                        the United Nations, the European Union, the United States, the United Kingdom and
+                        local customs laws.
+                    </p>
+
+                    <h3>Your obligations</h3>
+                    <p>By using Global shippments services, you represent and warrant that:</p>
+                    <ul>
+                        <li>You are not listed on any applicable sanctions lists</li>
+                        <li>You are not a denied or restricted party</li>
+                        <li>You will refuse access to users from comprehensively sanctioned locations</li>
+                        <li>You will deny access to denied parties or those owned or controlled by them</li>
+                        <li>You will obtain required export licences for controlled technology or data</li>
+                    </ul>
+
+                    <p>
+                        If you cannot meet these requirements, you must immediately notify Global shippments in
+                        writing.
+                    </p>
+                </section>
+
+                <!-- 8. Dispute Resolution -->
+                <section id="dispute-resolution" class="ln-section">
+                    <div class="ln-section-header">
+                        <span class="ln-section-num">08</span>
+                        <h2>Dispute resolution</h2>
+                    </div>
+
+                    <h3>Governing law</h3>
+                    <p>
+                        These Terms of Use and any disputes arising from or in connection with them shall
+                        be governed by the laws of the Federal Republic of Germany, excluding its
+                        conflict-of-laws provisions and the United Nations Convention on Contracts for the
+                        International Sale of Goods (CISG).
+                    </p>
+
+                    <h3>ODR platform</h3>
+                    <p>
+                        The European Commission has established an online dispute resolution platform
+                        (ODR platform) for consumers:
+                        <a href="https://webgate.ec.europa.eu/odr" target="_blank" rel="noopener">webgate.ec.europa.eu/odr</a>.
+                        Consumers may submit complaints relating to the online purchase of goods or
+                        services via that platform.
+                    </p>
+                </section>
+
+                <!-- 9. Contact Information -->
+                <section id="contact" class="ln-section">
+                    <div class="ln-section-header">
+                        <span class="ln-section-num">09</span>
+                        <h2>Contact information</h2>
+                    </div>
+
+                    <div class="ln-contact-grid">
+                        <div class="ln-contact-item">
+                            <i class="fas fa-building"></i>
+                            <div>
+                                <h6>Registered office</h6>
+                                <p>Charles-de-Gaulle-Str. 20<br>53113 Bonn, Germany</p>
+                            </div>
+                        </div>
+                        <div class="ln-contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <h6>Phone</h6>
+                                <p><a href="tel:+492284290">+49 228 429-0</a></p>
+                            </div>
+                        </div>
+                        <div class="ln-contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h6>General inquiries</h6>
+                                <p><a href="mailto:info@Globalshippments.com">info@Globalshippments.com</a></p>
+                            </div>
+                        </div>
+                        <div class="ln-contact-item">
+                            <i class="fas fa-user-shield"></i>
+                            <div>
+                                <h6>Data Protection Officer</h6>
+                                <p><a href="mailto:datenschutz@Globalshippments.com">datenschutz@Globalshippments.com</a></p>
+                            </div>
+                        </div>
+                        <div class="ln-contact-item">
+                            <i class="fas fa-gavel"></i>
+                            <div>
+                                <h6>Legal inquiries</h6>
+                                <p><a href="mailto:legal@Globalshippments.com">legal@Globalshippments.com</a></p>
+                            </div>
+                        </div>
+                        <div class="ln-contact-item">
+                            <i class="fas fa-globe"></i>
+                            <div>
+                                <h6>Website</h6>
+                                <p><a href="{{ url_for('index') }}">Globalshippments.com</a></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 18px;">
+                        To exercise your data protection rights, please use our
+                        <a href="{{ url_for('contact') }}">contact form</a> or write to us at the address above.
+                    </p>
+                </section>
+
+                <!-- 10. Supervisory Authorities -->
+                <section id="supervisory" class="ln-section">
+                    <div class="ln-section-header">
+                        <span class="ln-section-num">10</span>
+                        <h2>Supervisory authorities</h2>
+                    </div>
+
+                    <h3>Federal Commissioner for Data Protection and Freedom of Information</h3>
+                    <p>
+                        Die Bundesbeauftragte für den Datenschutz und die Informationsfreiheit<br>
+                        Graurheindorfer Straße 153<br>
+                        53117 Bonn, Germany
+                    </p>
+
+                    <h3>State Commissioner for Data Protection of North Rhine-Westphalia</h3>
+                    <p>
+                        Landesbeauftragte für den Datenschutz Nordrhein-Westfalen<br>
+                        Kavalleriestraße 2-4<br>
+                        40213 Düsseldorf, Germany
+                    </p>
+
+                    <div class="ln-note ln-note--info">
+                        <i class="fas fa-circle-info"></i>
+                        <div>
+                            The Federal Commissioner is the competent supervisory authority for data
+                            processing in connection with mail and telecommunications services.
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Footnote -->
+                <div class="ln-footnote">
+                    <span class="date">
+                        <i class="fas fa-calendar-check"></i>
+                        Last updated: March 2026
+                    </span>
+                    <span>© 2026 Global shippments International GmbH. All rights reserved.</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* ---------- Smooth-scroll for anchor links ---------- */
+    (function () {
+        const links = document.querySelectorAll('.ln-nav-list a, .ln-content a[href^="#"]');
+        if (!links.length) return;
+
+        links.forEach(link => {
+            link.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (!href || !href.startsWith('#')) return;
+
+                const target = document.querySelector(href);
+                if (!target) return;
+
+                e.preventDefault();
+
+                const top = target.getBoundingClientRect().top +
+                            window.scrollY -
+                            (parseInt(getComputedStyle(document.documentElement)
+                                .getPropertyValue('--nav-h')) || 68) - 24;
+
+                window.scrollTo({ top, behavior: 'smooth' });
+                history.replaceState(null, '', href);
+            });
+        });
+    })();
+
+    /* ---------- Highlight the currently visible section in the sidebar ---------- */
+    (function () {
+        const sections = document.querySelectorAll('.ln-content .ln-section');
+        const navLinks = document.querySelectorAll('.ln-nav-list a');
+        if (!sections.length || !navLinks.length) return;
+
+        const map = new Map();
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) map.set(href.replace('#', ''), link);
+        });
+
+        function setActive(id) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const active = map.get(id);
+            if (active) active.classList.add('active');
+        }
+
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(entries => {
+                const visible = entries
+                    .filter(e => e.isIntersecting)
+                    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+                if (visible.length) setActive(visible[0].target.id);
+            }, {
+                rootMargin: '-30% 0px -60% 0px',
+                threshold: 0
+            });
+
+            sections.forEach(section => {
+                if (section.id) observer.observe(section);
+            });
+        } else {
+            let ticking = false;
+            function onScroll() {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    let current = '';
+                    const scrollY = window.scrollY + 200;
+                    sections.forEach(section => {
+                        if (section.offsetTop <= scrollY && section.id) current = section.id;
+                    });
+                    if (current) setActive(current);
+                    ticking = false;
+                });
+            }
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        }
+    })();
+</script>
+{% endblock %}

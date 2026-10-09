@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+
+{% block title %}Something went wrong — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — ERROR PAGE (500)
+   Consistent with the rest of the app. Full dark-mode support.
+   ========================================================================= */
+
+:root {
+    --err-surface:       #FFFFFF;
+    --err-surface-alt:   #F8FAFC;
+    --err-surface-soft:  #F1F5F9;
+    --err-line:          #E6EAF0;
+    --err-line-soft:     #EEF2F7;
+    --err-ink:           #0B1220;
+    --err-text:          #1E293B;
+    --err-muted:         #64748B;
+    --err-muted-2:       #94A3B8;
+
+    --err-danger:        #DC2626;
+    --err-danger-bg:     #FEF2F2;
+    --err-warning:       #D97706;
+    --err-warning-bg:    #FFF7ED;
+    --err-info:          #0EA5E9;
+    --err-info-bg:       #EFF9FF;
+    --err-success:       #16A34A;
+    --err-success-bg:    #ECFDF5;
+
+    --err-sh-sm: 0 2px 8px rgba(15, 23, 42, .06);
+    --err-sh-md: 0 12px 28px -14px rgba(15, 23, 42, .18);
+    --err-sh-lg: 0 30px 60px -22px rgba(15, 23, 42, .28);
+
+    --err-ease: cubic-bezier(.4, 0, .2, 1);
+    --err-dur:  220ms;
+
+    --err-r-sm: 8px;
+    --err-r-md: 12px;
+    --err-r-lg: 16px;
+    --err-r-xl: 24px;
+    --err-pill: 999px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --err-surface:      #111C30;
+        --err-surface-alt:  #0F172A;
+        --err-surface-soft: #1A273F;
+        --err-line:         #1E293B;
+        --err-line-soft:    #172A45;
+        --err-ink:          #F1F5F9;
+        --err-text:         #CBD5E1;
+        --err-muted:        #94A3B8;
+        --err-muted-2:      #64748B;
+
+        --err-danger-bg:    #2E0A0D;
+        --err-warning-bg:   #2E1A05;
+        --err-info-bg:      #0B2A3E;
+        --err-success-bg:   #052E1A;
+
+        --err-sh-sm: 0 2px 8px rgba(0, 0, 0, .5);
+        --err-sh-md: 0 12px 28px -14px rgba(0, 0, 0, .6);
+        --err-sh-lg: 0 30px 60px -22px rgba(0, 0, 0, .7);
+    }
+}
+
+body { background: var(--err-surface-alt); color: var(--err-text); }
+
+.err-page h1, .err-page h2, .err-page h3 {
+    color: var(--err-ink);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   PAGE WRAPPER
+   ========================================================================= */
+.err-page {
+    position: relative;
+    min-height: calc(100vh - var(--nav-h, 68px) - 4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(40px, 6vw, 80px) 16px;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 60% 70% at 50% 0%, rgba(225, 29, 42, .10), transparent 60%),
+        linear-gradient(180deg, var(--err-surface) 0%, var(--err-surface-alt) 100%);
+}
+.err-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(225, 29, 42, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(225, 29, 42, .035) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, #000 20%, transparent 75%);
+    pointer-events: none;
+}
+.err-page > .container { position: relative; z-index: 1; max-width: 720px; }
+
+/* =========================================================================
+   CARD
+   ========================================================================= */
+.err-card {
+    position: relative;
+    padding: clamp(32px, 5vw, 56px) clamp(28px, 5vw, 56px);
+    background: var(--err-surface);
+    border: 1px solid var(--err-line);
+    border-radius: var(--err-r-xl);
+    box-shadow: var(--err-sh-lg);
+    overflow: hidden;
+    text-align: center;
+}
+.err-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+}
+
+/* =========================================================================
+   ICON
+   ========================================================================= */
+.err-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: 2.5rem;
+    margin-bottom: 24px;
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--primary, #e11d2a) 6%, transparent);
+    animation: errPulse 2.4s var(--err-ease) infinite;
+}
+@keyframes errPulse {
+    0%, 100% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--primary, #e11d2a) 6%, transparent); }
+    50%      { box-shadow: 0 0 0 16px color-mix(in srgb, var(--primary, #e11d2a) 3%, transparent); }
+}
+
+/* =========================================================================
+   TYPOGRAPHY
+   ========================================================================= */
+.err-code {
+    display: block;
+    font-size: clamp(4rem, 10vw, 6rem);
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    color: var(--primary, #e11d2a);
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+}
+
+.err-page h1 {
+    font-size: clamp(1.4rem, 3vw, 1.85rem);
+    line-height: 1.2;
+    margin: 0 0 12px;
+    letter-spacing: -0.025em;
+}
+
+.err-page p.lead {
+    font-size: clamp(1rem, 1.3vw, 1.1rem);
+    line-height: 1.65;
+    color: var(--err-muted);
+    max-width: 520px;
+    margin: 0 auto 28px;
+}
+
+/* =========================================================================
+   HELP CARD
+   ========================================================================= */
+.err-help {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 18px;
+    margin-top: 32px;
+    background: var(--err-surface-alt);
+    border: 1px solid var(--err-line);
+    border-left: 3px solid var(--primary, #e11d2a);
+    border-radius: var(--err-r-md);
+    text-align: left;
+}
+.err-help .icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--err-r-sm);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: .95rem;
+}
+.err-help h4 {
+    font-size: .85rem;
+    font-weight: 800;
+    color: var(--err-ink);
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+}
+.err-help p {
+    font-size: .88rem;
+    line-height: 1.6;
+    color: var(--err-muted);
+    margin: 0;
+}
+.err-help p a {
+    color: var(--primary, #e11d2a);
+    text-decoration: none;
+    font-weight: 700;
+}
+.err-help p a:hover { text-decoration: underline; }
+
+/* =========================================================================
+   ACTIONS
+   ========================================================================= */
+.err-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 28px;
+}
+
+.err-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 13px 26px;
+    border: 1.5px solid transparent;
+    border-radius: var(--err-pill);
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--err-dur) var(--err-ease);
+    white-space: nowrap;
+}
+.err-btn:focus-visible { outline: 2px solid var(--primary, #e11d2a); outline-offset: 2px; }
+.err-btn i { transition: transform var(--err-dur) var(--err-ease); }
+
+.err-btn.primary {
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    box-shadow: 0 10px 22px -10px rgba(225, 29, 42, .55);
+}
+.err-btn.primary:hover,
+.err-btn.primary:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px -12px rgba(225, 29, 42, .6);
+    color: #fff;
+}
+.err-btn.primary:hover i { transform: translateX(3px); }
+
+.err-btn.ghost {
+    background: transparent;
+    color: var(--err-text);
+    border-color: var(--err-line);
+}
+.err-btn.ghost:hover,
+.err-btn.ghost:focus-visible {
+    border-color: var(--err-ink);
+    color: var(--err-ink);
+    background: var(--err-surface-alt);
+    transform: translateY(-2px);
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+@media (max-width: 520px) {
+    .err-card { padding: 28px 22px; }
+    .err-icon { width: 76px; height: 76px; font-size: 2rem; }
+    .err-actions { flex-direction: column; align-items: stretch; }
+    .err-btn { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+@media print {
+    .err-page::before, .err-actions, .err-help,
+    .navbar, footer, .back-to-top { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .err-page { background: #fff !important; min-height: auto; padding: 20px 0; }
+    .err-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="err-page">
+    <div class="container">
+        <div class="err-card">
+
+            <span class="err-icon" aria-hidden="true">
+                <i class="fas fa-triangle-exclamation"></i>
+            </span>
+
+            <span class="err-code">500</span>
+
+            <h1>Something went wrong on our end</h1>
+
+            <p class="lead">
+                A server error prevented this page from loading. Our team has been notified
+                and is looking into it. Please try again in a moment.
+            </p>
+
+            <div class="err-help" role="note">
+                <span class="icon"><i class="fas fa-life-ring"></i></span>
+                <div>
+                    <h4>Still not working?</h4>
+                    <p>
+                        Refresh the page, or head back to the
+                        <a href="{{ url_for('index') }}">homepage</a>.
+                        If the problem continues, contact
+                        <a href="{{ url_for('contact') }}">support</a>.
+                    </p>
+                </div>
+            </div>
+
+            <div class="err-actions">
+                <a href="{{ url_for('index') }}" class="err-btn primary">
+                    <i class="fas fa-arrow-left"></i> Return home
+                </a>
+                <button type="button" class="err-btn ghost" onclick="window.location.reload()">
+                    <i class="fas fa-rotate-right"></i> Try again
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

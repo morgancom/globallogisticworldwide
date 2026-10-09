@@ -1,0 +1,820 @@
+{% extends "base.html" %}
+
+{% block title %}User Management — Global shippments Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — USER MANAGEMENT (ADMIN)
+   List of admin users with quick actions.
+   Uses base.html design tokens. Full dark-mode support.
+   ========================================================================= */
+
+:root {
+    --um-surface:       #FFFFFF;
+    --um-surface-alt:   #F8FAFC;
+    --um-surface-soft:  #F1F5F9;
+    --um-line:          #E6EAF0;
+    --um-line-soft:     #EEF2F7;
+    --um-ink:           #0B1220;
+    --um-text:          #1E293B;
+    --um-muted:         #64748B;
+    --um-muted-2:       #94A3B8;
+
+    --um-success:       #16A34A;
+    --um-success-bg:    #ECFDF5;
+    --um-danger:        #DC2626;
+    --um-danger-bg:     #FEF2F2;
+    --um-warning:       #D97706;
+    --um-warning-bg:    #FFF7ED;
+    --um-info:          #0EA5E9;
+    --um-info-bg:       #EFF9FF;
+    --um-neutral:       #475569;
+    --um-neutral-bg:    #F1F5F9;
+
+    --um-sh-xs: 0 1px 2px rgba(15, 23, 42, .04);
+    --um-sh-sm: 0 2px 8px rgba(15, 23, 42, .06);
+    --um-sh-md: 0 12px 28px -14px rgba(15, 23, 42, .18);
+    --um-sh-lg: 0 30px 60px -22px rgba(15, 23, 42, .28);
+
+    --um-ease: cubic-bezier(.4, 0, .2, 1);
+    --um-dur:  220ms;
+
+    --um-r-sm: 8px;
+    --um-r-md: 12px;
+    --um-r-lg: 16px;
+    --um-r-xl: 24px;
+    --um-pill: 999px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --um-surface:      #111C30;
+        --um-surface-alt:  #0F172A;
+        --um-surface-soft: #1A273F;
+        --um-line:         #1E293B;
+        --um-line-soft:    #172A45;
+        --um-ink:          #F1F5F9;
+        --um-text:         #CBD5E1;
+        --um-muted:        #94A3B8;
+        --um-muted-2:      #64748B;
+
+        --um-success-bg:   #052E1A;
+        --um-danger-bg:    #2E0A0D;
+        --um-warning-bg:   #2E1A05;
+        --um-info-bg:      #0B2A3E;
+        --um-neutral-bg:   #1E293B;
+
+        --um-sh-xs: 0 1px 2px rgba(0, 0, 0, .4);
+        --um-sh-sm: 0 2px 8px rgba(0, 0, 0, .5);
+        --um-sh-md: 0 12px 28px -14px rgba(0, 0, 0, .6);
+        --um-sh-lg: 0 30px 60px -22px rgba(0, 0, 0, .7);
+    }
+}
+
+body { background: var(--um-surface-alt); color: var(--um-text); }
+
+.um-page h1, .um-page h2, .um-page h3,
+.um-page h4, .um-page h5, .um-page h6 {
+    color: var(--um-ink);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+.um-hero {
+    position: relative;
+    padding: clamp(28px, 4vw, 44px) 0 clamp(24px, 3vw, 32px);
+    background:
+        radial-gradient(ellipse 60% 70% at 20% 20%, rgba(225, 29, 42, .12), transparent 60%),
+        linear-gradient(180deg, #0b1220, #1a1a2a);
+    color: #fff;
+    overflow: hidden;
+}
+.um-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    pointer-events: none;
+}
+.um-hero > .container { position: relative; z-index: 1; max-width: 1440px; }
+
+.um-hero-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+}
+
+.um-hero-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 8px;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+}
+.um-hero-title .hero-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: var(--um-r-md);
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+    box-shadow: 0 10px 22px -8px rgba(225, 29, 42, .55);
+}
+.um-hero-sub {
+    font-size: .92rem;
+    color: rgba(255, 255, 255, .78);
+    margin: 0;
+    max-width: 620px;
+}
+
+.um-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 24px;
+    border-radius: var(--um-pill);
+    background: #fff;
+    color: #0b1220;
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all var(--um-dur) var(--um-ease);
+    box-shadow: 0 12px 28px -10px rgba(0, 0, 0, .45);
+    white-space: nowrap;
+    border: 1.5px solid transparent;
+}
+.um-hero-btn:hover,
+.um-hero-btn:focus-visible {
+    transform: translateY(-2px);
+    background: #f1f5f9;
+    color: #0b1220;
+}
+.um-hero-btn i { transition: transform var(--um-dur) var(--um-ease); }
+.um-hero-btn:hover i { transform: scale(1.05); }
+
+/* =========================================================================
+   SHELL
+   ========================================================================= */
+.um-shell {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: clamp(20px, 3vw, 32px) 16px 60px;
+}
+
+/* =========================================================================
+   STATS
+   ========================================================================= */
+.um-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 22px;
+}
+@media (max-width: 900px) { .um-stats { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .um-stats { grid-template-columns: 1fr; } }
+
+.um-stat {
+    position: relative;
+    padding: 22px 24px;
+    background: var(--um-surface);
+    border: 1px solid var(--um-line);
+    border-left: 4px solid var(--um-muted-2);
+    border-radius: var(--um-r-lg);
+    box-shadow: var(--um-sh-xs);
+    overflow: hidden;
+    transition: all var(--um-dur) var(--um-ease);
+}
+.um-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--um-sh-md);
+}
+.um-stat.primary { border-left-color: var(--primary, #e11d2a); }
+.um-stat.success { border-left-color: var(--um-success); }
+.um-stat.info    { border-left-color: var(--um-info); }
+
+.um-stat-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+.um-stat-label {
+    display: block;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--um-muted);
+    margin-bottom: 8px;
+}
+.um-stat-value {
+    display: block;
+    font-size: clamp(1.7rem, 3vw, 2.15rem);
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    color: var(--um-ink);
+    line-height: 1;
+    margin-bottom: 12px;
+    font-variant-numeric: tabular-nums;
+}
+.um-stat-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--um-r-md);
+    background: var(--um-surface-soft);
+    color: var(--um-muted);
+    font-size: 1.15rem;
+    transition: all var(--um-dur) var(--um-ease);
+}
+.um-stat.primary .um-stat-icon { background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent); color: var(--primary, #e11d2a); }
+.um-stat.success .um-stat-icon { background: var(--um-success-bg); color: var(--um-success); }
+.um-stat.info    .um-stat-icon { background: var(--um-info-bg);    color: var(--um-info); }
+
+.um-stat:hover .um-stat-icon { transform: scale(1.05) rotate(-4deg); }
+.um-stat.primary:hover .um-stat-icon { background: var(--primary, #e11d2a); color: #fff; }
+.um-stat.success:hover .um-stat-icon { background: var(--um-success); color: #fff; }
+.um-stat.info:hover    .um-stat-icon { background: var(--um-info);    color: #fff; }
+
+.um-stat-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: var(--um-pill);
+    background: var(--um-surface-soft);
+    color: var(--um-muted);
+    font-size: .74rem;
+    font-weight: 700;
+}
+.um-stat-note i { font-size: .85em; }
+.um-stat.primary .um-stat-note { background: color-mix(in srgb, var(--primary, #e11d2a) 8%, transparent); color: var(--primary, #e11d2a); }
+.um-stat.success .um-stat-note { background: var(--um-success-bg); color: var(--um-success); }
+.um-stat.info    .um-stat-note { background: var(--um-info-bg);    color: var(--um-info); }
+
+/* =========================================================================
+   TABLE CARD
+   ========================================================================= */
+.um-card {
+    background: var(--um-surface);
+    border: 1px solid var(--um-line);
+    border-radius: var(--um-r-lg);
+    box-shadow: var(--um-sh-sm);
+    overflow: hidden;
+}
+.um-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--um-line-soft);
+    flex-wrap: wrap;
+}
+.um-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .92rem;
+    font-weight: 800;
+    color: var(--um-ink);
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-transform: uppercase;
+}
+.um-card-title .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--um-r-sm);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: .85rem;
+    flex-shrink: 0;
+}
+.um-count-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--um-pill);
+    background: var(--um-surface-soft);
+    color: var(--um-muted);
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+/* =========================================================================
+   TABLE
+   ========================================================================= */
+.um-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.um-table thead th {
+    padding: 12px 20px;
+    background: var(--um-surface-soft);
+    color: var(--um-muted);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-align: left;
+    border-bottom: 1px solid var(--um-line);
+    white-space: nowrap;
+}
+.um-table tbody td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--um-line-soft);
+    font-size: .9rem;
+    color: var(--um-text);
+    vertical-align: middle;
+}
+.um-table tbody tr { transition: background var(--um-dur) var(--um-ease); }
+.um-table tbody tr:hover {
+    background: color-mix(in srgb, var(--primary, #e11d2a) 3%, var(--um-surface));
+}
+.um-table tbody tr:last-child td { border-bottom: 0; }
+
+/* ID chip */
+.um-id {
+    display: inline-block;
+    padding: 3px 10px;
+    background: var(--um-surface-soft);
+    border: 1px solid var(--um-line);
+    border-radius: var(--um-r-sm);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--um-ink);
+    letter-spacing: .01em;
+}
+
+/* User cell */
+.um-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+.um-avatar {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    font-size: .9rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px -4px rgba(225, 29, 42, .4);
+}
+.um-user-meta {
+    min-width: 0;
+}
+.um-user-name {
+    display: block;
+    font-weight: 700;
+    color: var(--um-ink);
+    font-size: .9rem;
+    letter-spacing: -0.01em;
+    word-break: break-word;
+}
+.um-user-handle {
+    display: block;
+    font-size: .78rem;
+    color: var(--um-muted);
+    word-break: break-all;
+}
+
+/* Email cell */
+.um-email a {
+    color: var(--primary, #e11d2a);
+    text-decoration: none;
+    font-weight: 600;
+    word-break: break-all;
+}
+.um-email a:hover { text-decoration: underline; }
+.um-email .muted { color: var(--um-muted-2); }
+
+/* Badges */
+.um-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: var(--um-pill);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+.um-badge i { font-size: .85em; }
+.um-badge.success {
+    background: var(--um-success-bg);
+    color: var(--um-success);
+    border-color: color-mix(in srgb, var(--um-success) 25%, transparent);
+}
+.um-badge.danger {
+    background: var(--um-danger-bg);
+    color: var(--um-danger);
+    border-color: color-mix(in srgb, var(--um-danger) 25%, transparent);
+}
+.um-badge.warning {
+    background: var(--um-warning-bg);
+    color: var(--um-warning);
+    border-color: color-mix(in srgb, var(--um-warning) 25%, transparent);
+}
+.um-badge.info {
+    background: var(--um-info-bg);
+    color: var(--um-info);
+    border-color: color-mix(in srgb, var(--um-info) 25%, transparent);
+}
+.um-badge.primary {
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    border-color: color-mix(in srgb, var(--primary, #e11d2a) 25%, transparent);
+}
+.um-badge.secondary {
+    background: var(--um-neutral-bg);
+    color: var(--um-neutral);
+    border-color: color-mix(in srgb, var(--um-neutral) 20%, transparent);
+}
+
+/* Actions */
+.um-actions {
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.um-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1.5px solid transparent;
+    border-radius: var(--um-r-sm);
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--um-dur) var(--um-ease);
+    white-space: nowrap;
+}
+.um-btn:focus-visible { outline: 2px solid var(--primary, #e11d2a); outline-offset: 2px; }
+.um-btn i { font-size: .9em; }
+
+.um-btn.primary {
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+}
+.um-btn.primary:hover {
+    background: var(--primary, #e11d2a);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -8px rgba(225, 29, 42, .5);
+}
+
+.um-btn.danger {
+    background: transparent;
+    color: var(--um-danger);
+    border-color: var(--um-danger);
+}
+.um-btn.danger:hover {
+    background: var(--um-danger);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -8px rgba(220, 38, 38, .5);
+}
+
+/* =========================================================================
+   EMPTY STATE
+   ========================================================================= */
+.um-empty {
+    padding: 60px 24px;
+    text-align: center;
+}
+.um-empty .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: 1.75rem;
+    margin-bottom: 18px;
+}
+.um-empty h3 {
+    font-size: 1.1rem;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+}
+.um-empty p {
+    font-size: .92rem;
+    color: var(--um-muted);
+    margin: 0 0 24px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+/* =========================================================================
+   RESPONSIVE — table → cards on mobile
+   ========================================================================= */
+@media (max-width: 900px) {
+    .um-table thead { display: none; }
+    .um-table,
+    .um-table tbody,
+    .um-table tr,
+    .um-table td { display: block; width: 100%; }
+    .um-table tbody tr {
+        margin-bottom: 14px;
+        background: var(--um-surface);
+        border: 1px solid var(--um-line);
+        border-radius: var(--um-r-md);
+        overflow: hidden;
+    }
+    .um-table tbody tr:last-child { margin-bottom: 0; }
+    .um-table tbody td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 18px;
+        text-align: right;
+        border-bottom: 1px solid var(--um-line-soft);
+    }
+    .um-table tbody td::before {
+        content: attr(data-label);
+        flex: 0 0 auto;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--um-muted);
+        text-align: left;
+    }
+    .um-table tbody td:last-child { border-bottom: 0; }
+
+    /* User cell stacks without the label */
+    .um-table tbody td[data-label="User"] {
+        display: block;
+        text-align: left;
+    }
+    .um-table tbody td[data-label="User"]::before { display: none; }
+
+    .um-actions { justify-content: flex-end; }
+
+    .um-hero-inner { flex-direction: column; align-items: stretch; }
+    .um-hero-btn { justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+@media print {
+    .um-hero::before, .um-hero-btn, .um-actions,
+    .navbar, footer, .back-to-top { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .um-hero { background: #fff !important; color: #000 !important; padding: 20px 0 !important; border-bottom: 2px solid #000; box-shadow: none; }
+    .um-hero-title, .um-hero-sub { color: #000 !important; }
+    .um-card, .um-stat { box-shadow: none !important; border: 1px solid #ddd !important; }
+    .um-badge, .um-id { border: 1px solid #000; color: #000 !important; background: transparent !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="um-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="um-hero">
+        <div class="container">
+            <div class="um-hero-inner">
+                <div>
+                    <h1 class="um-hero-title">
+                        <span class="hero-icon"><i class="fas fa-users-gear"></i></span>
+                        User management
+                    </h1>
+                    <p class="um-hero-sub">
+                        Create, edit and manage administrator and staff accounts for Global shippments.
+                    </p>
+                </div>
+
+                <a class="um-hero-btn" href="{{ url_for('admin_register') }}">
+                    <i class="fas fa-user-plus"></i> Add user
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SHELL ==================== -->
+    <div class="um-shell">
+
+        {% if users %}
+        <!-- ==================== STATS ==================== -->
+        <section class="um-stats" aria-label="User statistics">
+            <div class="um-stat primary">
+                <div class="um-stat-row">
+                    <div>
+                        <span class="um-stat-label">Total users</span>
+                        <span class="um-stat-value">{{ users|length }}</span>
+                    </div>
+                    <div class="um-stat-icon"><i class="fas fa-users"></i></div>
+                </div>
+                <span class="um-stat-note">
+                    <i class="fas fa-circle-info"></i> All registered accounts
+                </span>
+            </div>
+
+            <div class="um-stat success">
+                <div class="um-stat-row">
+                    <div>
+                        <span class="um-stat-label">Active users</span>
+                        <span class="um-stat-value">{{ users|selectattr('is_active', 'equalto', True)|list|length }}</span>
+                    </div>
+                    <div class="um-stat-icon"><i class="fas fa-user-check"></i></div>
+                </div>
+                <span class="um-stat-note">
+                    <i class="fas fa-circle-check"></i> Currently enabled
+                </span>
+            </div>
+
+            <div class="um-stat info">
+                <div class="um-stat-row">
+                    <div>
+                        <span class="um-stat-label">Administrators</span>
+                        <span class="um-stat-value">{{ users|selectattr('role', 'equalto', 'admin')|list|length }}</span>
+                    </div>
+                    <div class="um-stat-icon"><i class="fas fa-shield-halved"></i></div>
+                </div>
+                <span class="um-stat-note">
+                    <i class="fas fa-key"></i> Full access
+                </span>
+            </div>
+        </section>
+
+        <!-- ==================== TABLE CARD ==================== -->
+        <div class="um-card">
+            <div class="um-card-header">
+                <h2 class="um-card-title">
+                    <span class="icon"><i class="fas fa-list"></i></span>
+                    All users
+                </h2>
+                <span class="um-count-pill">
+                    <i class="fas fa-users"></i> {{ users|length }} {{ 'user' if users|length == 1 else 'users' }}
+                </span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="um-table" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td data-label="ID">
+                                <span class="um-id">{{ u.id }}</span>
+                            </td>
+
+                            <td data-label="User">
+                                <div class="um-user">
+                                    <span class="um-avatar">
+                                        {{ (u.full_name or u.username or '?')[0] }}
+                                    </span>
+                                    <div class="um-user-meta">
+                                        <span class="um-user-name">{{ u.full_name or u.username }}</span>
+                                        <span class="um-user-handle">@{{ u.username }}</span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td data-label="Email">
+                                <span class="um-email">
+                                    {% if u.email %}
+                                        <a href="mailto:{{ u.email }}">{{ u.email }}</a>
+                                    {% else %}
+                                        <span class="muted">—</span>
+                                    {% endif %}
+                                </span>
+                            </td>
+
+                            <td data-label="Role">
+                                {% if u.role == 'admin' %}
+                                    <span class="um-badge primary"><i class="fas fa-shield-halved"></i> Admin</span>
+                                {% elif u.role == 'super_admin' %}
+                                    <span class="um-badge danger"><i class="fas fa-crown"></i> Super admin</span>
+                                {% elif u.role == 'viewer' %}
+                                    <span class="um-badge info"><i class="fas fa-eye"></i> Viewer</span>
+                                {% else %}
+                                    <span class="um-badge secondary"><i class="fas fa-user"></i> User</span>
+                                {% endif %}
+                            </td>
+
+                            <td data-label="Status">
+                                {% if u.is_active %}
+                                    <span class="um-badge success"><i class="fas fa-circle"></i> Active</span>
+                                {% else %}
+                                    <span class="um-badge danger"><i class="fas fa-circle"></i> Inactive</span>
+                                {% endif %}
+                            </td>
+
+                            <td data-label="Actions">
+                                <div class="um-actions">
+                                    <a class="um-btn primary"
+                                       href="{{ url_for('admin_edit_user', user_id=u.id) }}"
+                                       title="Edit user" aria-label="Edit user">
+                                        <i class="fas fa-pen"></i> Edit
+                                    </a>
+                                    <a class="um-btn danger"
+                                       href="{{ url_for('admin_delete_user', user_id=u.id) }}"
+                                       onclick="return confirm('Are you sure you want to delete this user? This cannot be undone.');"
+                                       title="Delete user" aria-label="Delete user">
+                                        <i class="fas fa-trash-can"></i> Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- ==================== EMPTY STATE ==================== -->
+        <div class="um-card">
+            <div class="um-empty">
+                <div class="icon"><i class="fas fa-users"></i></div>
+                <h3>No users yet</h3>
+                <p>
+                    Once you add your first user, they'll show up here with their role,
+                    status and quick actions for editing or removal.
+                </p>
+                <a href="{{ url_for('admin_register') }}" class="um-hero-btn" style="display: inline-flex; background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18)); color: #fff; box-shadow: 0 12px 28px -10px rgba(225, 29, 42, .5);">
+                    <i class="fas fa-user-plus"></i> Add your first user
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

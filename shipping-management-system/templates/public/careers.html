@@ -1,0 +1,1394 @@
+{% extends "base.html" %}
+
+{% block title %}Careers — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — CAREERS PAGE
+   Extends base.html tokens. Matches the index page look & feel.
+   ========================================================================= */
+
+body { background: var(--bg); color: var(--text); }
+
+.cr-page h1, .cr-page h2, .cr-page h3,
+.cr-page h4, .cr-page h5, .cr-page h6 {
+    color: var(--text-strong);
+    letter-spacing: -0.015em;
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+.cr-hero {
+    position: relative;
+    padding: clamp(64px, 9vw, 120px) 0 clamp(56px, 8vw, 100px);
+    color: #fff;
+    overflow: hidden;
+    background:
+        linear-gradient(100deg,
+            rgba(15, 13, 11, .94) 0%,
+            rgba(15, 13, 11, .86) 40%,
+            rgba(15, 13, 11, .58) 72%,
+            rgba(15, 13, 11, .35) 100%),
+        url("https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=2000&q=85") center/cover no-repeat;
+}
+.cr-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 50% 60% at 15% 50%, var(--primary-glow), transparent 70%);
+    pointer-events: none;
+}
+.cr-hero > .container { position: relative; z-index: 1; }
+
+.cr-hero .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    border-radius: var(--r-md);
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .16);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+}
+.cr-hero .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
+.cr-hero h1 {
+    font-size: clamp(2.35rem, 5.2vw, 4rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin: 0 0 20px;
+    max-width: 900px;
+}
+.cr-hero h1 em {
+    font-style: normal;
+    color: #e5c9cd;
+}
+
+.cr-hero .lead {
+    font-size: clamp(1rem, 1.3vw, 1.1rem);
+    line-height: 1.65;
+    color: #d5d1c9;
+    max-width: 720px;
+    margin: 0 0 32px;
+}
+
+.cr-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.cr-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: var(--r-md);
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+}
+.cr-hero-btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+.cr-hero-btn.primary:hover,
+.cr-hero-btn.primary:focus-visible {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: #fff;
+}
+.cr-hero-btn.ghost {
+    background: transparent;
+    color: #fff;
+    border-color: rgba(255, 255, 255, .4);
+}
+.cr-hero-btn.ghost:hover,
+.cr-hero-btn.ghost:focus-visible {
+    background: rgba(255, 255, 255, .08);
+    border-color: rgba(255, 255, 255, .7);
+    color: #fff;
+}
+
+/* =========================================================================
+   SECTION HELPERS
+   ========================================================================= */
+.cr-section { padding: clamp(56px, 7vw, 96px) 0; }
+
+.cr-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: clamp(28px, 4vw, 44px);
+}
+.cr-heading-text h2 {
+    font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    color: var(--text-strong);
+}
+.cr-heading-text p {
+    font-size: .98rem;
+    color: var(--muted);
+    margin: 0;
+}
+.cr-heading-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: var(--r-sm);
+    background: var(--primary-50);
+    color: var(--primary);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* =========================================================================
+   TRUST STRIP
+   ========================================================================= */
+.cr-trust {
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 0;
+}
+.cr-trust-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px 52px;
+}
+.cr-trust-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.cr-trust-item i { color: var(--primary); font-size: 1.05rem; }
+
+/* =========================================================================
+   DEPARTMENT FILTERS
+   ========================================================================= */
+.cr-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 26px;
+    padding: 14px 16px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+}
+.cr-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    background: var(--bg-elev);
+    color: var(--text);
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+}
+.cr-filter:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.cr-filter.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+.cr-filter .count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--r-sm);
+    background: var(--bg-soft);
+    color: var(--muted);
+    font-size: .7rem;
+    font-weight: 700;
+}
+.cr-filter.active .count {
+    background: rgba(255, 255, 255, .22);
+    color: #fff;
+}
+
+/* =========================================================================
+   JOB CARDS
+   ========================================================================= */
+.cr-jobs {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.cr-job {
+    position: relative;
+    padding: 24px 26px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--r-lg);
+    transition:
+        border-color var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease);
+}
+.cr-job:hover {
+    border-color: var(--border-strong);
+    border-left-color: var(--primary);
+    box-shadow: var(--sh-sm);
+}
+
+.cr-job-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.cr-job h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+    color: var(--text-strong);
+    transition: color var(--dur) var(--ease);
+}
+.cr-job:hover h3 { color: var(--primary); }
+
+.cr-job-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--r-sm);
+    background: #f2f8f3;
+    color: #2f6b3c;
+    border: 1px solid #d4e6d8;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+@media (prefers-color-scheme: dark) {
+    .cr-job-type {
+        background: #16261a;
+        color: #8ec99e;
+        border-color: #24402c;
+    }
+}
+
+.cr-job-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-bottom: 14px;
+    font-size: .84rem;
+    color: var(--muted);
+}
+.cr-job-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.cr-job-meta i {
+    color: var(--primary);
+    font-size: .85em;
+    width: 14px;
+    text-align: center;
+}
+
+.cr-job-description {
+    font-size: .92rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin: 0 0 20px;
+}
+
+.cr-job-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+.cr-job-posted {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .8rem;
+    color: var(--muted);
+}
+.cr-job-posted i { color: var(--muted); }
+
+.cr-btn-apply {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 22px;
+    border: 1px solid var(--primary);
+    border-radius: var(--r-md);
+    background: var(--primary);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+}
+.cr-btn-apply:hover,
+.cr-btn-apply:focus-visible {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: #fff;
+}
+.cr-btn-apply i { transition: transform var(--dur) var(--ease); }
+.cr-btn-apply:hover i { transform: translateX(3px); }
+
+@media (max-width: 640px) {
+    .cr-job { padding: 20px; }
+    .cr-btn-apply { width: 100%; justify-content: center; }
+}
+
+/* =========================================================================
+   JOB ALERTS
+   ========================================================================= */
+.cr-alert {
+    margin-top: 22px;
+    padding: 26px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--r-lg);
+    text-align: center;
+}
+.cr-alert h3 {
+    font-size: 1.02rem;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+    color: var(--text-strong);
+}
+.cr-alert h3 i { color: var(--primary); margin-right: 8px; }
+.cr-alert p {
+    font-size: .9rem;
+    color: var(--muted);
+    margin: 0 0 18px;
+    line-height: 1.55;
+}
+.cr-alert-form {
+    display: flex;
+    gap: 8px;
+    max-width: 520px;
+    margin: 0 auto;
+}
+.cr-alert-form input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 12px 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    background: var(--bg-elev);
+    color: var(--text);
+    font-size: .92rem;
+    outline: none;
+    transition:
+        border-color var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease);
+}
+.cr-alert-form input::placeholder { color: var(--muted); }
+.cr-alert-form input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.cr-alert-form button {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border: 1px solid var(--primary);
+    border-radius: var(--r-md);
+    background: var(--primary);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease);
+}
+.cr-alert-form button:hover {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+}
+@media (max-width: 560px) {
+    .cr-alert-form { flex-direction: column; }
+    .cr-alert-form button { width: 100%; justify-content: center; }
+}
+
+/* =========================================================================
+   SIDEBAR
+   ========================================================================= */
+.cr-sidebar {
+    position: sticky;
+    top: calc(var(--nav-h) + 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+@media (max-width: 992px) {
+    .cr-sidebar { position: static; margin-top: 32px; }
+}
+
+.cr-why {
+    padding: 26px 24px;
+    border-radius: var(--r-lg);
+    background: #171512;
+    color: #d5d1c9;
+    border-top: 3px solid var(--primary);
+}
+.cr-why h3 {
+    font-size: 1.05rem;
+    color: #f4f2ee;
+    margin: 0 0 18px;
+    letter-spacing: -0.01em;
+    position: relative;
+    padding-bottom: 12px;
+    font-weight: 700;
+}
+.cr-why h3::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 32px;
+    height: 2px;
+    background: var(--primary);
+}
+
+.cr-why ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 22px;
+    display: grid;
+    gap: 10px;
+}
+.cr-why ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: .87rem;
+    line-height: 1.55;
+    color: #b8b2a7;
+}
+.cr-why ul li i {
+    color: var(--primary);
+    font-size: .95rem;
+    flex-shrink: 0;
+    margin-top: 3px;
+    width: 18px;
+    text-align: center;
+}
+
+.cr-contact {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 20px;
+    border: 1px solid rgba(255, 255, 255, .25);
+    border-radius: var(--r-md);
+    background: transparent;
+    color: #f4f2ee;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+}
+.cr-contact:hover,
+.cr-contact:focus-visible {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.cr-why-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, .1);
+}
+.cr-why-stat { text-align: center; }
+.cr-why-stat .num {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #f4f2ee;
+    line-height: 1;
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+}
+.cr-why-stat .lbl {
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #918b80;
+}
+
+/* ---------- Benefits card ---------- */
+.cr-benefits {
+    padding: 22px 22px 24px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+}
+.cr-benefits h4 {
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.cr-benefits h4 i { color: var(--primary); }
+
+.cr-benefits ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+}
+.cr-benefits ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: .86rem;
+    line-height: 1.55;
+    color: var(--text);
+}
+.cr-benefits ul li::before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--primary-50);
+    color: var(--primary);
+    font-size: .6rem;
+    margin-top: 3px;
+}
+
+/* =========================================================================
+   STATS STRIP
+   ========================================================================= */
+.cr-stats {
+    position: relative;
+    padding: clamp(56px, 7vw, 88px) 0;
+    color: #fff;
+    overflow: hidden;
+    background:
+        linear-gradient(110deg, rgba(15, 13, 11, .93), rgba(15, 13, 11, .82)),
+        url("https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=2000&q=80") center/cover no-repeat;
+}
+.cr-stats::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 0%, var(--primary-glow), transparent 70%);
+    pointer-events: none;
+}
+.cr-stats .container { position: relative; }
+
+.cr-stats-heading {
+    text-align: center;
+    margin-bottom: clamp(36px, 4vw, 52px);
+}
+.cr-stats-heading h2 {
+    font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+    color: #fff;
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+}
+.cr-stats-heading p { color: #9a948a; margin: 0; font-size: 1rem; }
+
+.cr-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+.cr-stat {
+    text-align: center;
+    padding: 12px 20px;
+    border-right: 1px solid rgba(255, 255, 255, .1);
+}
+.cr-stat:last-child { border-right: 0; }
+.cr-stat-number {
+    font-size: clamp(2rem, 4.4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: #fff;
+    margin-bottom: 12px;
+    font-variant-numeric: tabular-nums;
+}
+.cr-stat-label {
+    color: #9a948a;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+@media (max-width: 820px) {
+    .cr-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 30px 0; }
+    .cr-stat:nth-child(2),
+    .cr-stat:nth-child(4) { border-right: 0; }
+    .cr-stat:nth-child(1),
+    .cr-stat:nth-child(2) { border-bottom: 1px solid rgba(255, 255, 255, .1); padding-bottom: 30px; }
+    .cr-stat:nth-child(3),
+    .cr-stat:nth-child(4) { padding-top: 30px; }
+}
+@media (max-width: 480px) {
+    .cr-stats-grid { grid-template-columns: 1fr; gap: 0; }
+    .cr-stat {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+        padding: 24px 0;
+    }
+    .cr-stat:last-child { border-bottom: 0; }
+}
+
+/* =========================================================================
+   CTA
+   ========================================================================= */
+.cr-cta {
+    text-align: center;
+    padding: clamp(56px, 7vw, 88px) clamp(28px, 5vw, 64px);
+    border-radius: var(--r-lg);
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+}
+.cr-cta h2 {
+    font-size: clamp(1.6rem, 3.4vw, 2.25rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+    color: var(--text-strong);
+}
+.cr-cta p {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--muted);
+    max-width: 620px;
+    margin: 0 auto 28px;
+}
+.cr-cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+.cr-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: var(--r-md);
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+}
+.cr-cta-btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+.cr-cta-btn.primary:hover,
+.cr-cta-btn.primary:focus-visible {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: #fff;
+}
+.cr-cta-btn.ghost {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border-strong);
+}
+.cr-cta-btn.ghost:hover,
+.cr-cta-btn.ghost:focus-visible {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-50);
+}
+
+/* =========================================================================
+   NOTIFICATIONS
+   ========================================================================= */
+.cr-toast {
+    position: fixed;
+    top: 88px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    min-width: 260px;
+    max-width: calc(100vw - 48px);
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--r-md);
+    box-shadow: var(--sh-lg);
+    font-size: .88rem;
+    font-weight: 500;
+    color: var(--text);
+    animation: crToastIn 200ms var(--ease);
+}
+.cr-toast i { font-size: 1.05rem; color: var(--primary); flex-shrink: 0; }
+.cr-toast.success { border-left-color: #4c8a5c; }
+.cr-toast.success i { color: #4c8a5c; }
+.cr-toast.warning { border-left-color: #b8862d; }
+.cr-toast.warning i { color: #b8862d; }
+.cr-toast.info    { border-left-color: #4b8ab8; }
+.cr-toast.info    i { color: #4b8ab8; }
+.cr-toast.fade-out { animation: crToastOut 200ms var(--ease) forwards; }
+
+@keyframes crToastIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes crToastOut {
+    to { opacity: 0; transform: translateX(20px); }
+}
+@media (max-width: 576px) {
+    .cr-toast { left: 16px; right: 16px; top: 76px; min-width: auto; }
+}
+
+/* =========================================================================
+   ANIMATIONS
+   ========================================================================= */
+@keyframes crFadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.cr-job.is-entering {
+    animation: crFadeUp 300ms var(--ease) both;
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .cr-hero-actions, .cr-filters, .cr-alert-form button,
+    .cr-btn-apply, .cr-contact, .cr-cta-actions,
+    .navbar, footer, .back-to-top { display: none !important; }
+    .cr-hero { background: #fff !important; color: #000 !important; padding: 30px 0 !important; }
+    .cr-hero h1, .cr-hero .lead { color: #000 !important; }
+    .cr-job, .cr-why, .cr-cta { box-shadow: none !important; border: 1px solid #ddd !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cr-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="cr-hero">
+        <div class="container">
+            <span class="eyebrow">Careers at Global shippments</span>
+            <h1>Build the future of logistics <em>with us.</em></h1>
+            <p class="lead">
+                We're a team of problem-solvers, engineers and operators connecting people and businesses
+                across more than 220 countries. If you want work that moves the world, you'll fit right in.
+            </p>
+            <div class="cr-hero-actions">
+                <a href="#openings" class="cr-hero-btn primary">
+                    View open roles <i class="fas fa-arrow-down"></i>
+                </a>
+                <a href="#contact" class="cr-hero-btn ghost">
+                    Talk to recruiting <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TRUST STRIP ==================== -->
+    <div class="cr-trust">
+        <div class="container">
+            <div class="cr-trust-inner">
+                <span class="cr-trust-item"><i class="fas fa-globe"></i> 220+ countries</span>
+                <span class="cr-trust-item"><i class="fas fa-users"></i> 500,000+ colleagues</span>
+                <span class="cr-trust-item"><i class="fas fa-graduation-cap"></i> Learning &amp; development budget</span>
+                <span class="cr-trust-item"><i class="fas fa-house"></i> Hybrid &amp; remote roles</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== OPEN POSITIONS ==================== -->
+    <section class="cr-section" id="openings">
+        <div class="container">
+            <div class="cr-heading">
+                <div class="cr-heading-text">
+                    <h2>Open positions</h2>
+                    <p>Roles across logistics, engineering, operations and customer experience.</p>
+                </div>
+                <span class="cr-heading-count" id="jobCount">
+                    <i class="fas fa-briefcase"></i> 6 open roles
+                </span>
+            </div>
+
+            <!-- Department filter -->
+            <div class="cr-filters" role="tablist" aria-label="Filter roles by department">
+                <button class="cr-filter active" data-department="all" role="tab" aria-selected="true">
+                    All departments <span class="count">6</span>
+                </button>
+                <button class="cr-filter" data-department="Logistics" role="tab" aria-selected="false">
+                    Logistics <span class="count">1</span>
+                </button>
+                <button class="cr-filter" data-department="Engineering" role="tab" aria-selected="false">
+                    Engineering <span class="count">1</span>
+                </button>
+                <button class="cr-filter" data-department="Operations" role="tab" aria-selected="false">
+                    Operations <span class="count">2</span>
+                </button>
+                <button class="cr-filter" data-department="Customer Service" role="tab" aria-selected="false">
+                    Customer Service <span class="count">1</span>
+                </button>
+                <button class="cr-filter" data-department="Management" role="tab" aria-selected="false">
+                    Management <span class="count">1</span>
+                </button>
+            </div>
+
+            <div class="row g-4">
+                <!-- Job listings -->
+                <div class="col-lg-8">
+                    <div class="cr-jobs" id="jobList">
+
+                        <!-- Job 1 -->
+                        <article class="cr-job" data-department="Logistics">
+                            <div class="cr-job-header">
+                                <h3>Operations Coordinator</h3>
+                                <span class="cr-job-type"><i class="fas fa-circle" style="font-size:.5rem;"></i> Full-time</span>
+                            </div>
+                            <div class="cr-job-meta">
+                                <span><i class="fas fa-building"></i> Logistics</span>
+                                <span><i class="fas fa-location-dot"></i> Remote / Hybrid</span>
+                                <span><i class="fas fa-briefcase"></i> Mid-level</span>
+                            </div>
+                            <p class="cr-job-description">
+                                Coordinate daily shipments, work directly with carriers and customs brokers,
+                                and keep customers informed at every stage. You'll be the operations brain
+                                behind on-time delivery across our global network.
+                            </p>
+                            <div class="cr-job-footer">
+                                <span class="cr-job-posted">
+                                    <i class="fas fa-clock"></i> Posted 2 days ago
+                                </span>
+                                <button class="cr-btn-apply" data-job="Operations Coordinator">
+                                    Apply now <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </article>
+
+                        <!-- Job 2 -->
+                        <article class="cr-job" data-department="Engineering">
+                            <div class="cr-job-header">
+                                <h3>Software Engineer — Tracking Platform</h3>
+                                <span class="cr-job-type"><i class="fas fa-circle" style="font-size:.5rem;"></i> Full-time</span>
+                            </div>
+                            <div class="cr-job-meta">
+                                <span><i class="fas fa-code"></i> Engineering</span>
+                                <span><i class="fas fa-location-dot"></i> Remote</span>
+                                <span><i class="fas fa-briefcase"></i> Mid-level</span>
+                            </div>
+                            <p class="cr-job-description">
+                                Build the real-time tracking platform our customers rely on — from
+                                backend APIs and event pipelines to the map-based UI. You'll work with
+                                Python, React and modern cloud infrastructure.
+                            </p>
+                            <div class="cr-job-footer">
+                                <span class="cr-job-posted">
+                                    <i class="fas fa-clock"></i> Posted 3 days ago
+                                </span>
+                                <button class="cr-btn-apply" data-job="Software Engineer — Tracking Platform">
+                                    Apply now <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </article>
+
+                        <!-- Job 3 -->
+                        <article class="cr-job" data-department="Operations">
+                            <div class="cr-job-header">
+                                <h3>Customs Specialist</h3>
+                                <span class="cr-job-type"><i class="fas fa-circle" style="font-size:.5rem;"></i> Full-time</span>
+                            </div>
+                            <div class="cr-job-meta">
+                                <span><i class="fas fa-passport"></i> Operations</span>
+                                <span><i class="fas fa-location-dot"></i> On-site</span>
+                                <span><i class="fas fa-briefcase"></i> Experienced</span>
+                            </div>
+                            <p class="cr-job-description">
+                                Own import and export customs clearance for international shipments —
+                                from documentation and classification to compliance across multiple
+                                regulatory regimes.
+                            </p>
+                            <div class="cr-job-footer">
+                                <span class="cr-job-posted">
+                                    <i class="fas fa-clock"></i> Posted 1 week ago
+                                </span>
+                                <button class="cr-btn-apply" data-job="Customs Specialist">
+                                    Apply now <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </article>
+
+                        <!-- Job 4 -->
+                        <article class="cr-job" data-department="Customer Service">
+                            <div class="cr-job-header">
+                                <h3>Customer Service Representative</h3>
+                                <span class="cr-job-type"><i class="fas fa-circle" style="font-size:.5rem;"></i> Full-time</span>
+                            </div>
+                            <div class="cr-job-meta">
+                                <span><i class="fas fa-headset"></i> Customer Service</span>
+                                <span><i class="fas fa-location-dot"></i> Hybrid</span>
+                                <span><i class="fas fa-briefcase"></i> Entry level</span>
+                            </div>
+                            <p class="cr-job-description">
+                                Be the voice of Global shippments — resolve delivery questions, trace shipments
+                                and help customers get clear answers fast. No scripts, just genuine
+                                problem-solving.
+                            </p>
+                            <div class="cr-job-footer">
+                                <span class="cr-job-posted">
+                                    <i class="fas fa-clock"></i> Posted 1 week ago
+                                </span>
+                                <button class="cr-btn-apply" data-job="Customer Service Representative">
+                                    Apply now <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </article>
+
+                        <!-- Job 5 -->
+                        <article class="cr-job" data-department="Operations">
+                            <div class="cr-job-header">
+                                <h3>Warehouse Supervisor</h3>
+                                <span class="cr-job-type"><i class="fas fa-circle" style="font-size:.5rem;"></i> Full-time</span>
+                            </div>
+                            <div class="cr-job-meta">
+                                <span><i class="fas fa-warehouse"></i> Operations</span>
+                                <span><i class="fas fa-location-dot"></i> On-site</span>
+                                <span><i class="fas fa-briefcase"></i> Team lead</span>
+                            </div>
+                            <p class="cr-job-description">
+                                Lead a shift team in one of our regional distribution centres —
+                                manage inbound and outbound flow, maintain inventory accuracy and
+                                drive continuous improvement on the floor.
+                            </p>
+                            <div class="cr-job-footer">
+                                <span class="cr-job-posted">
+                                    <i class="fas fa-clock"></i> Posted 2 weeks ago
+                                </span>
+                                <button class="cr-btn-apply" data-job="Warehouse Supervisor">
+                                    Apply now <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </article>
+
+                        <!-- Job 6 -->
+                        <article class="cr-job" data-department="Management">
+                            <div class="cr-job-header">
+                                <h3>Regional Account Manager</h3>
+                                <span class="cr-job-type"><i class="fas fa-circle" style="font-size:.5rem;"></i> Full-time</span>
+                            </div>
+                            <div class="cr-job-meta">
+                                <span><i class="fas fa-chart-line"></i> Management</span>
+                                <span><i class="fas fa-location-dot"></i> Hybrid</span>
+                                <span><i class="fas fa-briefcase"></i> Senior</span>
+                            </div>
+                            <p class="cr-job-description">
+                                Own relationships with our largest business customers in your region —
+                                understand their supply chain, propose solutions and grow revenue
+                                through genuine partnership.
+                            </p>
+                            <div class="cr-job-footer">
+                                <span class="cr-job-posted">
+                                    <i class="fas fa-clock"></i> Posted 3 weeks ago
+                                </span>
+                                <button class="cr-btn-apply" data-job="Regional Account Manager">
+                                    Apply now <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </article>
+
+                    </div>
+
+                    <!-- Empty state -->
+                    <div id="noJobs" class="cr-alert" style="display:none;">
+                        <h3><i class="fas fa-search"></i> No roles match that department</h3>
+                        <p>Try a different filter — or sign up below and we'll email you when new roles open.</p>
+                    </div>
+
+                    <!-- Job alerts -->
+                    <div class="cr-alert">
+                        <h3><i class="fas fa-bell"></i> Don't see the right role?</h3>
+                        <p>Get new roles delivered to your inbox as soon as they open.</p>
+                        <form class="cr-alert-form" id="alertForm" onsubmit="return false;">
+                            <input type="email" id="alertEmail" placeholder="you@example.com" autocomplete="email" required>
+                            <button type="button" id="alertBtn">
+                                <i class="fas fa-bell"></i> Notify me
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-4" id="contact">
+                    <div class="cr-sidebar">
+
+                        <!-- Why join -->
+                        <div class="cr-why">
+                            <h3>Why Global shippments?</h3>
+                            <ul>
+                                <li><i class="fas fa-globe"></i> Global opportunities across 220+ countries</li>
+                                <li><i class="fas fa-chart-line"></i> Clear career progression paths</li>
+                                <li><i class="fas fa-medal"></i> Industry-leading training programmes</li>
+                                <li><i class="fas fa-heart-pulse"></i> Comprehensive health &amp; wellbeing benefits</li>
+                                <li><i class="fas fa-graduation-cap"></i> Tuition reimbursement &amp; learning budget</li>
+                                <li><i class="fas fa-people-group"></i> Inclusive, collaborative culture</li>
+                                <li><i class="fas fa-house"></i> Flexible &amp; hybrid work arrangements</li>
+                                <li><i class="fas fa-gift"></i> Competitive pay &amp; performance bonuses</li>
+                            </ul>
+
+                            <a href="mailto:careers@Globalshippments.com?subject=Career%20Inquiry" class="cr-contact">
+                                <i class="fas fa-envelope"></i> Contact recruiting
+                            </a>
+
+                            <div class="cr-why-stats">
+                                <div class="cr-why-stat">
+                                    <span class="num" data-counter data-target="6">0</span>
+                                    <span class="lbl">Open roles</span>
+                                </div>
+                                <div class="cr-why-stat">
+                                    <span class="num" data-counter data-target="15" data-suffix="+">0</span>
+                                    <span class="lbl">Countries hiring</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Benefits list -->
+                        <div class="cr-benefits">
+                            <h4><i class="fas fa-star"></i> Benefits at a glance</h4>
+                            <ul>
+                                <li>Medical, dental and vision coverage from day one</li>
+                                <li>Generous paid time off and parental leave</li>
+                                <li>Pension / retirement plan with employer match</li>
+                                <li>Employee assistance programme (EAP)</li>
+                                <li>Wellness reimbursement and gym discounts</li>
+                                <li>Annual travel allowance for eligible roles</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== STATS ==================== -->
+    <section class="cr-stats">
+        <div class="container">
+            <div class="cr-stats-heading">
+                <h2>A global team, building one network</h2>
+                <p>Numbers that show what it means to work at Global shippments.</p>
+            </div>
+            <div class="cr-stats-grid">
+                <div class="cr-stat">
+                    <div class="cr-stat-number" data-counter data-target="220" data-suffix="+">0</div>
+                    <div class="cr-stat-label">Countries</div>
+                </div>
+                <div class="cr-stat">
+                    <div class="cr-stat-number" data-counter data-target="500000" data-suffix="+">0</div>
+                    <div class="cr-stat-label">Employees worldwide</div>
+                </div>
+                <div class="cr-stat">
+                    <div class="cr-stat-number" data-counter data-target="40" data-suffix="+">0</div>
+                    <div class="cr-stat-label">Years of excellence</div>
+                </div>
+                <div class="cr-stat">
+                    <div class="cr-stat-number">#1</div>
+                    <div class="cr-stat-label">Global logistics</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CTA ==================== -->
+    <section class="cr-section">
+        <div class="container">
+            <div class="cr-cta">
+                <h2>Ready to make your next move?</h2>
+                <p>
+                    Join a team that treats every shipment — and every career — like it matters.
+                    Browse our current openings or reach out to talk about where you fit.
+                </p>
+                <div class="cr-cta-actions">
+                    <a href="#openings" class="cr-cta-btn primary">
+                        Browse open roles <i class="fas fa-arrow-up"></i>
+                    </a>
+                    <a href="mailto:careers@Globalshippments.com" class="cr-cta-btn ghost">
+                        Email recruiting <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    /* ---------- Config ---------- */
+    const CONFIG = {
+        toastDuration: 3200,
+        alertEmailPattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        careersEmail: 'careers@Globalshippments.com'
+    };
+
+    /* ---------- Toast ---------- */
+    function showToast(message, type = 'info') {
+        const el = document.createElement('div');
+        el.className = `cr-toast ${type}`;
+        const icon = {
+            success: 'circle-check',
+            warning: 'triangle-exclamation',
+            info:    'circle-info',
+            error:   'circle-exclamation'
+        }[type] || 'circle-info';
+
+        el.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(el);
+
+        setTimeout(() => {
+            el.classList.add('fade-out');
+            setTimeout(() => el.remove(), 300);
+        }, CONFIG.toastDuration);
+    }
+
+    /* ---------- Department filter ---------- */
+    const filters = document.querySelectorAll('.cr-filter');
+    const jobs = document.querySelectorAll('.cr-job');
+    const noJobs = document.getElementById('noJobs');
+    const jobCount = document.getElementById('jobCount');
+
+    function applyFilter(department) {
+        let visible = 0;
+        jobs.forEach(job => {
+            const match = department === 'all' || job.dataset.department === department;
+            job.style.display = match ? '' : 'none';
+            if (match) {
+                visible++;
+                job.classList.remove('is-entering');
+                // restart animation
+                void job.offsetWidth;
+                job.classList.add('is-entering');
+            }
+        });
+
+        if (jobCount) {
+            jobCount.innerHTML = `<i class="fas fa-briefcase"></i> ${visible} ${visible === 1 ? 'open role' : 'open roles'}`;
+        }
+
+        if (noJobs) noJobs.style.display = visible === 0 ? '' : 'none';
+    }
+
+    filters.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filters.forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            });
+            btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
+
+            const dept = btn.dataset.department || 'all';
+            applyFilter(dept);
+
+            const label = btn.childNodes[0].textContent.trim() || 'roles';
+            showToast(`Showing ${label.toLowerCase()}`, 'info');
+        });
+    });
+
+    /* ---------- Apply now ---------- */
+    document.querySelectorAll('.cr-btn-apply').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const job = this.dataset.job || 'this role';
+            const subject = encodeURIComponent(`Application — ${job}`);
+            const body = encodeURIComponent(
+                `Hello Global shippments Recruiting Team,\n\nI would like to apply for the "${job}" position.\n\nPlease find my CV attached.\n\nBest regards,`
+            );
+            window.location.href = `mailto:${CONFIG.careersEmail}?subject=${subject}&body=${body}`;
+            showToast(`Opening your email client for "${job}"`, 'success');
+        });
+    });
+
+    /* ---------- Job alert form ---------- */
+    const alertForm = document.getElementById('alertForm');
+    const alertEmail = document.getElementById('alertEmail');
+    const alertBtn = document.getElementById('alertBtn');
+
+    function submitAlert() {
+        if (!alertForm || !alertEmail) return;
+        const email = alertEmail.value.trim();
+        if (!email || !CONFIG.alertEmailPattern.test(email)) {
+            showToast('Please enter a valid email address', 'warning');
+            alertEmail.focus();
+            return;
+        }
+        showToast('Subscribed — we\'ll email you when new roles open', 'success');
+        alertEmail.value = '';
+    }
+
+    if (alertBtn) alertBtn.addEventListener('click', submitAlert);
+    if (alertForm) {
+        alertForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            submitAlert();
+        });
+        alertEmail.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); submitAlert(); }
+        });
+    }
+
+    /* ---------- Counter animation ---------- */
+    (function () {
+        const counters = document.querySelectorAll('[data-counter]');
+        if (!counters.length) return;
+
+        function animate(el) {
+            const target = parseFloat(el.dataset.target);
+            const suffix = el.dataset.suffix || '';
+            const duration = 1400;
+            const start = performance.now();
+
+            function tick(now) {
+                const t = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - t, 3);
+                const value = target * eased;
+                el.textContent = (Number.isInteger(target)
+                    ? Math.floor(value).toLocaleString()
+                    : value.toFixed(1)) + suffix;
+
+                if (t < 1) requestAnimationFrame(tick);
+                else el.textContent = (Number.isInteger(target)
+                    ? target.toLocaleString()
+                    : target.toFixed(1)) + suffix;
+            }
+            requestAnimationFrame(tick);
+        }
+
+        if ('IntersectionObserver' in window) {
+            const seen = new WeakSet();
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !seen.has(entry.target)) {
+                        seen.add(entry.target);
+                        animate(entry.target);
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.4 });
+            counters.forEach(el => obs.observe(el));
+        } else {
+            counters.forEach(animate);
+        }
+    })();
+
+})();
+</script>
+{% endblock %}

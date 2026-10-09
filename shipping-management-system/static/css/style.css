@@ -1,0 +1,31 @@
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f7f7f7; color: #333; }
+.container { max-width: 960px; margin: 0 auto; padding: 20px; }
+header { background: #004aad; color: #fff; padding: 12px 20px; }
+footer { text-align: center; padding: 12px 20px; color: #666; font-size: 0.9rem; }
+
+/* Footer overrides to ensure visibility despite Bootstrap defaults */
+footer {
+	background: #2d2d2d !important;
+	color: #ffffff !important;
+}
+footer .container {
+	max-width: 1200px;
+}
+footer a {
+	color: #CCCCCC !important;
+}
+footer .text-white-50 {
+	color: rgba(255,255,255,0.85) !important;
+}
+
+/* Ensure long text wraps in footer columns */
+footer p, footer li, footer .text-white-50 {
+	word-wrap: break-word;
+	white-space: normal !important;
+}
+
+body footer, footer.site-footer {
+  background: #2d2d2d !important;
+  color: #fff !important;
+  word-wrap: break-word;
+}

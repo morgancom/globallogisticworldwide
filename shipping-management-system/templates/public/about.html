@@ -1,0 +1,1085 @@
+{% extends "base.html" %}
+
+{% block title %}About Global shippments — Global logistics leader{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — ABOUT PAGE
+   Warm neutrals + muted wine red, matching the current base.html.
+   ========================================================================= */
+
+:root {
+    --ab-surface:       #ffffff;
+    --ab-surface-alt:   #f7f6f3;
+    --ab-surface-soft:  #f0ede7;
+    --ab-line:          #e6e2db;
+    --ab-line-soft:     #eeebe5;
+    --ab-ink:           #141414;
+    --ab-text:          #2c2c2c;
+    --ab-muted:         #6b6b6b;
+    --ab-muted-2:       #9a948a;
+
+    --ab-sh-sm: 0 1px 2px rgba(20, 20, 20, .04);
+    --ab-sh-md: 0 4px 12px -6px rgba(20, 20, 20, .10);
+    --ab-sh-lg: 0 16px 40px -20px rgba(20, 20, 20, .18);
+
+    --ab-ease: cubic-bezier(.4, 0, .2, 1);
+    --ab-dur:  180ms;
+
+    --ab-r-sm: 6px;
+    --ab-r-md: 8px;
+    --ab-r-lg: 10px;
+    --ab-r-xl: 14px;
+    --ab-pill: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --ab-surface:      #221f1c;
+        --ab-surface-alt:  #1c1a17;
+        --ab-surface-soft: #26231f;
+        --ab-line:         #2b2823;
+        --ab-line-soft:    #24211d;
+        --ab-ink:          #f4f2ee;
+        --ab-text:         #d4cec5;
+        --ab-muted:        #9a948a;
+        --ab-muted-2:      #7a746a;
+
+        --ab-sh-sm: 0 1px 2px rgba(0, 0, 0, .4);
+        --ab-sh-md: 0 4px 12px -6px rgba(0, 0, 0, .5);
+        --ab-sh-lg: 0 16px 40px -20px rgba(0, 0, 0, .7);
+    }
+}
+
+body { background: var(--ab-surface-alt); color: var(--ab-text); }
+
+.ab-page h1, .ab-page h2, .ab-page h3,
+.ab-page h4, .ab-page h5, .ab-page h6 {
+    color: var(--ab-ink);
+    letter-spacing: -0.015em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+.ab-hero {
+    position: relative;
+    padding: clamp(56px, 8vw, 104px) 0 clamp(48px, 6vw, 84px);
+    color: #fff;
+    overflow: hidden;
+    background:
+        linear-gradient(100deg,
+            rgba(15, 13, 11, .94) 0%,
+            rgba(15, 13, 11, .86) 40%,
+            rgba(15, 13, 11, .55) 72%,
+            rgba(15, 13, 11, .32) 100%),
+        url("https://images.unsplash.com/photo-1494412651409-8963ce7935a7?auto=format&fit=crop&w=2000&q=85") center/cover no-repeat;
+}
+.ab-hero > .container { position: relative; z-index: 1; max-width: 1280px; }
+
+.ab-hero .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    border-radius: var(--ab-pill);
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .16);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+}
+.ab-hero .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary, #a51e2b);
+}
+
+.ab-hero h1 {
+    font-size: clamp(2.05rem, 4.8vw, 3.35rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin: 0 0 20px;
+    max-width: 900px;
+}
+.ab-hero h1 em {
+    font-style: normal;
+    color: #e5c9cd;
+}
+
+.ab-hero .lead {
+    font-size: clamp(1rem, 1.25vw, 1.1rem);
+    line-height: 1.7;
+    color: #d5d1c9;
+    max-width: 720px;
+    margin: 0;
+}
+
+/* Hero meta strip */
+.ab-hero-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 44px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255, 255, 255, .1);
+}
+.ab-hero-meta-item .value {
+    display: block;
+    font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 6px;
+    font-variant-numeric: tabular-nums;
+}
+.ab-hero-meta-item .label {
+    display: block;
+    font-size: .76rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #9a948a;
+}
+@media (max-width: 820px) {
+    .ab-hero-meta { grid-template-columns: repeat(2, 1fr); gap: 24px 20px; }
+}
+@media (max-width: 480px) {
+    .ab-hero-meta { grid-template-columns: 1fr 1fr; gap: 20px 16px; }
+}
+
+/* =========================================================================
+   SECTION HELPERS
+   ========================================================================= */
+.ab-section { padding: clamp(52px, 7vw, 92px) 0; }
+.ab-section--alt { background: var(--ab-surface-alt); }
+.ab-section--surface { background: var(--ab-surface); }
+
+.ab-heading {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto clamp(36px, 5vw, 60px);
+}
+.ab-heading .label {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: var(--ab-pill);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+.ab-heading h2 {
+    font-size: clamp(1.6rem, 3.6vw, 2.4rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+}
+.ab-heading p {
+    font-size: 1rem;
+    color: var(--ab-muted);
+    margin: 0;
+    line-height: 1.7;
+}
+
+.ab-heading--left {
+    text-align: left;
+    margin-left: 0;
+}
+
+/* =========================================================================
+   STORY SECTION
+   ========================================================================= */
+.ab-story {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(32px, 5vw, 64px);
+    align-items: center;
+}
+@media (max-width: 900px) {
+    .ab-story { grid-template-columns: 1fr; }
+}
+
+.ab-story-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--ab-r-lg);
+    overflow: hidden;
+    box-shadow: var(--ab-sh-sm);
+}
+.ab-story-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.ab-story-media::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(20, 20, 20, 0) 55%, rgba(20, 20, 20, .35) 100%);
+    pointer-events: none;
+}
+.ab-story-media .float-card {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    padding: 14px 18px;
+    background: #ffffff;
+    border-radius: var(--ab-r-md);
+    border-left: 3px solid var(--primary, #a51e2b);
+    box-shadow: 0 12px 28px -12px rgba(0, 0, 0, .35);
+    max-width: 260px;
+}
+@media (prefers-color-scheme: dark) {
+    .ab-story-media .float-card { background: #221f1c; }
+}
+.ab-story-media .float-card strong {
+    display: block;
+    font-size: .92rem;
+    font-weight: 800;
+    color: var(--ab-ink);
+    margin-bottom: 2px;
+    letter-spacing: -0.01em;
+}
+.ab-story-media .float-card span {
+    font-size: .78rem;
+    color: var(--ab-muted);
+}
+
+.ab-story-content h2 {
+    font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+    line-height: 1.18;
+    margin: 0 0 18px;
+}
+.ab-story-content h2 em {
+    font-style: normal;
+    color: var(--primary, #a51e2b);
+}
+.ab-story-content p {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--ab-text);
+    margin: 0 0 16px;
+}
+.ab-story-content p:last-of-type { margin-bottom: 26px; }
+.ab-story-content strong { color: var(--ab-ink); font-weight: 700; }
+
+.ab-story-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.ab-story-actions .btn-link-alt {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .86rem;
+    font-weight: 700;
+    color: var(--primary, #a51e2b);
+    text-decoration: none;
+    padding: 4px 0;
+    border-bottom: 2px solid transparent;
+    transition: border-color var(--ab-dur) var(--ab-ease);
+}
+.ab-story-actions .btn-link-alt:hover { border-bottom-color: var(--primary, #a51e2b); }
+
+/* =========================================================================
+   PILLARS (Vision / Mission / Values)
+   ========================================================================= */
+.ab-pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+@media (max-width: 900px) { .ab-pillars { grid-template-columns: 1fr; } }
+
+.ab-pillar {
+    position: relative;
+    padding: 28px 24px;
+    background: var(--ab-surface);
+    border: 1px solid var(--ab-line);
+    border-radius: var(--ab-r-lg);
+    transition: border-color var(--ab-dur) var(--ab-ease);
+    overflow: hidden;
+}
+.ab-pillar:hover {
+    border-color: var(--ab-line-strong, #d3cec5);
+}
+
+.ab-pillar .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--ab-r-md);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: 1.25rem;
+    margin-bottom: 18px;
+}
+.ab-pillar h3 {
+    font-size: 1.08rem;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+}
+.ab-pillar p {
+    font-size: .9rem;
+    line-height: 1.7;
+    color: var(--ab-muted);
+    margin: 0;
+}
+
+/* =========================================================================
+   TIMELINE
+   ========================================================================= */
+.ab-timeline {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 12px 0;
+}
+.ab-timeline::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--ab-line);
+    transform: translateX(-50%);
+}
+
+.ab-tl-item {
+    position: relative;
+    padding: 0 0 40px;
+    width: 50%;
+}
+.ab-tl-item:last-child { padding-bottom: 0; }
+.ab-tl-item:nth-child(odd) {
+    padding-right: 36px;
+    text-align: right;
+    margin-left: 0;
+}
+.ab-tl-item:nth-child(even) {
+    padding-left: 36px;
+    text-align: left;
+    margin-left: 50%;
+}
+
+.ab-tl-item::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--ab-surface);
+    border: 2px solid var(--primary, #a51e2b);
+    z-index: 2;
+}
+.ab-tl-item:nth-child(odd)::after { right: -6px; }
+.ab-tl-item:nth-child(even)::after { left: -6px; }
+
+.ab-tl-year {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: var(--ab-r-sm);
+    background: var(--primary, #a51e2b);
+    color: #fff;
+    font-size: .74rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    margin-bottom: 12px;
+}
+
+.ab-tl-content {
+    padding: 18px 20px;
+    background: var(--ab-surface);
+    border: 1px solid var(--ab-line);
+    border-radius: var(--ab-r-md);
+    transition: border-color var(--ab-dur) var(--ab-ease);
+}
+.ab-tl-content:hover {
+    border-color: var(--ab-line-strong, #d3cec5);
+}
+.ab-tl-content h4 {
+    font-size: 1rem;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+}
+.ab-tl-content p {
+    font-size: .88rem;
+    line-height: 1.7;
+    color: var(--ab-muted);
+    margin: 0;
+}
+
+@media (max-width: 720px) {
+    .ab-timeline::before { left: 18px; transform: none; }
+    .ab-tl-item {
+        width: 100%;
+        padding: 0 0 30px 48px !important;
+        text-align: left !important;
+        margin-left: 0 !important;
+    }
+    .ab-tl-item::after { left: 12px !important; right: auto !important; }
+}
+
+/* =========================================================================
+   NETWORK
+   ========================================================================= */
+.ab-network {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+@media (max-width: 900px) { .ab-network { grid-template-columns: 1fr; } }
+
+.ab-network-card {
+    position: relative;
+    padding: 28px 24px;
+    background: var(--ab-surface);
+    border: 1px solid var(--ab-line);
+    border-radius: var(--ab-r-lg);
+    transition: border-color var(--ab-dur) var(--ab-ease);
+    overflow: hidden;
+}
+.ab-network-card:hover {
+    border-color: var(--ab-line-strong, #d3cec5);
+}
+.ab-network-card .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--ab-r-md);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: 1.15rem;
+    margin-bottom: 16px;
+}
+.ab-network-card h3 {
+    font-size: 1.05rem;
+    margin: 0 0 8px;
+}
+.ab-network-card .metric {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--primary, #a51e2b);
+    line-height: 1;
+    margin-bottom: 10px;
+    font-variant-numeric: tabular-nums;
+}
+.ab-network-card p {
+    font-size: .88rem;
+    line-height: 1.65;
+    color: var(--ab-muted);
+    margin: 0;
+}
+
+/* =========================================================================
+   LEADERSHIP
+   ========================================================================= */
+.ab-team {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+@media (max-width: 1000px) { .ab-team { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px)  { .ab-team { grid-template-columns: 1fr; } }
+
+.ab-team-card {
+    background: var(--ab-surface);
+    border: 1px solid var(--ab-line);
+    border-radius: var(--ab-r-lg);
+    overflow: hidden;
+    transition: border-color var(--ab-dur) var(--ab-ease);
+}
+.ab-team-card:hover {
+    border-color: var(--ab-line-strong, #d3cec5);
+}
+.ab-team-media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--ab-surface-soft);
+}
+.ab-team-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(15%);
+}
+.ab-team-body {
+    padding: 16px 18px 20px;
+    text-align: center;
+    border-top: 3px solid var(--primary, #a51e2b);
+}
+.ab-team-body h4 {
+    font-size: .98rem;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+}
+.ab-team-body p {
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--primary, #a51e2b);
+    margin: 0;
+}
+
+/* =========================================================================
+   SUSTAINABILITY BANNER
+   ========================================================================= */
+.ab-sustain {
+    position: relative;
+    padding: clamp(32px, 5vw, 52px) clamp(28px, 4vw, 52px);
+    border-radius: var(--ab-r-xl);
+    background: #171512;
+    color: #fff;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.4fr auto;
+    gap: 28px;
+    align-items: center;
+    border-top: 3px solid var(--primary, #a51e2b);
+}
+@media (max-width: 900px) {
+    .ab-sustain { grid-template-columns: 1fr; text-align: left; }
+}
+
+.ab-sustain .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: var(--ab-pill);
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .14);
+    color: #e8e4de;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.ab-sustain .eyebrow i { color: #6eaa7c; }
+
+.ab-sustain h2 {
+    font-size: clamp(1.3rem, 2.4vw, 1.75rem);
+    line-height: 1.25;
+    color: #fff;
+    margin: 0 0 14px;
+    letter-spacing: -0.015em;
+    max-width: 640px;
+}
+.ab-sustain p {
+    font-size: .98rem;
+    line-height: 1.7;
+    color: #b8b2a7;
+    margin: 0;
+    max-width: 640px;
+}
+.ab-sustain-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 26px;
+    border-radius: var(--ab-r-md);
+    background: var(--primary, #a51e2b);
+    color: #fff;
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color var(--ab-dur) var(--ab-ease);
+    white-space: nowrap;
+}
+.ab-sustain-cta:hover,
+.ab-sustain-cta:focus-visible {
+    background: var(--primary-600, #8f1825);
+    color: #fff;
+}
+
+/* =========================================================================
+   CTA
+   ========================================================================= */
+.ab-cta {
+    text-align: center;
+    padding: clamp(52px, 6vw, 80px) clamp(28px, 5vw, 60px);
+    border-radius: var(--ab-r-xl);
+    background: var(--ab-surface);
+    border: 1px solid var(--ab-line);
+    box-shadow: none;
+}
+.ab-cta h2 {
+    font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+}
+.ab-cta p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--ab-muted);
+    max-width: 620px;
+    margin: 0 auto 26px;
+}
+.ab-cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+.ab-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 26px;
+    border-radius: var(--ab-r-md);
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color var(--ab-dur) var(--ab-ease),
+                border-color var(--ab-dur) var(--ab-ease),
+                color var(--ab-dur) var(--ab-ease);
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+.ab-cta-btn.primary {
+    background: var(--primary, #a51e2b);
+    border-color: var(--primary, #a51e2b);
+    color: #fff;
+}
+.ab-cta-btn.primary:hover,
+.ab-cta-btn.primary:focus-visible {
+    background: var(--primary-600, #8f1825);
+    border-color: var(--primary-600, #8f1825);
+    color: #fff;
+}
+.ab-cta-btn.ghost {
+    background: transparent;
+    color: var(--ab-text);
+    border-color: var(--ab-line-strong, #d3cec5);
+}
+.ab-cta-btn.ghost:hover,
+.ab-cta-btn.ghost:focus-visible {
+    border-color: var(--primary, #a51e2b);
+    color: var(--primary, #a51e2b);
+    background: var(--primary-50, #fbf3f4);
+}
+
+/* =========================================================================
+   ANIMATIONS
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .ab-hero-cta, .ab-story-actions, .ab-sustain-cta, .ab-cta-actions { display: none !important; }
+    .ab-hero { background: #fff !important; color: #000 !important; padding: 30px 0 !important; }
+    .ab-hero h1, .ab-hero .lead, .ab-hero-meta-item .value { color: #000 !important; }
+    .ab-hero-meta { border-color: #ccc !important; }
+    .ab-story-media, .ab-pillar, .ab-tl-content, .ab-network-card, .ab-team-card, .ab-cta {
+        box-shadow: none !important; border: 1px solid #ddd !important;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="ab-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="ab-hero">
+        <div class="container">
+            <span class="eyebrow">About Global shippments</span>
+            <h1>Moving the world forward, <em>one shipment at a time.</em></h1>
+            <p class="lead">
+                For over five decades, Global shippments has connected people, businesses and communities across
+                more than 220 countries and territories — combining global reach with local expertise,
+                cutting-edge technology and a genuine commitment to service.
+            </p>
+
+            <div class="ab-hero-meta">
+                <div class="ab-hero-meta-item">
+                    <span class="value" data-counter data-target="1969" data-suffix="">1969</span>
+                    <span class="label">Founded</span>
+                </div>
+                <div class="ab-hero-meta-item">
+                    <span class="value" data-counter data-target="220" data-suffix="+">0</span>
+                    <span class="label">Countries &amp; territories</span>
+                </div>
+                <div class="ab-hero-meta-item">
+                    <span class="value" data-counter data-target="500000" data-suffix="+">0</span>
+                    <span class="label">Employees worldwide</span>
+                </div>
+                <div class="ab-hero-meta-item">
+                    <span class="value" data-counter data-target="80" data-suffix="€B">0</span>
+                    <span class="label">Annual revenue</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== OUR STORY ==================== -->
+    <section class="ab-section ab-section--surface">
+        <div class="container">
+            <div class="ab-story">
+                <div class="ab-story-media">
+                    <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=80"
+                         alt="Global shippments logistics facility at work">
+                    <div class="float-card">
+                        <strong>Operating in 220+ countries</strong>
+                        <span>One network, one standard of service.</span>
+                    </div>
+                </div>
+
+                <div class="ab-story-content">
+                    <div class="ab-heading ab-heading--left" style="margin-bottom: 18px;">
+                        <span class="label">Our story</span>
+                        <h2>Built on a simple idea: <em>speed that matters.</em></h2>
+                    </div>
+                    <p>
+                        Global shippments was founded in 1969 on the belief that businesses deserved a faster,
+                        more reliable way to move goods across borders. What began as a small operation
+                        handling urgent documents between San Francisco and Honolulu has grown into one of
+                        the world's most extensive logistics networks.
+                    </p>
+                    <p>
+                        Today we operate across five integrated divisions — <strong>Express</strong>,
+                        <strong>Global forwarding</strong>, <strong>Supply chain</strong>,
+                        <strong>eCommerce</strong> and <strong>Post &amp; parcel</strong> — serving
+                        multinationals, growing retailers, governments and families with the same
+                        standard of care. Every shipment is tracked in real time, every route is
+                        optimised by data, and every customer has a direct line to a real person.
+                    </p>
+                    <div class="ab-story-actions">
+                        <a href="{{ url_for('services') }}" class="btn-link-alt">
+                            Explore our services <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== VISION / MISSION / VALUES ==================== -->
+    <section class="ab-section ab-section--alt">
+        <div class="container">
+            <div class="ab-heading">
+                <span class="label">What guides us</span>
+                <h2>The principles behind every decision</h2>
+                <p>Three ideas shape how we work, how we invest and how we show up for our customers.</p>
+            </div>
+
+            <div class="ab-pillars">
+                <div class="ab-pillar">
+                    <div class="icon"><i class="fas fa-eye"></i></div>
+                    <h3>Our vision</h3>
+                    <p>
+                        To be the world's most trusted logistics partner — connecting people and markets,
+                        enabling global trade, and doing so in a way that is sustainable for the
+                        generations who come next.
+                    </p>
+                </div>
+                <div class="ab-pillar">
+                    <div class="icon"><i class="fas fa-bullseye"></i></div>
+                    <h3>Our mission</h3>
+                    <p>
+                        To deliver excellence — simply and every time. That means reliable networks,
+                        transparent pricing, honest communication and service quality you can plan
+                        a business around.
+                    </p>
+                </div>
+                <div class="ab-pillar">
+                    <div class="icon"><i class="fas fa-heart"></i></div>
+                    <h3>Our values</h3>
+                    <p>
+                        <strong>Respect &amp; results.</strong> Put customers first. Work as one team.
+                        Take responsibility. Deliver on every promise — even when it's difficult.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== GLOBAL NETWORK ==================== -->
+    <section class="ab-section ab-section--surface">
+        <div class="container">
+            <div class="ab-heading">
+                <span class="label">Global network</span>
+                <h2>A worldwide infrastructure you can rely on</h2>
+                <p>Air, ocean and road assets operating as one coordinated network — 24 hours a day, every day of the year.</p>
+            </div>
+
+            <div class="ab-network">
+                <div class="ab-network-card">
+                    <div class="icon"><i class="fas fa-plane-departure"></i></div>
+                    <h3>Air freight</h3>
+                    <span class="metric" data-counter data-target="270" data-suffix="+">0</span>
+                    <p>
+                        Dedicated aircraft and partnerships with major carriers, serving more than
+                        220 airports worldwide — including priority uplift for time-critical shipments.
+                    </p>
+                </div>
+                <div class="ab-network-card">
+                    <div class="icon"><i class="fas fa-truck-fast"></i></div>
+                    <h3>Road network</h3>
+                    <span class="metric" data-counter data-target="34000" data-suffix="+">0</span>
+                    <p>
+                        Vehicles covering 1.2 billion kilometres every year — from last-mile delivery
+                        vans to long-haul trucks across Europe, Asia and the Americas.
+                    </p>
+                </div>
+                <div class="ab-network-card">
+                    <div class="icon"><i class="fas fa-ship"></i></div>
+                    <h3>Ocean freight</h3>
+                    <span class="metric" data-counter data-target="2.5" data-suffix="M TEU">0</span>
+                    <p>
+                        Container volume moved annually across all major trade lanes, with customs
+                        and compliance expertise in every port we operate.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TIMELINE ==================== -->
+    <section class="ab-section ab-section--alt">
+        <div class="container">
+            <div class="ab-heading">
+                <span class="label">Our journey</span>
+                <h2>Five decades of logistics milestones</h2>
+                <p>From a single trans-Pacific route to a network spanning every continent.</p>
+            </div>
+
+            <div class="ab-timeline">
+                <div class="ab-tl-item">
+                    <span class="ab-tl-year">1969</span>
+                    <div class="ab-tl-content">
+                        <h4>The beginning</h4>
+                        <p>Founded as a small express service moving urgent documents between San Francisco and Honolulu — pioneering the idea of door-to-door priority shipping.</p>
+                    </div>
+                </div>
+
+                <div class="ab-tl-item">
+                    <span class="ab-tl-year">1970s</span>
+                    <div class="ab-tl-content">
+                        <h4>International expansion</h4>
+                        <p>Rapid growth into the Far East, the Pacific Rim, the Middle East, Africa and Europe — establishing the first global framework for our network.</p>
+                    </div>
+                </div>
+
+                <div class="ab-tl-item">
+                    <span class="ab-tl-year">1998</span>
+                    <div class="ab-tl-content">
+                        <h4>Global consolidation</h4>
+                        <p>Full integration into a worldwide logistics group, adding air, ocean and supply chain capabilities under one roof — creating the integrated partner we are today.</p>
+                    </div>
+                </div>
+
+                <div class="ab-tl-item">
+                    <span class="ab-tl-year">2012</span>
+                    <div class="ab-tl-content">
+                        <h4>Digital transformation</h4>
+                        <p>Launched a multi-year programme to connect every shipment to real-time tracking, digitise customs documentation and modernise our warehousing infrastructure.</p>
+                    </div>
+                </div>
+
+                <div class="ab-tl-item">
+                    <span class="ab-tl-year">2025</span>
+                    <div class="ab-tl-content">
+                        <h4>Roadmap to net zero</h4>
+                        <p>Committed to a multi-billion euro investment in clean operations — electric last-mile fleets, sustainable aviation fuel and climate-neutral facilities — targeting net-zero emissions by 2050.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== LEADERSHIP ==================== -->
+    <section class="ab-section ab-section--surface">
+        <div class="container">
+            <div class="ab-heading">
+                <span class="label">Leadership</span>
+                <h2>The team behind Global shippments</h2>
+                <p>Our executive board brings together decades of experience across logistics, finance, technology and operations.</p>
+            </div>
+
+            <div class="ab-team">
+                <div class="ab-team-card">
+                    <div class="ab-team-media">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80"
+                             alt="Chief Executive Officer">
+                    </div>
+                    <div class="ab-team-body">
+                        <h4>Tobias Meyer</h4>
+                        <p>Chief Executive Officer</p>
+                    </div>
+                </div>
+                <div class="ab-team-card">
+                    <div class="ab-team-media">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80"
+                             alt="Chief Financial Officer">
+                    </div>
+                    <div class="ab-team-body">
+                        <h4>Melanie Kreis</h4>
+                        <p>Chief Financial Officer</p>
+                    </div>
+                </div>
+                <div class="ab-team-card">
+                    <div class="ab-team-media">
+                        <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80"
+                             alt="HR and Labour Director">
+                    </div>
+                    <div class="ab-team-body">
+                        <h4>Thomas Ogilvie</h4>
+                        <p>HR &amp; Labour Director</p>
+                    </div>
+                </div>
+                <div class="ab-team-card">
+                    <div class="ab-team-media">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"
+                             alt="CEO of Express division">
+                    </div>
+                    <div class="ab-team-body">
+                        <h4>John Pearson</h4>
+                        <p>CEO, Express division</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SUSTAINABILITY ==================== -->
+    <div class="container">
+        <section class="ab-sustain">
+            <div>
+                <span class="eyebrow"><i class="fas fa-leaf"></i> Sustainability</span>
+                <h2>Committed to logistics that future generations can rely on</h2>
+                <p>
+                    We are investing in clean operations across every division — electric vehicles,
+                    sustainable aviation fuel, renewable energy in our facilities and climate-neutral
+                    shipping options for our customers. The target is net-zero emissions by 2050.
+                </p>
+            </div>
+            <a href="{{ url_for('contact') }}" class="ab-sustain-cta">
+                Get the report <i class="fas fa-arrow-right"></i>
+            </a>
+        </section>
+    </div>
+
+    <!-- ==================== CTA ==================== -->
+    <section class="ab-section">
+        <div class="container">
+            <div class="ab-cta">
+                <h2>Partner with a logistics team that delivers</h2>
+                <p>
+                    Whether you ship one package a month or thousands a day, you deserve a partner
+                    who treats every shipment like it matters — because it does.
+                </p>
+                <div class="ab-cta-actions">
+                    <a href="{{ url_for('contact') }}" class="ab-cta-btn primary">
+                        Talk to our team <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="{{ url_for('services') }}" class="ab-cta-btn ghost">
+                        See our services <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* ---------- Counter animation for hero meta + network metrics ---------- */
+    (function () {
+        const counters = document.querySelectorAll('[data-counter]');
+        if (!counters.length) return;
+
+        const decimalsFor = (value) => {
+            const s = String(value);
+            return s.includes('.') ? (s.split('.')[1] || '').length : 0;
+        };
+
+        function animate(el) {
+            const target = parseFloat(el.dataset.target);
+            const suffix = el.dataset.suffix || '';
+            const decimals = decimalsFor(target);
+            const duration = 1600;
+            const start = performance.now();
+
+            function tick(now) {
+                const t = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - t, 3);
+                const value = target * eased;
+
+                const formatted = decimals > 0
+                    ? value.toFixed(decimals)
+                    : Math.floor(value).toLocaleString();
+
+                el.textContent = formatted + suffix;
+
+                if (t < 1) requestAnimationFrame(tick);
+                else el.textContent = (decimals > 0
+                    ? target.toFixed(decimals)
+                    : target.toLocaleString()) + suffix;
+            }
+            requestAnimationFrame(tick);
+        }
+
+        if ('IntersectionObserver' in window) {
+            const seen = new WeakSet();
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !seen.has(entry.target)) {
+                        seen.add(entry.target);
+                        animate(entry.target);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.35 });
+
+            counters.forEach(el => {
+                el.textContent = '0' + (el.dataset.suffix || '');
+                observer.observe(el);
+            });
+        } else {
+            counters.forEach(animate);
+        }
+    })();
+</script>
+{% endblock %}

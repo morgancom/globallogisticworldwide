@@ -1,0 +1,1255 @@
+{% extends "base.html" %}
+
+{% block title %}Edit user {{ user.username }} — Global shippments Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — EDIT USER (ADMIN)
+   User profile + permissions + security + danger zone.
+   Uses base.html design tokens. Full dark-mode support.
+   ========================================================================= */
+
+:root {
+    --eu-surface:       #FFFFFF;
+    --eu-surface-alt:   #F8FAFC;
+    --eu-surface-soft:  #F1F5F9;
+    --eu-line:          #E6EAF0;
+    --eu-line-soft:     #EEF2F7;
+    --eu-ink:           #0B1220;
+    --eu-text:          #1E293B;
+    --eu-muted:         #64748B;
+    --eu-muted-2:       #94A3B8;
+
+    --eu-success:       #16A34A;
+    --eu-success-bg:    #ECFDF5;
+    --eu-danger:        #DC2626;
+    --eu-danger-bg:     #FEF2F2;
+    --eu-warning:       #D97706;
+    --eu-warning-bg:    #FFF7ED;
+    --eu-info:          #0EA5E9;
+    --eu-info-bg:       #EFF9FF;
+    --eu-neutral:       #475569;
+    --eu-neutral-bg:    #F1F5F9;
+
+    --eu-sh-xs: 0 1px 2px rgba(15, 23, 42, .04);
+    --eu-sh-sm: 0 2px 8px rgba(15, 23, 42, .06);
+    --eu-sh-md: 0 12px 28px -14px rgba(15, 23, 42, .18);
+    --eu-sh-lg: 0 30px 60px -22px rgba(15, 23, 42, .28);
+
+    --eu-ease: cubic-bezier(.4, 0, .2, 1);
+    --eu-dur:  220ms;
+
+    --eu-r-sm: 8px;
+    --eu-r-md: 12px;
+    --eu-r-lg: 16px;
+    --eu-r-xl: 24px;
+    --eu-pill: 999px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --eu-surface:      #111C30;
+        --eu-surface-alt:  #0F172A;
+        --eu-surface-soft: #1A273F;
+        --eu-line:         #1E293B;
+        --eu-line-soft:    #172A45;
+        --eu-ink:          #F1F5F9;
+        --eu-text:         #CBD5E1;
+        --eu-muted:        #94A3B8;
+        --eu-muted-2:      #64748B;
+
+        --eu-success-bg:   #052E1A;
+        --eu-danger-bg:    #2E0A0D;
+        --eu-warning-bg:   #2E1A05;
+        --eu-info-bg:      #0B2A3E;
+        --eu-neutral-bg:   #1E293B;
+
+        --eu-sh-xs: 0 1px 2px rgba(0, 0, 0, .4);
+        --eu-sh-sm: 0 2px 8px rgba(0, 0, 0, .5);
+        --eu-sh-md: 0 12px 28px -14px rgba(0, 0, 0, .6);
+        --eu-sh-lg: 0 30px 60px -22px rgba(0, 0, 0, .7);
+    }
+}
+
+body { background: var(--eu-surface-alt); color: var(--eu-text); }
+
+.eu-page h1, .eu-page h2, .eu-page h3,
+.eu-page h4, .eu-page h5, .eu-page h6 {
+    color: var(--eu-ink);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   PAGE HERO
+   ========================================================================= */
+.eu-hero {
+    position: relative;
+    padding: clamp(28px, 4vw, 44px) 0 clamp(24px, 3vw, 32px);
+    background:
+        radial-gradient(ellipse 60% 70% at 20% 20%, rgba(225, 29, 42, .12), transparent 60%),
+        linear-gradient(180deg, #0b1220, #1a1a2a);
+    color: #fff;
+    overflow: hidden;
+}
+.eu-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    pointer-events: none;
+}
+.eu-hero > .container { position: relative; z-index: 1; }
+
+.eu-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .82rem;
+    color: rgba(255, 255, 255, .7);
+    margin-bottom: 14px;
+    list-style: none;
+    padding: 0;
+    flex-wrap: wrap;
+}
+.eu-breadcrumb li { display: inline-flex; align-items: center; gap: 8px; }
+.eu-breadcrumb li:not(:last-child)::after {
+    content: "\f105";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: .65rem;
+    opacity: .5;
+}
+.eu-breadcrumb a {
+    color: rgba(255, 255, 255, .8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--eu-dur) var(--eu-ease);
+}
+.eu-breadcrumb a:hover { color: #fff; }
+.eu-breadcrumb .active { color: #fff; font-weight: 600; }
+
+.eu-hero-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+}
+.eu-hero-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(1.35rem, 2.8vw, 1.8rem);
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    flex-wrap: wrap;
+}
+.eu-hero-title .hero-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--eu-r-md);
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    box-shadow: 0 10px 22px -8px rgba(225, 29, 42, .55);
+}
+.eu-hero-sub {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: .92rem;
+    color: rgba(255, 255, 255, .78);
+    margin: 6px 0 0;
+    max-width: 640px;
+}
+.eu-hero-sub code {
+    display: inline-block;
+    padding: 3px 10px;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: var(--eu-r-sm);
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .01em;
+}
+
+.eu-avatar {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .18);
+    color: #fff;
+    font-size: 2rem;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* =========================================================================
+   LAYOUT
+   ========================================================================= */
+.eu-shell {
+    max-width: 980px;
+    margin: -20px auto 0;
+    padding: 0 16px 60px;
+    position: relative;
+    z-index: 2;
+}
+
+/* =========================================================================
+   CARDS
+   ========================================================================= */
+.eu-card {
+    background: var(--eu-surface);
+    border: 1px solid var(--eu-line);
+    border-radius: var(--eu-r-xl);
+    box-shadow: var(--eu-sh-lg);
+    overflow: hidden;
+    margin-bottom: 22px;
+}
+.eu-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px 26px;
+    border-bottom: 1px solid var(--eu-line-soft);
+    flex-wrap: wrap;
+}
+.eu-card-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--eu-ink);
+    letter-spacing: -0.015em;
+    margin: 0;
+}
+.eu-card-title .icon-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--eu-r-sm);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: .9rem;
+    flex-shrink: 0;
+}
+.eu-card-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: var(--eu-pill);
+    background: var(--eu-warning-bg);
+    color: var(--eu-warning);
+    font-size: .74rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    border: 1px solid color-mix(in srgb, var(--eu-warning) 25%, transparent);
+}
+.eu-card-pill i { font-size: .9em; }
+.eu-card-body { padding: clamp(22px, 3vw, 34px); }
+
+/* =========================================================================
+   FORM SECTIONS
+   ========================================================================= */
+.eu-section {
+    padding-bottom: 28px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--eu-line-soft);
+}
+.eu-section:last-of-type {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: 0;
+}
+
+/* Section header — matches the pattern used on newer admin pages
+   (edit package, view package, user management): icon chip + title. */
+.eu-section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: .9rem;
+    font-weight: 800;
+    color: var(--eu-ink);
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    margin: 0 0 20px;
+}
+.eu-section-title .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--eu-r-sm);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: .85rem;
+    flex-shrink: 0;
+}
+
+/* =========================================================================
+   FORM CONTROLS
+   ========================================================================= */
+.eu-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--eu-muted);
+    margin-bottom: 8px;
+}
+.eu-label i { color: var(--primary, #e11d2a); font-size: .85em; }
+.eu-label .req { color: var(--primary, #e11d2a); }
+.eu-label .opt {
+    font-size: .7rem;
+    color: var(--eu-muted-2);
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: none;
+}
+
+.eu-field {
+    display: block;
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--eu-surface);
+    border: 1.5px solid var(--eu-line);
+    border-radius: var(--eu-r-md);
+    color: var(--eu-ink);
+    font-size: .92rem;
+    font-weight: 500;
+    outline: none;
+    transition: border-color var(--eu-dur) var(--eu-ease),
+                box-shadow   var(--eu-dur) var(--eu-ease),
+                background   var(--eu-dur) var(--eu-ease);
+    font-family: inherit;
+}
+.eu-field::placeholder { color: var(--eu-muted-2); font-weight: 400; }
+.eu-field:focus {
+    border-color: var(--primary, #e11d2a);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary, #e11d2a) 15%, transparent);
+}
+.eu-field[readonly],
+.eu-field:disabled {
+    background: var(--eu-surface-soft);
+    color: var(--eu-muted);
+    cursor: not-allowed;
+}
+select.eu-field {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e11d2a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px 10px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+.eu-field.is-invalid {
+    border-color: var(--eu-danger);
+    background: color-mix(in srgb, var(--eu-danger) 5%, var(--eu-surface));
+}
+.eu-field.is-invalid:focus {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--eu-danger) 18%, transparent);
+}
+.eu-field.is-valid { border-color: var(--eu-success); }
+
+.eu-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: .78rem;
+    color: var(--eu-muted-2);
+    line-height: 1.5;
+}
+.eu-hint i { margin-right: 4px; }
+
+/* Read-only presentation field */
+.eu-readonly {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    background: var(--eu-surface-soft);
+    border: 1.5px solid var(--eu-line);
+    border-radius: var(--eu-r-md);
+    color: var(--eu-muted);
+    font-size: .92rem;
+    font-weight: 600;
+}
+.eu-readonly i { color: var(--eu-muted-2); font-size: .85em; }
+
+/* =========================================================================
+   PERMISSION TAGS
+   ========================================================================= */
+.eu-perms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 16px;
+    background: var(--eu-surface-alt);
+    border: 1px solid var(--eu-line);
+    border-radius: var(--eu-r-md);
+    margin-top: 20px;
+}
+.eu-perm {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--eu-surface);
+    border: 1px solid var(--eu-line);
+    border-radius: var(--eu-pill);
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--eu-text);
+    transition: all var(--eu-dur) var(--eu-ease);
+}
+.eu-perm i { font-size: .9em; }
+.eu-perm.allowed { border-color: color-mix(in srgb, var(--eu-success) 25%, var(--eu-line)); }
+.eu-perm.allowed i { color: var(--eu-success); }
+.eu-perm.denied i { color: var(--eu-danger); }
+
+/* =========================================================================
+   STATUS ROW
+   ========================================================================= */
+.eu-status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 18px;
+}
+@media (max-width: 560px) { .eu-status-grid { grid-template-columns: 1fr; } }
+
+.eu-status {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 18px;
+    background: var(--eu-surface-alt);
+    border: 1px solid var(--eu-line);
+    border-radius: var(--eu-r-md);
+}
+.eu-status .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.eu-status .label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .88rem;
+    color: var(--eu-text);
+    font-weight: 600;
+}
+.eu-status .label i { color: var(--primary, #e11d2a); font-size: .85em; }
+.eu-status .value {
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--eu-muted);
+}
+.eu-status .note {
+    font-size: .78rem;
+    color: var(--eu-muted-2);
+}
+
+.eu-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--eu-pill);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+}
+.eu-badge.success {
+    background: var(--eu-success-bg);
+    color: var(--eu-success);
+    border-color: color-mix(in srgb, var(--eu-success) 25%, transparent);
+}
+.eu-badge.warning {
+    background: var(--eu-warning-bg);
+    color: var(--eu-warning);
+    border-color: color-mix(in srgb, var(--eu-warning) 25%, transparent);
+}
+.eu-badge.danger {
+    background: var(--eu-danger-bg);
+    color: var(--eu-danger);
+    border-color: color-mix(in srgb, var(--eu-danger) 25%, transparent);
+}
+.eu-badge.info {
+    background: var(--eu-info-bg);
+    color: var(--eu-info);
+    border-color: color-mix(in srgb, var(--eu-info) 25%, transparent);
+}
+.eu-badge.neutral {
+    background: var(--eu-neutral-bg);
+    color: var(--eu-neutral);
+    border-color: color-mix(in srgb, var(--eu-neutral) 20%, transparent);
+}
+
+/* =========================================================================
+   ACTIONS
+   ========================================================================= */
+.eu-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 28px;
+    margin-top: 32px;
+    border-top: 1px solid var(--eu-line-soft);
+    flex-wrap: wrap;
+}
+.eu-actions .spacer { flex: 1 1 auto; }
+
+.eu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 13px 26px;
+    border: 1.5px solid transparent;
+    border-radius: var(--eu-pill);
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--eu-dur) var(--eu-ease);
+    white-space: nowrap;
+}
+.eu-btn:focus-visible { outline: 2px solid var(--primary, #e11d2a); outline-offset: 2px; }
+.eu-btn i { transition: transform var(--eu-dur) var(--eu-ease); }
+
+.eu-btn.primary {
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    box-shadow: 0 10px 22px -10px rgba(225, 29, 42, .55);
+}
+.eu-btn.primary:hover,
+.eu-btn.primary:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px -12px rgba(225, 29, 42, .6);
+    color: #fff;
+}
+.eu-btn.primary:hover i { transform: scale(1.05); }
+
+.eu-btn.ghost {
+    background: transparent;
+    color: var(--eu-text);
+    border-color: var(--eu-line);
+}
+.eu-btn.ghost:hover,
+.eu-btn.ghost:focus-visible {
+    border-color: var(--eu-ink);
+    color: var(--eu-ink);
+    background: var(--eu-surface-alt);
+    transform: translateY(-2px);
+}
+
+.eu-btn.danger {
+    background: transparent;
+    color: var(--eu-danger);
+    border-color: var(--eu-danger);
+}
+.eu-btn.danger:hover,
+.eu-btn.danger:focus-visible {
+    background: var(--eu-danger);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -10px rgba(220, 38, 38, .5);
+}
+.eu-btn.danger.solid {
+    background: linear-gradient(135deg, var(--eu-danger), #991B1B);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 10px 22px -10px rgba(220, 38, 38, .5);
+}
+.eu-btn.danger.solid:hover,
+.eu-btn.danger.solid:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px -12px rgba(220, 38, 38, .6);
+    color: #fff;
+}
+
+.eu-btn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* =========================================================================
+   DANGER ZONE
+   ========================================================================= */
+.eu-danger-card {
+    background: var(--eu-surface);
+    border: 1px solid color-mix(in srgb, var(--eu-danger) 30%, var(--eu-line));
+    border-left: 4px solid var(--eu-danger);
+    border-radius: var(--eu-r-xl);
+    overflow: hidden;
+    box-shadow: var(--eu-sh-sm);
+}
+.eu-danger-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 24px;
+    background: var(--eu-danger-bg);
+    color: var(--eu-danger);
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    border-bottom: 1px solid color-mix(in srgb, var(--eu-danger) 25%, transparent);
+}
+.eu-danger-header i { font-size: 1rem; }
+.eu-danger-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 24px;
+}
+.eu-danger-body h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 0 0 6px;
+    color: var(--eu-ink);
+    letter-spacing: -0.01em;
+}
+.eu-danger-body p {
+    font-size: .88rem;
+    color: var(--eu-muted);
+    margin: 0;
+    line-height: 1.55;
+    max-width: 520px;
+}
+
+/* =========================================================================
+   MODAL
+   ========================================================================= */
+.eu-modal .modal-content {
+    background: var(--eu-surface);
+    border: 1px solid var(--eu-line);
+    border-radius: var(--eu-r-lg);
+    overflow: hidden;
+    box-shadow: var(--eu-sh-lg);
+}
+.eu-modal .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 22px;
+    border-bottom: 0;
+    background: linear-gradient(135deg, var(--eu-danger), #991B1B);
+    color: #fff;
+}
+.eu-modal .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+.eu-modal .modal-title i { color: rgba(255, 255, 255, .85); }
+.eu-modal .btn-close { filter: brightness(0) invert(1); opacity: .85; }
+.eu-modal .btn-close:hover { opacity: 1; }
+.eu-modal .modal-body { padding: 24px 22px; color: var(--eu-text); }
+.eu-modal .modal-body p {
+    font-size: .95rem;
+    line-height: 1.65;
+    margin: 0 0 12px;
+}
+.eu-modal .modal-body p:last-child { margin-bottom: 0; }
+.eu-modal .modal-body strong { color: var(--eu-ink); font-weight: 700; }
+.eu-modal .warning-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    margin-top: 12px;
+    background: var(--eu-danger-bg);
+    border-left: 3px solid var(--eu-danger);
+    border-radius: var(--eu-r-sm);
+    font-size: .88rem;
+    color: var(--eu-danger);
+    line-height: 1.55;
+}
+.eu-modal .warning-note i { margin-top: 3px; flex-shrink: 0; }
+.eu-modal .modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding: 16px 22px 20px;
+    border-top: 1px solid var(--eu-line-soft);
+}
+
+/* =========================================================================
+   TOASTS
+   ========================================================================= */
+.eu-toast {
+    position: fixed;
+    top: 88px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    min-width: 280px;
+    max-width: calc(100vw - 48px);
+    background: var(--eu-surface);
+    border: 1px solid var(--eu-line);
+    border-left: 4px solid var(--primary, #e11d2a);
+    border-radius: var(--eu-r-sm);
+    box-shadow: var(--eu-sh-lg);
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--eu-text);
+    animation: euToastIn 280ms var(--eu-ease);
+}
+.eu-toast i { font-size: 1.15rem; color: var(--primary, #e11d2a); flex-shrink: 0; }
+.eu-toast.success { border-left-color: var(--eu-success); }
+.eu-toast.success i { color: var(--eu-success); }
+.eu-toast.error   { border-left-color: var(--eu-danger); }
+.eu-toast.error   i { color: var(--eu-danger); }
+.eu-toast.warning { border-left-color: var(--eu-warning); }
+.eu-toast.warning i { color: var(--eu-warning); }
+.eu-toast.info    { border-left-color: var(--eu-info); }
+.eu-toast.info    i { color: var(--eu-info); }
+.eu-toast.fade-out { animation: euToastOut 280ms var(--eu-ease) forwards; }
+
+@keyframes euToastIn {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes euToastOut {
+    to { opacity: 0; transform: translateX(24px); }
+}
+@media (max-width: 576px) {
+    .eu-toast { left: 16px; right: 16px; top: 76px; min-width: auto; }
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+@media (max-width: 640px) {
+    .eu-hero-head { flex-direction: column; align-items: flex-start; }
+    .eu-avatar { width: 68px; height: 68px; font-size: 1.6rem; }
+    .eu-card-body { padding: 22px 20px; }
+    .eu-actions { flex-direction: column; align-items: stretch; }
+    .eu-actions .spacer { display: none; }
+    .eu-btn { width: 100%; }
+    .eu-danger-body { flex-direction: column; align-items: stretch; }
+    .eu-danger-body .eu-btn { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+@media print {
+    .eu-hero::before, .eu-actions, .eu-danger-card, .eu-toast,
+    .navbar, footer, .back-to-top { display: none !important; }
+    .eu-hero { background: #fff !important; color: #000 !important; padding: 20px 0 !important; border-bottom: 2px solid #000; }
+    .eu-hero-title, .eu-hero-sub, .eu-breadcrumb,
+    .eu-breadcrumb a, .eu-breadcrumb .active { color: #000 !important; }
+    .eu-hero-sub code { background: #f5f5f5 !important; border-color: #ccc !important; color: #000 !important; }
+    .eu-avatar { background: #f5f5f5 !important; color: #000 !important; border: 1px solid #ccc !important; }
+    .eu-shell { margin: 0 !important; }
+    .eu-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="eu-page">
+
+    <!-- ==================== PAGE HERO ==================== -->
+    <section class="eu-hero">
+        <div class="container">
+            <ol class="eu-breadcrumb">
+                <li><a href="{{ url_for('admin_dashboard') }}">Admin dashboard</a></li>
+                <li><a href="{{ url_for('manage_users') }}">User management</a></li>
+                <li class="active">Edit user</li>
+            </ol>
+
+            <div class="eu-hero-head">
+                <div>
+                    <h1 class="eu-hero-title">
+                        <span class="hero-icon"><i class="fas fa-user-pen"></i></span>
+                        Edit user profile
+                    </h1>
+                    <p class="eu-hero-sub">
+                        Update profile details, permissions and security settings for
+                        <code>{{ user.username }}</code>
+                    </p>
+                </div>
+                <div class="eu-avatar" aria-hidden="true">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SHELL ==================== -->
+    <div class="eu-shell">
+
+        <!-- ==================== MAIN FORM CARD ==================== -->
+        <div class="eu-card">
+            <div class="eu-card-header">
+                <h2 class="eu-card-title">
+                    <span class="icon-chip"><i class="fas fa-user-cog"></i></span>
+                    User information
+                </h2>
+                <span class="eu-card-pill">
+                    <i class="fas fa-pen"></i> Editing {{ user.username }}
+                </span>
+            </div>
+
+            <div class="eu-card-body">
+                <form method="POST" class="eu-form" id="editUserForm" novalidate>
+
+                    <!-- ==================== ACCOUNT DETAILS ==================== -->
+                    <section class="eu-section">
+                        <h3 class="eu-section-title">
+                            <span class="icon"><i class="fas fa-id-card"></i></span>
+                            Account details
+                        </h3>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="eu-label" for="username">
+                                    <i class="fas fa-user"></i> Username
+                                </label>
+                                <div class="eu-readonly">
+                                    <i class="fas fa-lock"></i>
+                                    <span>{{ user.username }}</span>
+                                </div>
+                                <small class="eu-hint">Usernames cannot be changed.</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="eu-label" for="email">
+                                    <i class="fas fa-envelope"></i> Email address <span class="req">*</span>
+                                </label>
+                                <input type="email"
+                                       id="email"
+                                       name="email"
+                                       class="eu-field"
+                                       value="{{ user.email or '' }}"
+                                       required
+                                       autocomplete="email"
+                                       placeholder="user@example.com">
+                                <small class="eu-hint">Used for notifications and login.</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="eu-label" for="full_name">
+                                    <i class="fas fa-signature"></i> Full name
+                                </label>
+                                <input type="text"
+                                       id="full_name"
+                                       name="full_name"
+                                       class="eu-field"
+                                       value="{{ user.full_name or '' }}"
+                                       autocomplete="name"
+                                       placeholder="e.g. Jane Doe">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="eu-label" for="phone">
+                                    <i class="fas fa-phone"></i> Phone number
+                                </label>
+                                <input type="tel"
+                                       id="phone"
+                                       name="phone"
+                                       class="eu-field"
+                                       value="{{ user.phone or '' }}"
+                                       autocomplete="tel"
+                                       placeholder="+49 30 1234567">
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ==================== ROLE & PERMISSIONS ==================== -->
+                    <section class="eu-section">
+                        <h3 class="eu-section-title">
+                            <span class="icon"><i class="fas fa-shield-halved"></i></span>
+                            Role &amp; permissions
+                        </h3>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="eu-label" for="role">
+                                    <i class="fas fa-user-shield"></i> User role
+                                </label>
+                                <select id="role" name="role" class="eu-field">
+                                    <option value="admin"       {% if user.role == 'admin' %}selected{% endif %}>Administrator</option>
+                                    <option value="super_admin" {% if user.role == 'super_admin' %}selected{% endif %}>Super administrator</option>
+                                    <option value="viewer"      {% if user.role == 'viewer' %}selected{% endif %}>Viewer (read-only)</option>
+                                </select>
+                                <small class="eu-hint">Determines the user's access level.</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="eu-label" for="department">
+                                    <i class="fas fa-building"></i> Department
+                                </label>
+                                <select id="department" name="department" class="eu-field">
+                                    <option value="">Select department</option>
+                                    <option value="operations"       {% if user.department == 'operations' %}selected{% endif %}>Operations</option>
+                                    <option value="logistics"        {% if user.department == 'logistics' %}selected{% endif %}>Logistics</option>
+                                    <option value="customer_service" {% if user.department == 'customer_service' %}selected{% endif %}>Customer service</option>
+                                    <option value="management"       {% if user.department == 'management' %}selected{% endif %}>Management</option>
+                                    <option value="it"               {% if user.department == 'it' %}selected{% endif %}>IT department</option>
+                                    <option value="warehouse"        {% if user.department == 'warehouse' %}selected{% endif %}>Warehouse</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Permission indicators -->
+                        <div class="eu-perms" aria-label="Effective permissions for the selected role">
+                            <span class="eu-perm allowed">
+                                <i class="fas fa-circle-check"></i> View packages
+                            </span>
+                            <span class="eu-perm {% if user.role != 'viewer' %}allowed{% else %}denied{% endif %}">
+                                <i class="fas fa-{% if user.role != 'viewer' %}circle-check{% else %}circle-xmark{% endif %}"></i>
+                                Create packages
+                            </span>
+                            <span class="eu-perm {% if user.role in ['admin', 'super_admin'] %}allowed{% else %}denied{% endif %}">
+                                <i class="fas fa-{% if user.role in ['admin', 'super_admin'] %}circle-check{% else %}circle-xmark{% endif %}"></i>
+                                Edit packages
+                            </span>
+                            <span class="eu-perm {% if user.role == 'super_admin' %}allowed{% else %}denied{% endif %}">
+                                <i class="fas fa-{% if user.role == 'super_admin' %}circle-check{% else %}circle-xmark{% endif %}"></i>
+                                Delete packages
+                            </span>
+                            <span class="eu-perm {% if user.role == 'super_admin' %}allowed{% else %}denied{% endif %}">
+                                <i class="fas fa-{% if user.role == 'super_admin' %}circle-check{% else %}circle-xmark{% endif %}"></i>
+                                User management
+                            </span>
+                        </div>
+                    </section>
+
+                    <!-- ==================== PASSWORD ==================== -->
+                    <section class="eu-section">
+                        <h3 class="eu-section-title">
+                            <span class="icon"><i class="fas fa-key"></i></span>
+                            Password &amp; security
+                        </h3>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <label class="eu-label" for="password">
+                                    <i class="fas fa-lock"></i> New password <span class="opt">leave blank to keep current</span>
+                                </label>
+                                <input type="password"
+                                       id="password"
+                                       name="password"
+                                       class="eu-field"
+                                       autocomplete="new-password"
+                                       placeholder="Enter a new password">
+                                <small class="eu-hint">
+                                    <i class="fas fa-circle-info"></i>
+                                    Minimum 8 characters, including uppercase, lowercase and a number.
+                                </small>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ==================== ACCOUNT STATUS ==================== -->
+                    <section class="eu-section">
+                        <h3 class="eu-section-title">
+                            <span class="icon"><i class="fas fa-circle-info"></i></span>
+                            Account status
+                        </h3>
+
+                        <div class="eu-status-grid">
+                            <div class="eu-status">
+                                <div class="row">
+                                    <span class="label">
+                                        <i class="fas fa-circle" style="color: var(--eu-success);"></i>
+                                        Account status
+                                    </span>
+                                    <span class="eu-badge success">Active</span>
+                                </div>
+                                <span class="note">
+                                    Last login:
+                                    {{ user.last_login|default('Never', true) }}
+                                </span>
+                            </div>
+
+                            <div class="eu-status">
+                                <div class="row">
+                                    <span class="label">
+                                        <i class="fas fa-calendar-day"></i>
+                                        Created
+                                    </span>
+                                    <span class="value">
+                                        <span class="local-time"
+                                              data-iso="{{ user.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                                              data-format="date">
+                                            {{ user.created_at|format_date }}
+                                        </span>
+                                    </span>
+                                </div>
+                                <span class="note">
+                                    Member since
+                                    {{ user.created_at.strftime('%B %Y') if user.created_at else '—' }}
+                                </span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ==================== ACTIONS ==================== -->
+                    <div class="eu-actions">
+                        <a href="{{ url_for('manage_users') }}" class="eu-btn ghost">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        <span class="spacer"></span>
+                        <button type="submit" class="eu-btn primary" id="submitBtn">
+                            <i class="fas fa-save"></i> Save changes
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== DANGER ZONE ==================== -->
+        {% if current_user.role == 'super_admin' and user.role != 'super_admin' %}
+        <div class="eu-danger-card">
+            <div class="eu-danger-header">
+                <i class="fas fa-triangle-exclamation"></i>
+                Danger zone
+            </div>
+            <div class="eu-danger-body">
+                <div>
+                    <h3>Delete user account</h3>
+                    <p>
+                        Permanently remove {{ user.username }} and all associated data.
+                        This action cannot be undone.
+                    </p>
+                </div>
+                <button type="button" class="eu-btn danger"
+                        onclick="confirmDelete('{{ user.id }}')">
+                    <i class="fas fa-trash-can"></i> Delete user
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- ==================== DELETE CONFIRMATION MODAL ==================== -->
+<div class="modal fade eu-modal" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalTitle">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    Confirm deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    You are about to permanently delete the user
+                    <strong>{{ user.username }}</strong>.
+                </p>
+                <div class="warning-note">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span>This action cannot be undone. All associated data will be permanently removed.</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="eu-btn ghost" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteBtn" class="eu-btn danger solid">
+                    <i class="fas fa-trash-can"></i> Delete permanently
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    'use strict';
+
+    /* ==================== Toast ==================== */
+    function showNotification(message, type = 'info') {
+        const el = document.createElement('div');
+        el.className = `eu-toast ${type}`;
+        const icon = {
+            success: 'circle-check',
+            error:   'circle-exclamation',
+            warning: 'triangle-exclamation',
+            info:    'circle-info'
+        }[type] || 'circle-info';
+
+        el.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(el);
+
+        setTimeout(() => {
+            el.classList.add('fade-out');
+            setTimeout(() => el.remove(), 300);
+        }, 3400);
+    }
+    window.showNotification = showNotification;
+
+    /* ==================== Delete confirmation ==================== */
+    window.confirmDelete = function (userId) {
+        const link = document.getElementById('confirmDeleteBtn');
+        if (link) link.href = '/admin/user/' + userId + '/delete';
+
+        const modalEl = document.getElementById('deleteModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+            new bootstrap.Modal(modalEl).show();
+        }
+    };
+
+    /* ==================== Form validation ==================== */
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('editUserForm');
+        if (!form) return;
+
+        const emailInput = form.querySelector('input[name="email"]');
+        const passwordInput = form.querySelector('input[name="password"]');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        /* Live validation feedback */
+        form.querySelectorAll('.eu-field').forEach(el => {
+            el.addEventListener('blur', function () {
+                const required = this.hasAttribute('required');
+                const hasValue = (this.value || '').trim().length > 0;
+
+                if (required && !hasValue) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                } else if (hasValue) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-invalid', 'is-valid');
+                }
+            });
+        });
+
+        /* Password validation feedback on blur */
+        if (passwordInput) {
+            passwordInput.addEventListener('blur', function () {
+                const value = this.value || '';
+                if (!value) {
+                    this.classList.remove('is-invalid', 'is-valid');
+                    return;
+                }
+                const ok = value.length >= 8 &&
+                           /[A-Z]/.test(value) &&
+                           /[a-z]/.test(value) &&
+                           /[0-9]/.test(value);
+
+                this.classList.toggle('is-invalid', !ok);
+                this.classList.toggle('is-valid', ok);
+            });
+        }
+
+        /* Submission validation */
+        form.addEventListener('submit', function (e) {
+            let firstInvalid = null;
+
+            /* Email */
+            if (emailInput) {
+                const email = (emailInput.value || '').trim();
+                if (!emailRegex.test(email)) {
+                    emailInput.classList.add('is-invalid');
+                    emailInput.classList.remove('is-valid');
+                    if (!firstInvalid) firstInvalid = emailInput;
+                }
+            }
+
+            /* Password (only if provided) */
+            if (passwordInput) {
+                const value = passwordInput.value || '';
+                if (value) {
+                    const ok = value.length >= 8 &&
+                               /[A-Z]/.test(value) &&
+                               /[a-z]/.test(value) &&
+                               /[0-9]/.test(value);
+                    if (!ok) {
+                        passwordInput.classList.add('is-invalid');
+                        passwordInput.classList.remove('is-valid');
+                        if (!firstInvalid) firstInvalid = passwordInput;
+                    }
+                }
+            }
+
+            if (firstInvalid) {
+                e.preventDefault();
+                showNotification('Please fix the highlighted fields before saving.', 'error');
+                firstInvalid.focus();
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving…';
+            }
+            showNotification('Saving changes…', 'info');
+        });
+    });
+
+})();
+</script>
+{% endblock %}

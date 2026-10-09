@@ -1,0 +1,1153 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Use — Global shippments{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — TERMS OF USE
+   Long-form legal document. Warm neutrals + muted wine red.
+   ========================================================================= */
+
+:root {
+    --lg-surface:       #ffffff;
+    --lg-surface-alt:   #f7f6f3;
+    --lg-surface-soft:  #f0ede7;
+    --lg-line:          #e6e2db;
+    --lg-line-soft:     #eeebe5;
+    --lg-ink:           #141414;
+    --lg-text:          #2c2c2c;
+    --lg-muted:         #6b6b6b;
+    --lg-muted-2:       #9a948a;
+
+    --lg-sh-sm: 0 1px 2px rgba(20, 20, 20, .04);
+    --lg-sh-md: 0 4px 12px -6px rgba(20, 20, 20, .10);
+
+    --lg-ease: cubic-bezier(.4, 0, .2, 1);
+    --lg-dur:  180ms;
+
+    --lg-r-sm: 4px;
+    --lg-r-md: 6px;
+    --lg-lg: 8px;
+    --lg-pill: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --lg-surface:      #221f1c;
+        --lg-surface-alt:  #1c1a17;
+        --lg-surface-soft: #26231f;
+        --lg-line:         #2b2823;
+        --lg-line-soft:    #24211d;
+        --lg-ink:          #f4f2ee;
+        --lg-text:         #d4cec5;
+        --lg-muted:        #9a948a;
+        --lg-muted-2:      #7a746a;
+
+        --lg-sh-sm: 0 1px 2px rgba(0, 0, 0, .4);
+        --lg-sh-md: 0 4px 12px -6px rgba(0, 0, 0, .5);
+    }
+}
+
+body { background: var(--lg-surface-alt); color: var(--lg-text); }
+
+.lg-page h1, .lg-page h2, .lg-page h3, .lg-page h4 {
+    color: var(--lg-ink);
+    letter-spacing: -0.015em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+.lg-hero {
+    position: relative;
+    padding: clamp(52px, 7vw, 88px) 0 clamp(40px, 5vw, 64px);
+    overflow: hidden;
+    background: var(--lg-surface);
+    border-bottom: 1px solid var(--lg-line);
+}
+.lg-hero > .container { position: relative; z-index: 1; }
+
+.lg-hero .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: var(--lg-pill);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.lg-hero .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary, #a51e2b);
+}
+
+.lg-hero h1 {
+    font-size: clamp(1.85rem, 4.4vw, 2.75rem);
+    line-height: 1.08;
+    margin: 0 0 16px;
+}
+.lg-hero h1 .accent {
+    color: var(--primary, #a51e2b);
+}
+
+.lg-hero .lead {
+    font-size: clamp(1rem, 1.2vw, 1.08rem);
+    line-height: 1.7;
+    color: var(--lg-muted);
+    max-width: 720px;
+    margin: 0 0 22px;
+}
+
+.lg-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
+    padding-top: 22px;
+    border-top: 1px dashed var(--lg-line);
+    font-size: .84rem;
+    color: var(--lg-muted);
+}
+.lg-hero-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.lg-hero-meta span i { color: var(--primary, #a51e2b); }
+.lg-hero-meta span strong { color: var(--lg-ink); font-weight: 700; }
+
+/* =========================================================================
+   LAYOUT
+   ========================================================================= */
+.lg-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: clamp(28px, 4vw, 52px);
+    padding: clamp(36px, 5vw, 64px) 0;
+    align-items: start;
+}
+@media (max-width: 992px) {
+    .lg-layout { grid-template-columns: 1fr; }
+}
+
+/* =========================================================================
+   STICKY TABLE OF CONTENTS
+   ========================================================================= */
+.lg-toc {
+    position: sticky;
+    top: calc(var(--nav-h, 68px) + 24px);
+    padding: 20px 18px;
+    background: var(--lg-surface);
+    border: 1px solid var(--lg-line);
+    border-radius: var(--lg-r-md);
+    max-height: calc(100vh - var(--nav-h, 68px) - 48px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+.lg-toc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--lg-line-soft);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--lg-muted);
+}
+.lg-toc-header i { color: var(--primary, #a51e2b); }
+
+.lg-toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: lg-toc;
+}
+.lg-toc ol li {
+    counter-increment: lg-toc;
+}
+.lg-toc ol li a {
+    position: relative;
+    display: block;
+    padding: 8px 12px 8px 32px;
+    font-size: .84rem;
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--lg-text);
+    text-decoration: none;
+    border-radius: var(--lg-r-sm);
+    border-left: 2px solid transparent;
+    transition: color var(--lg-dur) var(--lg-ease),
+                background-color var(--lg-dur) var(--lg-ease),
+                border-color var(--lg-dur) var(--lg-ease);
+}
+.lg-toc ol li a::before {
+    content: counter(lg-toc) ".";
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    font-size: .76rem;
+    font-weight: 700;
+    color: var(--lg-muted);
+}
+.lg-toc ol li a:hover,
+.lg-toc ol li a:focus-visible {
+    background: var(--lg-surface-alt);
+    color: var(--primary, #a51e2b);
+    border-left-color: var(--primary, #a51e2b);
+}
+.lg-toc ol li a:hover::before,
+.lg-toc ol li a:focus-visible::before {
+    color: var(--primary, #a51e2b);
+}
+
+@media (max-width: 992px) {
+    .lg-toc {
+        position: static;
+        max-height: none;
+        margin-bottom: 28px;
+    }
+    .lg-toc ol {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2px;
+    }
+}
+@media (max-width: 560px) {
+    .lg-toc ol { grid-template-columns: 1fr; }
+}
+
+/* =========================================================================
+   CONTENT
+   ========================================================================= */
+.lg-content {
+    min-width: 0;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--lg-text);
+}
+
+.lg-section {
+    scroll-margin-top: calc(var(--nav-h, 68px) + 32px);
+    padding-bottom: 32px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--lg-line-soft);
+}
+.lg-section:last-child { border-bottom: 0; margin-bottom: 0; }
+
+.lg-section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.lg-section-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--lg-r-md);
+    background: var(--primary-50, #fbf3f4);
+    color: var(--primary, #a51e2b);
+    font-size: .85rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-top: 2px;
+}
+.lg-section h2 {
+    font-size: clamp(1.2rem, 1.9vw, 1.45rem);
+    line-height: 1.28;
+    margin: 0;
+    letter-spacing: -0.015em;
+}
+
+.lg-content h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 24px 0 12px;
+    color: var(--lg-ink);
+    letter-spacing: -0.01em;
+}
+.lg-content h4 {
+    font-size: .92rem;
+    font-weight: 700;
+    margin: 20px 0 10px;
+    color: var(--lg-ink);
+}
+
+.lg-content p {
+    margin: 0 0 14px;
+    line-height: 1.75;
+    color: var(--lg-text);
+}
+.lg-content p:last-child { margin-bottom: 0; }
+
+.lg-content strong {
+    color: var(--lg-ink);
+    font-weight: 700;
+}
+
+.lg-content a {
+    color: var(--primary, #a51e2b);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color var(--lg-dur) var(--lg-ease);
+}
+.lg-content a:hover { color: var(--primary-700, #77141f); }
+
+.lg-content ul, .lg-content ol {
+    padding-left: 0;
+    margin: 0 0 16px;
+    list-style: none;
+}
+.lg-content ul li, .lg-content ol li {
+    position: relative;
+    padding-left: 26px;
+    margin-bottom: 10px;
+    line-height: 1.7;
+}
+.lg-content ul li::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 11px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--primary, #a51e2b);
+    opacity: .65;
+}
+.lg-content ol {
+    counter-reset: lg-list;
+}
+.lg-content ol li {
+    counter-increment: lg-list;
+}
+.lg-content ol li::before {
+    content: counter(lg-list) ".";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-weight: 700;
+    color: var(--primary, #a51e2b);
+    font-size: .9em;
+}
+
+/* Numbered sub-clauses like "1.1", "2.3" */
+.lg-clause {
+    margin: 0 0 14px;
+}
+.lg-clause .num {
+    display: inline-block;
+    min-width: 2.6em;
+    font-weight: 700;
+    color: var(--lg-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================================
+   NOTES / CALLOUTS
+   ========================================================================= */
+.lg-note {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    margin: 18px 0;
+    background: var(--lg-surface-alt);
+    border: 1px solid var(--lg-line);
+    border-left: 3px solid var(--primary, #a51e2b);
+    border-radius: var(--lg-r-sm);
+    font-size: .9rem;
+    line-height: 1.65;
+    color: var(--lg-text);
+}
+.lg-note i {
+    color: var(--primary, #a51e2b);
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 3px;
+}
+.lg-note strong { color: var(--lg-ink); }
+
+.lg-note--amber {
+    background: var(--lg-surface-alt);
+    border-left-color: #a06420;
+}
+.lg-note--amber i { color: #a06420; }
+
+/* Legal code block (trademark list) */
+.lg-code {
+    padding: 14px 16px;
+    margin: 16px 0;
+    background: var(--lg-surface-soft);
+    border: 1px solid var(--lg-line);
+    border-radius: var(--lg-r-sm);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .8rem;
+    line-height: 1.7;
+    color: var(--lg-text);
+    word-break: break-word;
+}
+
+/* =========================================================================
+   BACK TO TOP
+   ========================================================================= */
+.lg-back-to-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    margin-top: 22px;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--lg-muted);
+    background: var(--lg-surface);
+    border: 1px solid var(--lg-line);
+    border-radius: var(--lg-r-md);
+    text-decoration: none;
+    transition: color var(--lg-dur) var(--lg-ease),
+                border-color var(--lg-dur) var(--lg-ease),
+                background-color var(--lg-dur) var(--lg-ease);
+}
+.lg-back-to-top:hover,
+.lg-back-to-top:focus-visible {
+    color: var(--primary, #a51e2b);
+    border-color: var(--primary, #a51e2b);
+    background: var(--primary-50, #fbf3f4);
+}
+
+/* =========================================================================
+   FOOTNOTE ROW
+   ========================================================================= */
+.lg-footnote {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 32px;
+    padding: 16px 20px;
+    background: var(--lg-surface);
+    border: 1px solid var(--lg-line);
+    border-radius: var(--lg-r-md);
+    font-size: .82rem;
+    color: var(--lg-muted);
+}
+.lg-footnote .date {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.lg-footnote .date i { color: var(--primary, #a51e2b); }
+.lg-footnote .copy { text-align: right; }
+@media (max-width: 560px) {
+    .lg-footnote { text-align: center; justify-content: center; }
+    .lg-footnote .copy { text-align: center; }
+}
+
+/* =========================================================================
+   REDUCED MOTION
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* =========================================================================
+   PRINT
+   ========================================================================= */
+@media print {
+    .lg-toc, .lg-back-to-top,
+    .navbar, footer, .back-to-top, #cookie-consent { display: none !important; }
+    .lg-layout { grid-template-columns: 1fr; gap: 0; padding: 0; }
+    body { background: #fff !important; color: #000 !important; }
+    .lg-hero { background: #fff !important; padding: 20px 0 !important; border-bottom: 2px solid #000; }
+    .lg-hero h1, .lg-hero .lead, .lg-hero-meta { color: #000 !important; }
+    .lg-section { page-break-inside: avoid; border-color: #ddd; }
+    .lg-note, .lg-code { background: #f5f5f5 !important; border-color: #ccc !important; }
+    .lg-content a { color: #000; text-decoration: underline; }
+    .lg-section-num { background: #eee !important; color: #000 !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lg-page">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="lg-hero">
+        <div class="container">
+            <span class="eyebrow">Legal</span>
+            <h1>Terms of <span class="accent">use</span></h1>
+            <p class="lead">
+                These Terms of Use govern your access to and use of Global shippments online applications,
+                websites and digital services. By using our services, you agree to be bound by these
+                terms — so please read them carefully.
+            </p>
+            <div class="lg-hero-meta">
+                <span><i class="fas fa-calendar-check"></i> <strong>Last updated:</strong> March 2026</span>
+                <span><i class="fas fa-globe"></i> <strong>Applies worldwide</strong> unless local terms apply</span>
+                <span><i class="fas fa-file-shield"></i> <strong>Version 4.2</strong></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== LAYOUT ==================== -->
+    <div class="container">
+        <div class="lg-layout">
+
+            <!-- ---------- TOC ---------- -->
+            <aside class="lg-toc" aria-label="On this page">
+                <div class="lg-toc-header">
+                    <i class="fas fa-list"></i> On this page
+                </div>
+                <ol>
+                    <li><a href="#scope">Scope &amp; contractual parties</a></li>
+                    <li><a href="#registration">Registration &amp; use</a></li>
+                    <li><a href="#user-account">Account responsibilities</a></li>
+                    <li><a href="#rights">Rights of use</a></li>
+                    <li><a href="#prohibited">Prohibited conduct</a></li>
+                    <li><a href="#availability">Availability</a></li>
+                    <li><a href="#it-security">IT security</a></li>
+                    <li><a href="#suspension">Suspension of account</a></li>
+                    <li><a href="#export">Export, sanctions &amp; customs</a></li>
+                    <li><a href="#liability">Liability &amp; claims</a></li>
+                    <li><a href="#ip">Intellectual property</a></li>
+                    <li><a href="#termination">Duration &amp; termination</a></li>
+                    <li><a href="#governing-law">Governing law</a></li>
+                </ol>
+            </aside>
+
+            <!-- ---------- CONTENT ---------- -->
+            <div class="lg-content">
+
+                <!-- 1 -->
+                <section id="scope" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">01</span>
+                        <h2>Scope, object of use and contractual parties</h2>
+                    </div>
+
+                    <p class="lg-clause">
+                        <span class="num">1.1</span>
+                        The Global shippments online services platform, mobile application and website
+                        (the <strong>"Online Application"</strong>) is offered by Global shippments International GmbH,
+                        Charles-de-Gaulle-Str. 20, 53113 Bonn, Germany (<strong>"Global shippments"</strong>).
+                        Through the Online Application you may access various Global shippments digital services
+                        (the <strong>"Services"</strong>) — including arranging pickups, creating shipments,
+                        managing returns and tracking deliveries.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">1.2</span>
+                        These Terms of Use (the <strong>"Terms"</strong>) apply to your use of the Online
+                        Application and the Services. By accepting the Terms, you enter a contract with
+                        Global shippments governing that use. Certain Services may be subject to separate
+                        contractual terms, which will be presented for your acceptance separately.
+                        All transportation services provided by Global shippments are governed by the
+                        applicable Global shippments Terms and Conditions of Carriage.
+                    </p>
+
+                    <div class="lg-note">
+                        <i class="fas fa-circle-info"></i>
+                        <div>
+                            <strong>Country-specific terms.</strong>
+                            Different terms and conditions may apply in certain countries.
+                            If you are shipping from or to a market outside the European Union,
+                            please check your local Global shippments website for the applicable regional terms.
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2 -->
+                <section id="registration" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">02</span>
+                        <h2>Registration and use of the online application</h2>
+                    </div>
+
+                    <p class="lg-clause">
+                        <span class="num">2.1</span>
+                        To use all features of the Online Application and the Services, you must hold an
+                        active account (<strong>"Your Account"</strong>) and accept these Terms. If you
+                        do not wish to accept the Terms, you may use the Online Application and the
+                        Services only as a guest user with limited capabilities. Registration is confirmed
+                        by an activation email from Global shippments, after which you may access the Online
+                        Application. Global shippments reserves the right to accept or reject any registration
+                        request.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">2.2</span>
+                        Registration in the Online Application is free of charge. Certain Services may
+                        however require payment of a fee. Where a fee applies, Global shippments will clearly
+                        disclose it before you use the Service.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">2.3</span>
+                        All data and information you provide to Global shippments on the registration form or
+                        through Your Account must be true, accurate and complete, and you must keep it
+                        up to date at all times.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">2.4</span>
+                        Where the Online Application allows you to authorise another person to act on
+                        your behalf — for example to collect a shipment — you confirm by giving that
+                        authorisation that: (i) you have obtained the authorised person's consent to
+                        the authorisation and to the storage of their necessary personal and address
+                        data in Global shippments systems; and (ii) the authorisation cannot be withdrawn
+                        through the Online Application alone.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">2.5</span>
+                        Where the Online Application uses Bluetooth Low Energy technology to transfer
+                        digital security keys and data between you and logistics providers, you agree
+                        that such data — including your own data and third-party or logistics provider
+                        data — may be transmitted by this technology and process.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">2.6</span>
+                        Unless otherwise specified within the Services, all data, documents and other
+                        information (<strong>"Electronic Data"</strong>) will be shared electronically
+                        within the Online Application. You authorise Global shippments to access, process and
+                        use all Electronic Data as necessary to perform and fulfil its obligations for
+                        the purposes specified in the Online Application and in the specific Services.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">2.7</span>
+                        By providing Electronic Data to Global shippments, you acknowledge that you are
+                        responsible for its completeness and accuracy, and for submitting it in a timely
+                        manner — including, without limitation, a detailed description of the contents
+                        of the shipment. Global shippments will rely on the Electronic Data you submit and
+                        is not obliged to verify its completeness or accuracy against any paper or
+                        scanned document. You bear full responsibility for any discrepancy between
+                        Electronic Data and any paper or scanned document.
+                    </p>
+                </section>
+
+                <!-- 3 -->
+                <section id="user-account" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">03</span>
+                        <h2>User account responsibilities</h2>
+                    </div>
+
+                    <p class="lg-clause">
+                        <span class="num">3.1</span>
+                        You are responsible for the management and use of Your Account and of the
+                        associated login credentials and passwords (<strong>"Login Credentials"</strong>).
+                        You must keep the Login Credentials secret and protect them from unauthorised use.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">3.2</span>
+                        You acknowledge your own responsibility for the safekeeping, handling and use of
+                        Your Account — including in relation to Services requested by third parties
+                        using Your Account. No claim may be brought against Global shippments if Your
+                        Account or Login Credentials are used by unauthorised third parties.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">3.3</span>
+                        You must notify Global shippments immediately of any unauthorised use of Your Account.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">3.4</span>
+                        You must use the Online Application and the Services in accordance with these
+                        Terms, lawfully and in good faith, and must not cause any damage — including
+                        reputational damage — to Global shippments or to any third party.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">3.5</span>
+                        You must not use the Online Application or the Services in a way that violates
+                        applicable law or these Terms.
+                    </p>
+                </section>
+
+                <!-- 4 -->
+                <section id="rights" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">04</span>
+                        <h2>Rights of use</h2>
+                    </div>
+
+                    <p class="lg-clause">
+                        <span class="num">4.1</span>
+                        Unless applicable law grants you additional rights notwithstanding the limitations
+                        set out in this clause, Global shippments grants you a revocable, non-exclusive,
+                        non-transferable, limited right to download, install and use the Online Application
+                        solely for the purposes described in Clause 1.1 of these Terms. This right is
+                        granted to you for personal, non-commercial use only.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">4.2</span>
+                        All text, graphics, user interfaces, databases, trademarks, logos and computer
+                        code (<strong>"Content"</strong>) in the Online Application and the Services are
+                        owned or licensed by Global shippments and are protected by copyright, trademark and
+                        other intellectual property laws. Content includes, without limitation, the
+                        design, structure, selection, expression, "look and feel" and arrangement of the
+                        Online Application.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">4.3</span>
+                        Except as expressly provided in these Terms, no Content may be processed without
+                        Global shippments's prior written consent. "Processing" includes — in whole or in part —
+                        copying, scraping, modifying, caching, reproducing, republishing, uploading,
+                        transmitting, or distributing in any way to any other computer, server, website
+                        or other medium for publication or distribution.
+                    </p>
+                </section>
+
+                <!-- 5 -->
+                <section id="prohibited" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">05</span>
+                        <h2>Prohibited conduct</h2>
+                    </div>
+
+                    <p>
+                        By way of example and without limitation, you shall not, and shall not attempt to,
+                        and shall not authorise or permit others to:
+                    </p>
+
+                    <ol>
+                        <li>Reverse engineer, decompile, disassemble, or otherwise attempt to derive the source code form, underlying ideas, algorithms or structure of the Online Application, the Services or the Content.</li>
+                        <li>Repackage, replicate, copy or recreate the Online Application, the Services or the Content.</li>
+                        <li>Modify the Online Application, the Services or the Content.</li>
+                        <li>Publish any performance or benchmark tests or analyses relating to the software or its use.</li>
+                        <li>Offer for sale, market, distribute, sublicense, assign, share, timeshare, (re-)sell, rent, lease, or grant a security interest in the Online Application, the Services or the Content — in whole or in part.</li>
+                        <li>Commercially exploit in any manner any Content or data obtained from the Online Application or the Services.</li>
+                        <li>Gain unauthorised access to Electronic Data that is not your data, or use a third party's Electronic Data without authorisation.</li>
+                        <li>Perform any security tests (e.g., penetration testing), performance tests (e.g., load testing), stress tests or similar tests on the Online Application.</li>
+                        <li>Use automated systems or software — including crawlers, spiders, search bots, browser plug-ins, extensions, add-ons or other technological means — to access, scrape or modify the Services or the Online Application, or to copy, add, download or retrieve Content from the Online Application.</li>
+                        <li>Interfere with, modify, disable, hinder or damage the accessibility, features, functionality or security controls of the Online Application or the Services.</li>
+                        <li>Defeat, avoid, bypass, remove, deactivate or otherwise circumvent any protection mechanisms for the Online Application or the Services.</li>
+                        <li>Introduce viruses, trojans, worms, logic bombs or other technologically harmful or malicious materials, or perform denial-of-service attacks or other cyber-attacks.</li>
+                        <li>Obtain — for example by phishing or social pharming — user credentials such as usernames, passwords or credit card information, and use or deploy them.</li>
+                        <li>Engage in industrial espionage to retrieve Electronic Data (in particular trade or business secrets) by any of the above actions.</li>
+                    </ol>
+                </section>
+
+                <!-- 6 -->
+                <section id="availability" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">06</span>
+                        <h2>Availability</h2>
+                    </div>
+
+                    <p class="lg-clause">
+                        <span class="num">6.1</span>
+                        Global shippments will use reasonable efforts to keep the Online Application available
+                        on every day of the year, except during scheduled maintenance windows or during
+                        force-majeure events. Scheduled maintenance windows will be announced in advance,
+                        to the best of our ability, on the Online Application or by email.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">6.2</span>
+                        The Online Application is considered available as long as you can log in to Your
+                        Account and access the Services. Global shippments makes no specific warranties
+                        regarding continued operation of the Online Application, nor regarding service
+                        levels for identifying or resolving reported issues.
+                    </p>
+                </section>
+
+                <!-- 7 -->
+                <section id="it-security" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">07</span>
+                        <h2>IT security</h2>
+                    </div>
+
+                    <p class="lg-clause">
+                        <span class="num">7.1</span>
+                        Global shippments maintains appropriate security measures in line with ISO 27001:2013.
+                        This is Global shippments's entire obligation regarding the security of information
+                        and data, and of Global shippments's IT systems, in connection with your use of the
+                        Online Application and the Services.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">7.2</span>
+                        You are solely responsible for maintaining backup copies of Electronic Data
+                        provided by you when using the Services, or retrieved by you from the Services
+                        (<strong>"Your Data"</strong>). Without prejudice to any existing contractual
+                        obligations between Global shippments and you, Global shippments shall not be required to
+                        hand over or provide access to Your Data, unless necessary to fulfil the purposes
+                        set out in Clause 1.1 or otherwise agreed in writing.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">7.3</span>
+                        It is your responsibility to take appropriate precautions to ensure the security
+                        of your computer systems and networks, as well as the integrity and confidentiality
+                        of Your Data — for example by activating the security features offered by Send
+                        Express (currently <strong>eSecure</strong>), by keeping backup copies of Your
+                        Data, or by observing all IT-security notifications (such as phishing alerts on
+                        the Online Application).
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">7.4</span>
+                        You shall not integrate the Online Application or the Services into IT systems, or
+                        operate IT systems, in a way that third parties or automated systems can have
+                        direct or indirect unsecured or unauthorised access to the Services or the Online
+                        Application. In particular, you shall take and maintain sufficient technical and
+                        IT-security measures — for example up-to-date virus protection, anti-malware
+                        tools and a current browser version — to prevent third parties or automated
+                        systems from accessing, downloading, retrieving or making available Electronic
+                        Data from the Online Application. These measures shall include the use of bot
+                        protection systems, CAPTCHA and/or monitoring and investigation of traffic spikes.
+                    </p>
+                </section>
+
+                <!-- 8 -->
+                <section id="suspension" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">08</span>
+                        <h2>Suspension of account</h2>
+                    </div>
+
+                    <p class="lg-clause">
+                        <span class="num">8.1</span>
+                        Global shippments may suspend or limit the use of Your Account and access to the
+                        Services, immediately upon notice, if:
+                    </p>
+                    <ul>
+                        <li>Global shippments determines at its own discretion that there is misuse, fraudulent, illegal, or bad-faith use of the Online Application or the Services;</li>
+                        <li>Global shippments determines at its own discretion that there is a material breach of your obligations under these Terms;</li>
+                        <li>Global shippments determines at its own discretion that there is reasonable suspicion of a security incident;</li>
+                        <li>extraordinary maintenance work is required; or</li>
+                        <li>suspension or limitation is required by law, by a court decision, or at the request of a governmental body.</li>
+                    </ul>
+
+                    <p class="lg-clause">
+                        <span class="num">8.2</span>
+                        Global shippments's failure to enforce the rights and entitlements under these Terms
+                        shall not be construed as a waiver, nor prevent Global shippments from demanding strict
+                        compliance with the contractual provisions at any time thereafter.
+                    </p>
+                </section>
+
+                <!-- 9 -->
+                <section id="export" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">09</span>
+                        <h2>Export controls, sanctions and customs</h2>
+                    </div>
+
+                    <p class="lg-clause">
+                        <span class="num">9.1</span>
+                        Export-control, economic-sanctions, and customs laws and regulations apply to the
+                        Services and to your access to the Online Application.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">9.2</span>
+                        You agree to comply fully with applicable trade regulations, including those of
+                        the United Nations, the European Union, the United States, the United Kingdom,
+                        and any other applicable export-control, economic-sanctions and local customs
+                        laws (collectively, <strong>"Trade Regulations"</strong>).
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">9.3</span>
+                        You represent and warrant that:
+                    </p>
+                    <ul>
+                        <li>Neither you nor any company, entity or third party you represent is listed on any applicable sanctions list or is a denied or restricted party;</li>
+                        <li>You will deny access to the Online Application from any location subject to comprehensive sanctions or an embargo on goods under any applicable Trade Regulations;</li>
+                        <li>You will deny access to the Online Application to any individual or entity that is a denied trade party, or is owned or controlled by a denied trade party;</li>
+                        <li>You will ensure that any software, technology or data owned or controlled by you, or by any third party acting on your behalf, and subject to Trade Regulations, is not used, re-exported, transferred or accessed without the export licence, authorisation or approval required from the relevant government authorities;</li>
+                        <li>If you cannot comply with any of the above requirements, you will notify Global shippments in writing immediately.</li>
+                    </ul>
+
+                    <p class="lg-clause">
+                        <span class="num">9.4</span>
+                        In connection with the Services, you agree to provide true, complete and accurate
+                        information in accordance with applicable local customs law, including restrictions
+                        on prohibited and restricted commodities, and to notify Global shippments promptly if
+                        you discover any error or inaccuracy.
+                    </p>
+                </section>
+
+                <!-- 10 -->
+                <section id="liability" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">10</span>
+                        <h2>Liability and claims</h2>
+                    </div>
+
+                    <h3>10.1 Disclaimer of warranties</h3>
+                    <p>
+                        The Services, the Content and the information on the Online Application are
+                        provided on an <strong>"as is"</strong> basis. Global shippments, to the fullest extent
+                        permitted by law, disclaims all warranties — whether express, implied, statutory
+                        or otherwise — including the implied warranties of merchantability, non-infringement
+                        of third-party rights, and fitness for a particular purpose. Global shippments, its
+                        affiliates and licensors make no representation or warranty about the accuracy,
+                        completeness, security or timeliness of the Services, Content or information
+                        provided on or through the Global shippments website or systems. No information obtained
+                        via the Global shippments systems or website creates any warranty not expressly stated
+                        in these Terms.
+                    </p>
+
+                    <div class="lg-note lg-note--amber">
+                        <i class="fas fa-scale-balanced"></i>
+                        <div>
+                            <strong>Consumer note.</strong>
+                            Some jurisdictions do not allow limitations of implied warranties, so the
+                            limitations and exclusions in this section may not apply to you. If you are
+                            dealing as a consumer, these provisions do not affect statutory rights that
+                            cannot be waived. You agree that the limitations and exclusions of liability
+                            and warranty in these Terms are fair and reasonable.
+                        </div>
+                    </div>
+
+                    <h3>10.2 Limitation of liability</h3>
+                    <p>
+                        To the extent permitted by law, in no event shall Global shippments, its affiliates or
+                        licensors, or any third party mentioned on the Global shippments website, be liable for
+                        any incidental, indirect, exemplary, punitive or consequential damages, lost
+                        profits, or damages resulting from lost data or business interruption arising out
+                        of or in connection with the use of, or inability to use, the Global shippments website
+                        or systems, Services, Content or information — whether based in warranty, contract,
+                        tort, delict or any other legal theory, and whether or not Global shippments has been
+                        advised of the possibility of such damages.
+                    </p>
+
+                    <h3>10.3 Cap on liability</h3>
+                    <p>
+                        Without limiting the foregoing, and to the extent permitted by applicable law,
+                        you agree that in no event shall Global shippments's total liability for any damages
+                        (direct or otherwise) or loss — regardless of the form of action or claim, whether
+                        in contract, tort or otherwise — exceed <strong>EUR 100.00</strong>.
+                    </p>
+
+                    <h3>10.4 Exclusive remedies</h3>
+                    <p>
+                        To the extent permitted by law, the remedies stated for you in these Terms are
+                        exclusive and are limited to those expressly provided for in these Terms.
+                    </p>
+
+                    <h3>10.5 Time limit on claims</h3>
+                    <p>
+                        Any claim regarding the operation of the Online Application must be made in
+                        writing within <strong>14 days</strong> after the occurrence of the anomaly or
+                        malfunctioning event.
+                    </p>
+
+                    <h3>10.6 Circumstances outside Global shippments's control</h3>
+                    <p>
+                        Global shippments will not be liable for any damages caused by chance or by circumstances
+                        beyond its reasonable control, including: acts of God; compliance with any act of a
+                        governmental or other authority; war or national emergency; riots; civil commotion;
+                        acts of terrorism; piracy; severe weather (such as storms or floods); explosion;
+                        fire; criminal acts; any information-security-related threat or attack (for example
+                        computer viruses, bot attacks or other cyber-attacks); use by you of software tools
+                        or applications not downloaded from the Online Application or other Global shippments
+                        authorised sites, or not kept up to date; power outages; configuration problems or
+                        malfunctions of your workstation or internet connection; incorrect data entered by
+                        you; epidemic, pandemic, lock-outs, strikes and other industrial disputes (whether
+                        or not affecting Global shippments's or its subcontractors' workforce); shortage of
+                        labour, materials and services; inability or delay in obtaining supplies; or the
+                        failure or limitation of performance of communication networks and gateways of
+                        other operators.
+                    </p>
+                </section>
+
+                <!-- 11 -->
+                <section id="ip" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">11</span>
+                        <h2>Intellectual property</h2>
+                    </div>
+
+                    <h3>Copyright</h3>
+                    <p>
+                        The copyright in the Online Application and its Content is owned by Global shippments
+                        International GmbH. All rights reserved.
+                    </p>
+
+                    <h3>Authorisation to reproduce</h3>
+                    <p>You may reproduce portions of the material on these web pages subject to the following conditions:</p>
+                    <ul>
+                        <li>The material may be used for informational and non-commercial purposes only;</li>
+                        <li>It may not be modified in any way;</li>
+                        <li>No unauthorised copy of any Global shippments trademark may be made;</li>
+                        <li>Any copy must include the following notice: <em>"Copyright © Global shippments International GmbH. All rights reserved."</em></li>
+                    </ul>
+
+                    <h3>Global shippments trademarks</h3>
+                    <p>
+                        The following are trademarks of Global shippments International GmbH, registered in at
+                        least one jurisdiction:
+                    </p>
+                    <div class="lg-code">
+                        "GLOBAL SHIPPMENTS", "Global shippments Worldwide", "Global shippments Easy", "Global shippments Express",
+                        "Global shippments Parcel", "Global shippments eCommerce", "Global shippments Freight",
+                        "Global shippments Supply Chain", "Global shippments Global Forwarding", "Jumbo Box",
+                        "Global shippments Economy Select", "Send ExpressJetline", "Global shippments Sprintline",
+                        "Global shippments Secureline", "Global shippments Connect", "EasyShip"
+                    </div>
+                    <p>
+                        No licence to use any of these trademarks is granted or implied. They may not be
+                        copied, downloaded, reproduced, used, modified or distributed in any way without
+                        prior written permission.
+                    </p>
+
+                    <h3>Other trademarks</h3>
+                    <p>
+                        All other trademarks or trade names referred to in the Online Application are the
+                        property of their respective owners.
+                    </p>
+                </section>
+
+                <!-- 12 -->
+                <section id="termination" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">12</span>
+                        <h2>Duration and termination</h2>
+                    </div>
+
+                    <p class="lg-clause">
+                        <span class="num">12.1</span>
+                        Registration on the Online Application is granted for an indefinite period. You may
+                        close your account at any time. In addition to its right of suspension under
+                        Clause 8, Global shippments may terminate your account on at least 14 days' written
+                        notice and will do so if your account remains inactive for 24 months.
+                    </p>
+
+                    <p class="lg-clause">
+                        <span class="num">12.2</span>
+                        In the event of a material breach of your contractual obligations, Global shippments's
+                        right to terminate — and all other rights and remedies it may have — remain
+                        unaffected.
+                    </p>
+                </section>
+
+                <!-- 13 -->
+                <section id="governing-law" class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num">13</span>
+                        <h2>Governing law</h2>
+                    </div>
+
+                    <p>
+                        These Terms of Use, and any dispute arising out of or in connection with them,
+                        shall be governed by the laws of the Federal Republic of Germany, excluding its
+                        conflict-of-laws provisions and the United Nations Convention on Contracts for the
+                        International Sale of Goods (CISG).
+                    </p>
+
+                    <h3>Dispute resolution</h3>
+                    <p>
+                        The European Commission has established an online dispute resolution platform
+                        (ODR platform) for consumers:
+                        <a href="https://webgate.ec.europa.eu/odr" target="_blank" rel="noopener">webgate.ec.europa.eu/odr</a>.
+                        Consumers may submit complaints relating to the online purchase of goods or services
+                        through that platform.
+                    </p>
+                </section>
+
+                <!-- Supplementary -->
+                <section class="lg-section">
+                    <div class="lg-section-header">
+                        <span class="lg-section-num"><i class="fas fa-plus" style="font-size: .8rem;"></i></span>
+                        <h2>Supplementary information</h2>
+                    </div>
+
+                    <h3>Your comments</h3>
+                    <p>
+                        Global shippments welcomes your feedback and appreciates your ideas and suggestions, but
+                        is unable to answer every comment individually. Global shippments will be free to use
+                        and act on any information you submit.
+                    </p>
+
+                    <h3>Accuracy of this site</h3>
+                    <p>
+                        These web pages may contain inadvertent inaccuracies or typographical errors.
+                        They will be corrected at Global shippments's discretion as they are found. Information
+                        is updated regularly, but inaccuracies may remain or occur where changes take place
+                        between updates. The internet is maintained independently at multiple sites around
+                        the world, and some of the information accessed through these web pages may
+                        originate outside Global shippments. Global shippments excludes any obligation or
+                        responsibility for such content.
+                    </p>
+
+                    <h3>Viruses</h3>
+                    <p>
+                        Global shippments makes every reasonable effort to exclude viruses from these web pages,
+                        but cannot guarantee their exclusion, and no liability is accepted for viruses.
+                        Please take all appropriate safeguards before downloading information from these
+                        web pages.
+                    </p>
+
+                    <h3>Products and services</h3>
+                    <p>
+                        Unless otherwise agreed in writing, the transportation products and services
+                        mentioned in these web pages are subject to Global shippments's Terms and Conditions of
+                        Carriage. Because these may vary depending on the country of origin of a shipment,
+                        please contact the nearest Global shippments service centre to obtain a copy of the
+                        applicable local terms. Not all Global shippments products and services are available
+                        in every country.
+                    </p>
+
+                    <h3>Disclosure of information</h3>
+                    <p>
+                        All information provided to Global shippments by visitors to these web pages is
+                        considered confidential and will not be disclosed to any third party except as
+                        may be required for the provision of the services.
+                    </p>
+                </section>
+
+                <!-- Back to top -->
+                <a href="#" class="lg-back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+                    <i class="fas fa-arrow-up"></i> Back to top
+                </a>
+
+                <!-- Footnote -->
+                <div class="lg-footnote">
+                    <span class="date">
+                        <i class="fas fa-calendar-check"></i>
+                        Last updated: March 2026
+                    </span>
+                    <span class="copy">
+                        © 2026 Global shippments International GmbH. All rights reserved.
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

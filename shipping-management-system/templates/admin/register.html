@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}SHPE Express - Admin Registration{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* SHPE Theme Styles */
+    :root {
+        --shpe-yellow: #FFCC00;
+        --shpe-red: #D40511;
+        --shpe-dark: #2D2D2D;
+        --shpe-gray: #666666;
+        --shpe-light-gray: #F5F5F5;
+        --shpe-border: #E5E5E5;
+    }
+
+    /* Override base styles */
+    .container {
+        max-width: 1400px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background-color: #FFFFFF;
+    }
+
+    /* Header */
+    .shpe-header {
+        background-color: var(--shpe-dark);
+        color: white;
+        margin-bottom: 2rem;
+    }
+
+    .shpe-top-bar {
+        height: 4px;
+        background-color: var(--shpe-yellow);
+    }
+
+    .shpe-nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .shpe-logo-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .shpe-logo {
+        height: 30px;
+        width: auto;
+    }
+
+    .shpe-divider {
+        color: var(--shpe-yellow);
+        font-size: 1.5rem;
+        font-weight: 300;
+    }
+
+    .shpe-section-title {
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .shpe-user-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .shpe-welcome {
+        color: var(--shpe-yellow);
+        font-size: 0.9rem;
+    }
+
+    /* Content */
+    .shpe-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Card Override */
+    .card {
+        border: 1px solid var(--shpe-border) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .card-header {
+        background-color: var(--shpe-dark) !important;
+        color: white !important;
+        padding: 1.25rem 1.5rem !important;
+        border-bottom: 3px solid var(--shpe-yellow) !important;
+    }
+
+    .card-header h4 {
+        font-weight: 600 !important;
+        font-size: 1.25rem !important;
+        margin: 0 !important;
+        letter-spacing: 0.5px;
+    }
+
+    .card-body {
+        padding: 2rem !important;
+    }
+
+    /* Form Elements */
+    .form-label {
+        color: var(--shpe-dark);
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid var(--shpe-border);
+        border-radius: 4px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--shpe-yellow);
+        box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+        outline: none;
+    }
+
+    /* Button Override */
+    .btn-primary {
+        background-color: var(--shpe-red) !important;
+        border-color: var(--shpe-red) !important;
+        padding: 0.75rem 2rem !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        letter-spacing: 0.5px !important;
+        box-shadow: 0 2px 4px rgba(212, 5, 17, 0.2) !important;
+        border-radius: 4px !important;
+    }
+
+    .btn-primary:hover {
+        background-color: #b0040e !important;
+        border-color: #b0040e !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(212, 5, 17, 0.3) !important;
+    }
+
+    /* Link Style */
+    a {
+        color: var(--shpe-dark);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    a:hover {
+        color: var(--shpe-red);
+        text-decoration: underline;
+    }
+
+    /* Footer */
+    .shpe-footer {
+        background-color: var(--shpe-dark);
+        color: white;
+        margin-top: 3rem;
+        padding: 2rem 0;
+    }
+
+    .shpe-footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .shpe-footer-links {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .shpe-footer-links a {
+        color: var(--shpe-yellow);
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .shpe-footer-links a:hover {
+        text-decoration: underline;
+        color: var(--shpe-yellow);
+    }
+
+    .shpe-copyright {
+        text-align: center;
+        color: #999;
+        font-size: 0.8rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .shpe-nav-container {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .shpe-content {
+            padding: 1rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem !important;
+        }
+        
+        .shpe-footer-links {
+            gap: 1rem;
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- SHPE Header -->
+<div class="shpe-header">
+    <div class="shpe-top-bar"></div>
+    <div class="shpe-nav-container">
+        <div class="shpe-logo-section">
+            <img src="https://www.shpe.com/content/dam/shpe/global/core/images/logos/shpe-logo.svg" alt="SHPE" class="shpe-logo">
+            <span class="shpe-divider">|</span>
+            <span class="shpe-section-title">Admin Registration</span>
+        </div>
+        <div class="shpe-user-section">
+            <span class="shpe-welcome">SHPE Express</span>
+            <div class="shpe-user-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="8" r="4" stroke="#FFCC00" stroke-width="2"/>
+                    <path d="M5 20V19C5 15.6863 7.68629 13 11 13H13C16.3137 13 19 15.6863 19 19V20" stroke="#FFCC00" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="shpe-content">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h4 class="mb-0">Create Admin Account</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin_register') }}">
+                        <div class="mb-4">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" name="username" required 
+                                   placeholder="Enter username">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required 
+                                   placeholder="Enter email address">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" name="full_name" 
+                                   placeholder="Enter full name (optional)">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required 
+                                   placeholder="Enter password">
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a href="{{ url_for('login') }}">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z" fill="#D40511"/>
+                                </svg>
+                                Back to login
+                            </a>
+                            <button class="btn btn-primary" type="submit">
+                                Register Admin
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SHPE Footer -->
+<div class="shpe-footer">
+    <div class="shpe-footer-content">
+        <div class="shpe-footer-links">
+            <a href="#">Imprint</a>
+            <a href="#">Legal Notice</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Use</a>
+        </div>
+        <div class="shpe-copyright">
+            © 2024 SHPE International GmbH. All rights reserved.
+        </div>
+    </div>
+</div>
+{% endblock %}

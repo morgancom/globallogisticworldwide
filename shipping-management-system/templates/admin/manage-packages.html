@@ -1,0 +1,1765 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Packages — Global shippments Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================================
+   GLOBAL SHIPPMENTS — MANAGE PACKAGES (ADMIN)
+   Filterable, searchable list of all shipments.
+   Uses base.html design tokens. Full dark-mode support.
+   ========================================================================= */
+
+:root {
+    --mp-surface:       #FFFFFF;
+    --mp-surface-alt:   #F8FAFC;
+    --mp-surface-soft:  #F1F5F9;
+    --mp-line:          #E6EAF0;
+    --mp-line-soft:     #EEF2F7;
+    --mp-ink:           #0B1220;
+    --mp-text:          #1E293B;
+    --mp-muted:         #64748B;
+    --mp-muted-2:       #94A3B8;
+
+    --mp-success:       #16A34A;
+    --mp-success-bg:    #ECFDF5;
+    --mp-danger:        #DC2626;
+    --mp-danger-bg:     #FEF2F2;
+    --mp-warning:       #D97706;
+    --mp-warning-bg:    #FFF7ED;
+    --mp-info:          #0EA5E9;
+    --mp-info-bg:       #EFF9FF;
+    --mp-neutral:       #475569;
+    --mp-neutral-bg:    #F1F5F9;
+
+    --mp-sh-xs: 0 1px 2px rgba(15, 23, 42, .04);
+    --mp-sh-sm: 0 2px 8px rgba(15, 23, 42, .06);
+    --mp-sh-md: 0 12px 28px -14px rgba(15, 23, 42, .18);
+    --mp-sh-lg: 0 30px 60px -22px rgba(15, 23, 42, .28);
+
+    --mp-ease: cubic-bezier(.4, 0, .2, 1);
+    --mp-dur:  220ms;
+
+    --mp-r-sm: 8px;
+    --mp-r-md: 12px;
+    --mp-r-lg: 16px;
+    --mp-r-xl: 24px;
+    --mp-pill: 999px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --mp-surface:      #111C30;
+        --mp-surface-alt:  #0F172A;
+        --mp-surface-soft: #1A273F;
+        --mp-line:         #1E293B;
+        --mp-line-soft:    #172A45;
+        --mp-ink:          #F1F5F9;
+        --mp-text:         #CBD5E1;
+        --mp-muted:        #94A3B8;
+        --mp-muted-2:      #64748B;
+
+        --mp-success-bg:   #052E1A;
+        --mp-danger-bg:    #2E0A0D;
+        --mp-warning-bg:   #2E1A05;
+        --mp-info-bg:      #0B2A3E;
+        --mp-neutral-bg:   #1E293B;
+
+        --mp-sh-xs: 0 1px 2px rgba(0, 0, 0, .4);
+        --mp-sh-sm: 0 2px 8px rgba(0, 0, 0, .5);
+        --mp-sh-md: 0 12px 28px -14px rgba(0, 0, 0, .6);
+        --mp-sh-lg: 0 30px 60px -22px rgba(0, 0, 0, .7);
+    }
+}
+
+body { background: var(--mp-surface-alt); color: var(--mp-text); }
+
+.mp-page h1, .mp-page h2, .mp-page h3,
+.mp-page h4, .mp-page h5, .mp-page h6 {
+    color: var(--mp-ink);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+}
+
+/* =========================================================================
+   PAGE HERO
+   ========================================================================= */
+.mp-hero {
+    position: relative;
+    padding: clamp(28px, 4vw, 44px) 0 clamp(24px, 3vw, 32px);
+    background:
+        radial-gradient(ellipse 60% 70% at 20% 20%, rgba(225, 29, 42, .12), transparent 60%),
+        linear-gradient(180deg, #0b1220, #1a1a2a);
+    color: #fff;
+    overflow: hidden;
+}
+.mp-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, #000 20%, transparent 75%);
+    pointer-events: none;
+}
+.mp-hero > .container { position: relative; z-index: 1; max-width: 1440px; }
+
+.mp-hero-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+}
+
+.mp-hero-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 8px;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+}
+.mp-hero-title .hero-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: var(--mp-r-md);
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+    box-shadow: 0 10px 22px -8px rgba(225, 29, 42, .55);
+}
+.mp-hero-sub {
+    font-size: .92rem;
+    color: rgba(255, 255, 255, .78);
+    margin: 0;
+    max-width: 620px;
+}
+
+.mp-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.mp-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 24px;
+    border-radius: var(--mp-pill);
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all var(--mp-dur) var(--mp-ease);
+    white-space: nowrap;
+}
+.mp-hero-btn:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+.mp-hero-btn.primary {
+    background: #fff;
+    color: #0b1220;
+    box-shadow: 0 12px 28px -10px rgba(0, 0, 0, .45);
+}
+.mp-hero-btn.primary:hover {
+    transform: translateY(-2px);
+    background: #f1f5f9;
+    color: #0b1220;
+}
+.mp-hero-btn.ghost {
+    background: rgba(255, 255, 255, .1);
+    border-color: rgba(255, 255, 255, .25);
+    color: #fff;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.mp-hero-btn.ghost:hover {
+    background: rgba(255, 255, 255, .18);
+    border-color: #fff;
+    color: #fff;
+    transform: translateY(-2px);
+}
+.mp-hero-btn i { transition: transform var(--mp-dur) var(--mp-ease); }
+.mp-hero-btn:hover i { transform: translateX(3px); }
+
+/* =========================================================================
+   SHELL
+   ========================================================================= */
+.mp-shell {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: clamp(20px, 3vw, 32px) 16px 60px;
+}
+
+/* =========================================================================
+   FILTER BAR
+   ========================================================================= */
+.mp-filter {
+    background: var(--mp-surface);
+    border: 1px solid var(--mp-line);
+    border-radius: var(--mp-r-lg);
+    box-shadow: var(--mp-sh-sm);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.mp-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mp-statuses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+@media (max-width: 620px) {
+    .mp-statuses { width: 100%; }
+}
+
+.mp-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: var(--mp-pill);
+    border: 1.5px solid var(--mp-line);
+    background: var(--mp-surface);
+    color: var(--mp-text);
+    font-size: .82rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all var(--mp-dur) var(--mp-ease);
+}
+.mp-status i { font-size: .85em; opacity: .85; }
+.mp-status:hover {
+    border-color: var(--primary, #e11d2a);
+    color: var(--primary, #e11d2a);
+}
+.mp-status.active {
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(225, 29, 42, .45);
+}
+.mp-status.active:hover { color: #fff; }
+
+.mp-status-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: var(--mp-pill);
+    background: var(--mp-surface-soft);
+    color: var(--mp-muted);
+    font-size: .72rem;
+    font-weight: 800;
+    transition: all var(--mp-dur) var(--mp-ease);
+}
+.mp-status.active .mp-status-count {
+    background: rgba(255, 255, 255, .25);
+    color: #fff;
+}
+
+.mp-search {
+    display: flex;
+    width: 100%;
+    max-width: 340px;
+    border: 1.5px solid var(--mp-line);
+    border-radius: var(--mp-pill);
+    overflow: hidden;
+    background: var(--mp-surface);
+    transition: border-color var(--mp-dur) var(--mp-ease),
+                box-shadow   var(--mp-dur) var(--mp-ease);
+}
+.mp-search:focus-within {
+    border-color: var(--primary, #e11d2a);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary, #e11d2a) 15%, transparent);
+}
+.mp-search input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 11px 16px;
+    border: 0;
+    background: transparent;
+    color: var(--mp-ink);
+    font-size: .9rem;
+    outline: none;
+}
+.mp-search input::placeholder { color: var(--mp-muted-2); }
+.mp-search button {
+    flex: 0 0 auto;
+    padding: 0 16px;
+    border: 0;
+    background: var(--primary, #e11d2a);
+    color: #fff;
+    cursor: pointer;
+    transition: background var(--mp-dur) var(--mp-ease);
+}
+.mp-search button:hover { background: var(--primary-700, #a30f18); }
+@media (max-width: 620px) {
+    .mp-search { max-width: none; }
+}
+
+/* =========================================================================
+   TABLE CARD
+   ========================================================================= */
+.mp-card {
+    background: var(--mp-surface);
+    border: 1px solid var(--mp-line);
+    border-radius: var(--mp-r-lg);
+    box-shadow: var(--mp-sh-sm);
+    overflow: hidden;
+}
+
+.mp-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.mp-table thead th {
+    padding: 12px 18px;
+    background: var(--mp-surface-soft);
+    color: var(--mp-muted);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-align: left;
+    border-bottom: 1px solid var(--mp-line);
+    white-space: nowrap;
+}
+
+.mp-table tbody td {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--mp-line-soft);
+    font-size: .9rem;
+    color: var(--mp-text);
+    vertical-align: middle;
+}
+
+.mp-table tbody tr {
+    transition: background var(--mp-dur) var(--mp-ease);
+}
+.mp-table tbody tr:hover {
+    background: color-mix(in srgb, var(--primary, #e11d2a) 3%, var(--mp-surface));
+}
+.mp-table tbody tr:last-child td { border-bottom: 0; }
+
+/* Tracking code cell */
+.mp-tracking {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+.mp-tracking code {
+    display: inline-block;
+    padding: 5px 10px;
+    background: var(--mp-surface-soft);
+    border: 1px solid var(--mp-line);
+    border-radius: var(--mp-r-sm);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--mp-ink);
+    letter-spacing: .01em;
+    white-space: nowrap;
+}
+.mp-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--mp-line);
+    background: var(--mp-surface);
+    border-radius: var(--mp-r-sm);
+    color: var(--mp-muted);
+    cursor: pointer;
+    transition: all var(--mp-dur) var(--mp-ease);
+    flex-shrink: 0;
+}
+.mp-copy:hover {
+    color: var(--primary, #e11d2a);
+    border-color: var(--primary, #e11d2a);
+    background: color-mix(in srgb, var(--primary, #e11d2a) 6%, var(--mp-surface));
+}
+
+/* Recipient cell */
+.mp-recipient-name {
+    display: block;
+    font-weight: 700;
+    color: var(--mp-ink);
+    margin-bottom: 2px;
+    font-size: .9rem;
+}
+.mp-recipient-email {
+    display: block;
+    font-size: .78rem;
+    color: var(--mp-muted);
+    word-break: break-all;
+}
+
+/* Service cell */
+.mp-service {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+.mp-service i {
+    color: var(--primary, #e11d2a);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.mp-service .method {
+    display: block;
+    font-weight: 700;
+    color: var(--mp-ink);
+    font-size: .88rem;
+    letter-spacing: -0.01em;
+}
+.mp-service .type {
+    display: block;
+    font-size: .74rem;
+    color: var(--mp-muted);
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Badges */
+.mp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: var(--mp-pill);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+.mp-badge i { font-size: .85em; }
+.mp-badge.success {
+    background: var(--mp-success-bg);
+    color: var(--mp-success);
+    border-color: color-mix(in srgb, var(--mp-success) 25%, transparent);
+}
+.mp-badge.warning {
+    background: var(--mp-warning-bg);
+    color: var(--mp-warning);
+    border-color: color-mix(in srgb, var(--mp-warning) 25%, transparent);
+}
+.mp-badge.info {
+    background: var(--mp-info-bg);
+    color: var(--mp-info);
+    border-color: color-mix(in srgb, var(--mp-info) 25%, transparent);
+}
+.mp-badge.secondary {
+    background: var(--mp-neutral-bg);
+    color: var(--mp-neutral);
+    border-color: color-mix(in srgb, var(--mp-neutral) 20%, transparent);
+}
+.mp-badge.danger {
+    background: var(--mp-danger-bg);
+    color: var(--mp-danger);
+    border-color: color-mix(in srgb, var(--mp-danger) 25%, transparent);
+}
+
+.mp-overdue {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    margin-left: 6px;
+    border-radius: var(--mp-pill);
+    background: var(--mp-danger-bg);
+    color: var(--mp-danger);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.mp-na {
+    color: var(--mp-muted-2);
+    font-size: .85rem;
+}
+
+/* Actions */
+.mp-actions {
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.mp-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--mp-r-sm);
+    font-size: .85rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--mp-dur) var(--mp-ease);
+    flex-shrink: 0;
+}
+.mp-action:focus-visible {
+    outline: 2px solid var(--primary, #e11d2a);
+    outline-offset: 2px;
+}
+.mp-action:disabled,
+.mp-action[disabled] {
+    opacity: .4;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.mp-action.primary { background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent); color: var(--primary, #e11d2a); }
+.mp-action.primary:hover:not(:disabled) { background: var(--primary, #e11d2a); color: #fff; transform: translateY(-2px); }
+
+.mp-action.success { background: var(--mp-success-bg); color: var(--mp-success); }
+.mp-action.success:hover:not(:disabled) { background: var(--mp-success); color: #fff; transform: translateY(-2px); }
+
+.mp-action.warning { background: var(--mp-warning-bg); color: var(--mp-warning); }
+.mp-action.warning:hover:not(:disabled) { background: var(--mp-warning); color: #fff; transform: translateY(-2px); }
+
+.mp-action.info { background: var(--mp-info-bg); color: var(--mp-info); }
+.mp-action.info:hover:not(:disabled) { background: var(--mp-info); color: #fff; transform: translateY(-2px); }
+
+.mp-action.secondary { background: var(--mp-surface-soft); color: var(--mp-muted); }
+.mp-action.secondary:hover:not(:disabled) { background: var(--mp-muted); color: #fff; transform: translateY(-2px); }
+
+/* =========================================================================
+   EMPTY STATE
+   ========================================================================= */
+.mp-empty {
+    text-align: center;
+    padding: 60px 24px;
+}
+.mp-empty .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--primary, #e11d2a) 10%, transparent);
+    color: var(--primary, #e11d2a);
+    font-size: 1.75rem;
+    margin-bottom: 18px;
+}
+.mp-empty h3 {
+    font-size: 1.1rem;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+}
+.mp-empty p {
+    font-size: .92rem;
+    color: var(--mp-muted);
+    margin: 0 0 24px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+/* =========================================================================
+   MODALS
+   ========================================================================= */
+.mp-modal .modal-content {
+    background: var(--mp-surface);
+    border: 1px solid var(--mp-line);
+    border-radius: var(--mp-r-lg);
+    overflow: hidden;
+    box-shadow: var(--mp-sh-lg);
+}
+.mp-modal .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 22px;
+    border-bottom: 0;
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+}
+.mp-modal .modal-header.warning {
+    background: linear-gradient(135deg, var(--mp-warning), #B45309);
+}
+.mp-modal .modal-header.success {
+    background: linear-gradient(135deg, var(--mp-success), #15803D);
+}
+.mp-modal .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+.mp-modal .modal-title i { color: rgba(255, 255, 255, .85); }
+.mp-modal .btn-close { filter: brightness(0) invert(1); opacity: .85; }
+.mp-modal .btn-close:hover { opacity: 1; }
+.mp-modal .modal-body { padding: 24px 22px; color: var(--mp-text); }
+.mp-modal .modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding: 16px 22px 20px;
+    border-top: 1px solid var(--mp-line-soft);
+}
+
+/* Map container */
+.mp-map {
+    width: 100%;
+    height: 260px;
+    border-radius: var(--mp-r-md);
+    overflow: hidden;
+    border: 1px solid var(--mp-line);
+    background: var(--mp-surface-alt);
+    margin-bottom: 16px;
+}
+
+/* Form controls */
+.mp-label {
+    display: block;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--mp-muted);
+    margin-bottom: 8px;
+}
+.mp-label .req { color: var(--primary, #e11d2a); }
+.mp-label .opt {
+    font-size: .7rem;
+    color: var(--mp-muted-2);
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: none;
+}
+.mp-field {
+    display: block;
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--mp-surface);
+    border: 1.5px solid var(--mp-line);
+    border-radius: var(--mp-r-sm);
+    color: var(--mp-ink);
+    font-size: .9rem;
+    font-weight: 500;
+    outline: none;
+    transition: border-color var(--mp-dur) var(--mp-ease),
+                box-shadow   var(--mp-dur) var(--mp-ease);
+    font-family: inherit;
+}
+.mp-field::placeholder { color: var(--mp-muted-2); font-weight: 400; }
+.mp-field:focus {
+    border-color: var(--primary, #e11d2a);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary, #e11d2a) 15%, transparent);
+}
+select.mp-field {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e11d2a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px 10px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+textarea.mp-field { resize: vertical; min-height: 72px; line-height: 1.55; }
+
+.mp-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: .78rem;
+    color: var(--mp-muted-2);
+    line-height: 1.5;
+}
+
+.mp-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: .88rem;
+    color: var(--mp-text);
+    cursor: pointer;
+}
+.mp-check input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    margin: 1px 0 0;
+    border: 2px solid var(--mp-line);
+    border-radius: 5px;
+    background: var(--mp-surface);
+    cursor: pointer;
+    position: relative;
+    transition: all var(--mp-dur) var(--mp-ease);
+}
+.mp-check input[type="checkbox"]:checked {
+    background: var(--primary, #e11d2a);
+    border-color: var(--primary, #e11d2a);
+}
+.mp-check input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px; top: 1px;
+    width: 6px; height: 11px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.mp-check input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--primary, #e11d2a);
+    outline-offset: 3px;
+}
+
+.mp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border: 1.5px solid transparent;
+    border-radius: var(--mp-pill);
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--mp-dur) var(--mp-ease);
+    white-space: nowrap;
+}
+.mp-btn:focus-visible { outline: 2px solid var(--primary, #e11d2a); outline-offset: 2px; }
+
+.mp-btn.primary {
+    background: linear-gradient(135deg, var(--primary, #e11d2a), var(--primary-700, #a30f18));
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(225, 29, 42, .45);
+}
+.mp-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(225, 29, 42, .55); color: #fff; }
+
+.mp-btn.warning {
+    background: linear-gradient(135deg, var(--mp-warning), #B45309);
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(217, 119, 6, .45);
+}
+.mp-btn.warning:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(217, 119, 6, .55); color: #fff; }
+
+.mp-btn.success {
+    background: linear-gradient(135deg, var(--mp-success), #15803D);
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(22, 163, 74, .45);
+}
+.mp-btn.success:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(22, 163, 74, .55); color: #fff; }
+
+.mp-btn.ghost {
+    background: transparent;
+    color: var(--mp-text);
+    border-color: var(--mp-line);
+}
+.mp-btn.ghost:hover {
+    border-color: var(--mp-ink);
+    background: var(--mp-surface-alt);
+    transform: translateY(-2px);
+    color: var(--mp-ink);
+}
+
+/* =========================================================================
+   TOASTS
+   ========================================================================= */
+.mp-toast {
+    position: fixed;
+    top: 88px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    min-width: 280px;
+    max-width: calc(100vw - 48px);
+    background: var(--mp-surface);
+    border: 1px solid var(--mp-line);
+    border-left: 4px solid var(--primary, #e11d2a);
+    border-radius: var(--mp-r-sm);
+    box-shadow: var(--mp-sh-lg);
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--mp-text);
+    animation: mpToastIn 280ms var(--mp-ease);
+}
+.mp-toast i { font-size: 1.15rem; color: var(--primary, #e11d2a); flex-shrink: 0; }
+.mp-toast.success { border-left-color: var(--mp-success); }
+.mp-toast.success i { color: var(--mp-success); }
+.mp-toast.error   { border-left-color: var(--mp-danger); }
+.mp-toast.error   i { color: var(--mp-danger); }
+.mp-toast.warning { border-left-color: var(--mp-warning); }
+.mp-toast.warning i { color: var(--mp-warning); }
+.mp-toast.info    { border-left-color: var(--mp-info); }
+.mp-toast.info    i { color: var(--mp-info); }
+.mp-toast.fade-out { animation: mpToastOut 280ms var(--mp-ease) forwards; }
+
+@keyframes mpToastIn {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes mpToastOut {
+    to { opacity: 0; transform: translateX(24px); }
+}
+@media (max-width: 576px) {
+    .mp-toast { left: 16px; right: 16px; top: 76px; min-width: auto; }
+}
+
+/* =========================================================================
+   RESPONSIVE — table → cards on mobile
+   ========================================================================= */
+@media (max-width: 900px) {
+    .mp-table thead { display: none; }
+    .mp-table,
+    .mp-table tbody,
+    .mp-table tr,
+    .mp-table td { display: block; width: 100%; }
+    .mp-table tbody tr {
+        margin: 0 0 14px;
+        background: var(--mp-surface);
+        border: 1px solid var(--mp-line);
+        border-radius: var(--mp-r-md);
+        overflow: hidden;
+    }
+    .mp-table tbody tr:last-child { margin-bottom: 0; }
+    .mp-table tbody td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 18px;
+        text-align: right;
+        border-bottom: 1px solid var(--mp-line-soft);
+    }
+    .mp-table tbody td::before {
+        content: attr(data-label);
+        flex: 0 0 auto;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--mp-muted);
+        text-align: left;
+    }
+    .mp-table tbody td:last-child { border-bottom: 0; }
+    .mp-actions { justify-content: flex-end; }
+
+    .mp-filter-row { flex-direction: column; align-items: stretch; }
+    .mp-statuses { width: 100%; }
+    .mp-search { max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* Print */
+@media print {
+    .mp-hero::before, .mp-hero-actions, .mp-filter, .mp-actions,
+    .mp-toast, .navbar, footer, .back-to-top { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .mp-hero { background: #fff !important; color: #000 !important; padding: 20px 0 !important; border-bottom: 2px solid #000; box-shadow: none; }
+    .mp-hero-title, .mp-hero-sub { color: #000 !important; }
+    .mp-card, .mp-table tbody tr { box-shadow: none !important; border: 1px solid #ddd !important; }
+    .mp-badge, .mp-tracking code { border: 1px solid #000; color: #000 !important; background: transparent !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mp-page">
+
+    <!-- ==================== PAGE HERO ==================== -->
+    <section class="mp-hero">
+        <div class="container">
+            <div class="mp-hero-inner">
+                <div>
+                    <h1 class="mp-hero-title">
+                        <span class="hero-icon"><i class="fas fa-boxes-stacked"></i></span>
+                        Manage packages
+                    </h1>
+                    <p class="mp-hero-sub">
+                        Search, filter and update every shipment in the Global shippments network.
+                    </p>
+                </div>
+
+                <div class="mp-hero-actions">
+                    <a href="{{ url_for('create_package') }}" class="mp-hero-btn primary">
+                        <i class="fas fa-plus"></i> New package
+                    </a>
+                    <button type="button" class="mp-hero-btn ghost" onclick="bulkImport()">
+                        <i class="fas fa-upload"></i> Bulk import
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SHELL ==================== -->
+    <div class="mp-shell">
+
+        <!-- ==================== FILTER BAR ==================== -->
+        <div class="mp-filter">
+            <div class="mp-filter-row">
+
+                <div class="mp-statuses" role="tablist" aria-label="Filter packages by status">
+                    <a href="{{ url_for('manage_packages') }}?status=all"
+                       class="mp-status {{ 'active' if current_status == 'all' else '' }}"
+                       role="tab" aria-selected="{{ 'true' if current_status == 'all' else 'false' }}">
+                        <i class="fas fa-boxes-stacked"></i>
+                        All
+                        <span class="mp-status-count">{{ status_counts.all }}</span>
+                    </a>
+                    <a href="{{ url_for('manage_packages') }}?status=pending"
+                       class="mp-status {{ 'active' if current_status == 'pending' else '' }}"
+                       role="tab" aria-selected="{{ 'true' if current_status == 'pending' else 'false' }}">
+                        <i class="fas fa-clock"></i>
+                        Pending
+                        <span class="mp-status-count">{{ status_counts.pending }}</span>
+                    </a>
+                    <a href="{{ url_for('manage_packages') }}?status=in_transit"
+                       class="mp-status {{ 'active' if current_status == 'in_transit' else '' }}"
+                       role="tab" aria-selected="{{ 'true' if current_status == 'in_transit' else 'false' }}">
+                        <i class="fas fa-truck-fast"></i>
+                        In transit
+                        <span class="mp-status-count">{{ status_counts.in_transit }}</span>
+                    </a>
+                    <a href="{{ url_for('manage_packages') }}?status=on_hold"
+                       class="mp-status {{ 'active' if current_status == 'on_hold' else '' }}"
+                       role="tab" aria-selected="{{ 'true' if current_status == 'on_hold' else 'false' }}">
+                        <i class="fas fa-pause"></i>
+                        On hold
+                        <span class="mp-status-count">{{ status_counts.on_hold }}</span>
+                    </a>
+                    <a href="{{ url_for('manage_packages') }}?status=delivered"
+                       class="mp-status {{ 'active' if current_status == 'delivered' else '' }}"
+                       role="tab" aria-selected="{{ 'true' if current_status == 'delivered' else 'false' }}">
+                        <i class="fas fa-circle-check"></i>
+                        Delivered
+                        <span class="mp-status-count">{{ status_counts.delivered }}</span>
+                    </a>
+                </div>
+
+                <form method="GET" action="{{ url_for('manage_packages') }}" class="mp-search" role="search">
+                    <input type="hidden" name="status" value="{{ current_status }}">
+                    <input type="text" name="search"
+                           value="{{ search }}"
+                           placeholder="Search tracking number, name or email…"
+                           autocomplete="off"
+                           spellcheck="false"
+                           aria-label="Search packages">
+                    <button type="submit" aria-label="Search">
+                        <i class="fas fa-magnifying-glass"></i>
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+        <!-- ==================== TABLE ==================== -->
+        <div class="mp-card">
+            <div class="table-responsive">
+                <table class="mp-table" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Tracking code</th>
+                            <th>Recipient</th>
+                            <th>Status</th>
+                            <th>Service</th>
+                            <th>Created</th>
+                            <th>Est. delivery</th>
+                            <th>Last update</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for package in packages %}
+                        <tr>
+                            <td data-label="Tracking code">
+                                <div class="mp-tracking">
+                                    <code>{{ package.tracking_code }}</code>
+                                    <button type="button" class="mp-copy"
+                                            onclick="copyToClipboard('{{ package.tracking_code }}')"
+                                            title="Copy tracking code" aria-label="Copy tracking code">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </td>
+
+                            <td data-label="Recipient">
+                                <span class="mp-recipient-name">{{ package.recipient_name }}</span>
+                                <span class="mp-recipient-email">{{ package.recipient_email }}</span>
+                            </td>
+
+                            <td data-label="Status">
+                                {% if package.status == 'in_transit' %}
+                                    <span class="mp-badge success"><i class="fas fa-truck"></i> In transit</span>
+                                {% elif package.status == 'on_hold' %}
+                                    <span class="mp-badge warning"><i class="fas fa-pause"></i> On hold</span>
+                                {% elif package.status == 'delivered' %}
+                                    <span class="mp-badge info"><i class="fas fa-circle-check"></i> Delivered</span>
+                                {% elif package.status == 'pending' %}
+                                    <span class="mp-badge secondary"><i class="fas fa-clock"></i> Pending</span>
+                                {% elif package.status == 'cancelled' %}
+                                    <span class="mp-badge danger"><i class="fas fa-times-circle"></i> Cancelled</span>
+                                {% elif package.status == 'shipped' %}
+                                    <span class="mp-badge info"><i class="fas fa-paper-plane"></i> Shipped</span>
+                                {% elif package.status == 'out_for_delivery' %}
+                                    <span class="mp-badge warning"><i class="fas fa-truck-fast"></i> Out for delivery</span>
+                                {% elif package.status == 'returned' %}
+                                    <span class="mp-badge secondary"><i class="fas fa-rotate-left"></i> Returned</span>
+                                {% elif package.status == 'dispatched' %}
+                                    <span class="mp-badge info"><i class="fas fa-arrow-up-from-bracket"></i> Dispatched</span>
+                                {% else %}
+                                    <span class="mp-badge secondary">{{ package.status|replace('_', ' ')|title }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td data-label="Service">
+                                <span class="mp-service">
+                                    <i class="fas fa-{{ 'plane' if package.shipping_method == 'air' else 'truck' if package.shipping_method == 'ground' else 'ship' if package.shipping_method == 'sea' else 'train' }}"></i>
+                                    <span>
+                                        <span class="method">{{ package.shipping_method|upper }}</span>
+                                        <span class="type">{{ package.shipping_type|title }}</span>
+                                    </span>
+                                </span>
+                            </td>
+
+                            <td data-label="Created">
+                                <span class="local-time"
+                                      data-iso="{{ package.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                                      data-format="date">
+                                    {{ package.created_at|format_dt('%Y-%m-%d') }}
+                                </span>
+                            </td>
+
+                            <td data-label="Est. delivery">
+                                {% if package.estimated_delivery %}
+                                    <span class="local-time"
+                                          data-iso="{{ package.estimated_delivery.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                                          data-format="date">
+                                        {{ package.estimated_delivery|format_dt('%Y-%m-%d') }}
+                                    </span>
+                                    {% if parse_dt(package.estimated_delivery)
+                                          and parse_dt(package.estimated_delivery).date() < now.date()
+                                          and package.status != 'delivered' %}
+                                        <span class="mp-overdue">Overdue</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="mp-na">—</span>
+                                {% endif %}
+                            </td>
+
+                            <td data-label="Last update">
+                                {% if package.updated_at %}
+                                    <span class="local-time"
+                                          data-iso="{{ package.updated_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                                          data-format="time">
+                                        {{ package.updated_at|format_dt('%H:%M') }}
+                                    </span>
+                                {% else %}
+                                    <span class="mp-na">Never</span>
+                                {% endif %}
+                            </td>
+
+                            <td data-label="Actions">
+                                <div class="mp-actions">
+                                    <a href="{{ url_for('view_package', package_id=package.id) }}"
+                                       class="mp-action primary" title="View details"
+                                       aria-label="View package details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+
+                                    <button type="button" class="mp-action success"
+                                            onclick="updateLocation({{ package.id }}, '{{ package.tracking_code }}')"
+                                            title="Update location" aria-label="Update location"
+                                            {% if package.status == 'delivered' or package.status == 'cancelled' %}disabled{% endif %}>
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </button>
+
+                                    {% if package.status == 'in_transit' %}
+                                    <button type="button" class="mp-action warning"
+                                            onclick="placeOnHold({{ package.id }})"
+                                            title="Place on hold" aria-label="Place on hold">
+                                        <i class="fas fa-pause"></i>
+                                    </button>
+                                    {% elif package.status == 'on_hold' %}
+                                    <button type="button" class="mp-action info"
+                                            onclick="releaseHold({{ package.id }})"
+                                            title="Release from hold" aria-label="Release from hold">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    {% endif %}
+
+                                    {% if package.status != 'delivered' and package.status != 'cancelled' %}
+                                    <button type="button" class="mp-action success"
+                                            onclick="markDelivered({{ package.id }})"
+                                            title="Mark as delivered" aria-label="Mark as delivered">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    {% endif %}
+
+                                    <a href="{{ url_for('generate_label', package_id=package.id) }}"
+                                       class="mp-action secondary" title="Generate label"
+                                       aria-label="Generate label" target="_blank" rel="noopener">
+                                        <i class="fas fa-tag"></i>
+                                    </a>
+                                    <a href="{{ url_for('generate_receipt', package_id=package.id) }}"
+                                       class="mp-action info" title="Generate receipt"
+                                       aria-label="Generate receipt" target="_blank" rel="noopener">
+                                        <i class="fas fa-receipt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8">
+                                <div class="mp-empty">
+                                    <div class="icon"><i class="fas fa-box-open"></i></div>
+                                    <h3>No packages match your filters</h3>
+                                    <p>
+                                        {% if search %}
+                                            Nothing matched <strong>"{{ search }}"</strong> with the current status filter.
+                                            Try a different search or clear the filters.
+                                        {% else %}
+                                            There are no packages in this view yet. Create one to get started.
+                                        {% endif %}
+                                    </p>
+                                    <a href="{{ url_for('create_package') }}" class="mp-btn primary">
+                                        <i class="fas fa-plus"></i> Create a package
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ==================== LOCATION MODAL ==================== -->
+<div class="modal fade mp-modal" id="locationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-map-marker-alt"></i> Update package location
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="updateMap" class="mp-map" aria-label="Map for selecting location"></div>
+                <p class="mp-hint" id="selectedCoords">Click on the map to set coordinates (optional).</p>
+
+                <form id="locationForm">
+                    <input type="hidden" id="packageId">
+                    <input type="hidden" id="trackingCode">
+
+                    <div class="mb-3">
+                        <label for="locationName" class="mp-label">Location name <span class="req">*</span></label>
+                        <input type="text" class="mp-field" id="locationName"
+                               placeholder="e.g. Berlin sorting centre" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="locationStatus" class="mp-label">Status</label>
+                        <select class="mp-field" id="locationStatus">
+                            <option value="in_transit">In transit</option>
+                            <option value="in_transit">Arrived at facility</option>
+                            <option value="departed">Departed facility</option>
+                            <option value="out_for_delivery">Out for delivery</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="locationDescription" class="mp-label">Description <span class="opt">optional</span></label>
+                        <textarea class="mp-field" id="locationDescription" rows="2"
+                                  placeholder="Any additional context for this update…"></textarea>
+                    </div>
+
+                    <label class="mp-check">
+                        <input type="checkbox" id="notifyRecipient">
+                        <span>Notify recipient via email / SMS</span>
+                    </label>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="mp-btn ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="mp-btn primary" onclick="saveLocation()">
+                    <i class="fas fa-save"></i> Update location
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== HOLD MODAL ==================== -->
+<div class="modal fade mp-modal" id="holdModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header warning">
+                <h5 class="modal-title">
+                    <i class="fas fa-pause"></i> Place package on hold
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="holdForm">
+                    <input type="hidden" id="holdPackageId">
+
+                    <div class="mb-3">
+                        <label for="holdReason" class="mp-label">Reason <span class="req">*</span></label>
+                        <select class="mp-field" id="holdReason" required>
+                            <option value="">Select a reason</option>
+                            <option value="Customs Inspection">Customs inspection</option>
+                            <option value="Weather Delay">Weather delay</option>
+                            <option value="Address Issue">Address issue</option>
+                            <option value="Recipient Not Available">Recipient not available</option>
+                            <option value="Payment Pending">Payment pending</option>
+                            <option value="Documentation Required">Documentation required</option>
+                            <option value="Operational Delay">Operational delay</option>
+                            <option value="Security Check">Security check</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="customReasonDiv" style="display: none;">
+                        <label for="customReason" class="mp-label">Custom reason</label>
+                        <input type="text" class="mp-field" id="customReason"
+                               placeholder="Describe the reason">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="holdDescription" class="mp-label">Additional details <span class="opt">optional</span></label>
+                        <textarea class="mp-field" id="holdDescription" rows="3"
+                                  placeholder="Any additional information…"></textarea>
+                    </div>
+
+                    <label class="mp-check">
+                        <input type="checkbox" id="notifyHold" checked>
+                        <span>Notify recipient about the hold</span>
+                    </label>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="mp-btn ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="mp-btn warning" onclick="confirmHold()">
+                    <i class="fas fa-pause"></i> Place on hold
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DELIVERY MODAL ==================== -->
+<div class="modal fade mp-modal" id="deliveryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header success">
+                <h5 class="modal-title">
+                    <i class="fas fa-circle-check"></i> Confirm delivery
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="deliveryForm">
+                    <input type="hidden" id="deliveryPackageId">
+
+                    <div class="mb-3">
+                        <label for="receivedBy" class="mp-label">Received by <span class="req">*</span></label>
+                        <input type="text" class="mp-field" id="receivedBy"
+                               placeholder="Full name of the person who signed" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="relationship" class="mp-label">Relationship to recipient</label>
+                        <select class="mp-field" id="relationship">
+                            <option value="Recipient">Recipient</option>
+                            <option value="Family Member">Family member</option>
+                            <option value="Neighbor">Neighbour</option>
+                            <option value="Receptionist">Receptionist</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="deliveryNotes" class="mp-label">Delivery notes <span class="opt">optional</span></label>
+                        <textarea class="mp-field" id="deliveryNotes" rows="2"
+                                  placeholder="Any notes about the delivery…"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="mp-label">Delivery location <span class="opt">optional</span></label>
+                        <div id="deliveryMap" class="mp-map" style="height: 200px;" aria-label="Delivery location map"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="mp-btn ghost" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="mp-btn success" onclick="confirmDelivery()">
+                    <i class="fas fa-check"></i> Confirm delivery
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Google Maps is included in base.html when need_maps is set -->
+<script>
+(function () {
+    'use strict';
+
+    /* ==================== State ==================== */
+    let currentPackageId = null;
+    let currentTrackingCode = null;
+    let updateMap = null;
+    let updateMarker = null;
+    let deliveryMap = null;
+    let deliveryMarker = null;
+
+    /* ==================== Toast ==================== */
+    function showNotification(message, type = 'info') {
+        const el = document.createElement('div');
+        el.className = `mp-toast ${type}`;
+        const icon = {
+            success: 'circle-check',
+            error:   'circle-exclamation',
+            warning: 'triangle-exclamation',
+            info:    'circle-info'
+        }[type] || 'circle-info';
+
+        el.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(el);
+
+        setTimeout(() => {
+            el.classList.add('fade-out');
+            setTimeout(() => el.remove(), 300);
+        }, 3400);
+    }
+    window.showNotification = showNotification;
+
+    /* ==================== JSON fetch helper ==================== */
+    async function postJSON(url, payload) {
+        const response = await fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(payload || {})
+        });
+
+        const ct = response.headers.get('content-type') || '';
+
+        if (!response.ok) {
+            if (ct.includes('application/json')) {
+                const err = await response.json();
+                throw new Error(err.error || JSON.stringify(err));
+            }
+            const text = await response.text();
+            throw new Error(text.split('\n')[0] || `HTTP ${response.status}`);
+        }
+
+        if (ct.includes('application/json')) return response.json();
+        const text = await response.text();
+        try { return JSON.parse(text); } catch (e) {
+            throw new Error(text.split('\n')[0] || 'Invalid server response');
+        }
+    }
+
+    /* ==================== Location update ==================== */
+    window.updateLocation = function (packageId, trackingCode) {
+        currentPackageId = packageId;
+        currentTrackingCode = trackingCode;
+
+        const idEl = document.getElementById('packageId');
+        const codeEl = document.getElementById('trackingCode');
+        if (idEl) idEl.value = packageId;
+        if (codeEl) codeEl.value = trackingCode || '';
+
+        // Show modal first, then lazily init the map when it's visible
+        const modalEl = document.getElementById('locationModal');
+        if (!modalEl || typeof bootstrap === 'undefined') return;
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        // Init map after the modal has been shown so sizing works correctly
+        modalEl.addEventListener('shown.bs.modal', function initOnce() {
+            modalEl.removeEventListener('shown.bs.modal', initOnce);
+            if (updateMap || typeof initializeMap !== 'function') return;
+
+            try {
+                updateMap = initializeMap('updateMap', [-98.5795, 39.8283], 3);
+                window.locationModalMap = updateMap;
+
+                if (updateMap && updateMap.addListener) {
+                    updateMap.addListener('click', function (e) {
+                        const lat = e.latLng.lat();
+                        const lng = e.latLng.lng();
+
+                        if (updateMarker && updateMarker.setPosition) {
+                            updateMarker.setPosition({ lat, lng });
+                        } else if (typeof addMarker === 'function') {
+                            updateMarker = addMarker(updateMap, [lng, lat], '#e11d2a');
+                            window.locationModalMarker = updateMarker;
+                        }
+
+                        const coordsEl = document.getElementById('selectedCoords');
+                        if (coordsEl) {
+                            coordsEl.innerHTML = `<strong>Coordinates:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                        }
+                    });
+                }
+            } catch (err) {
+                console.warn('Map init skipped:', err);
+            }
+        });
+    };
+
+    window.saveLocation = async function () {
+        const data = {
+            location_name: (document.getElementById('locationName')?.value || '').trim(),
+            status: document.getElementById('locationStatus')?.value || 'in_transit',
+            description: document.getElementById('locationDescription')?.value || '',
+            notify_recipient: document.getElementById('notifyRecipient')?.checked || false
+        };
+
+        if (!data.location_name) {
+            showNotification('Please enter a location name.', 'warning');
+            return;
+        }
+
+        if (updateMarker && typeof updateMarker.getPosition === 'function') {
+            const pos = updateMarker.getPosition();
+            if (pos) {
+                data.lat = parseFloat(pos.lat());
+                data.lng = parseFloat(pos.lng());
+            }
+        }
+
+        try {
+            const result = await postJSON(`/admin/package/${currentPackageId}/update-location`, data);
+            if (!result || !result.success) {
+                showNotification('Update failed: ' + ((result && result.error) || 'unknown error'), 'error');
+                return;
+            }
+
+            const newLat = Number.isFinite(data.lat) ? data.lat : (result.lat ? parseFloat(result.lat) : null);
+            const newLng = Number.isFinite(data.lng) ? data.lng : (result.lng ? parseFloat(result.lng) : null);
+
+            if (window.locationModalMap && newLat !== null && newLng !== null) {
+                if (window.locationModalMarker && window.locationModalMarker.setPosition) {
+                    window.locationModalMarker.setPosition({ lat: newLat, lng: newLng });
+                } else if (typeof addMarker === 'function') {
+                    window.locationModalMarker = addMarker(window.locationModalMap, [newLng, newLat], '#e11d2a');
+                }
+                if (typeof window.locationModalMap.setCenter === 'function') {
+                    window.locationModalMap.setCenter({ lat: newLat, lng: newLng });
+                }
+            }
+
+            // Optional: broadcast if Socket.IO is available
+            try {
+                if (typeof io !== 'undefined') {
+                    if (!window.socket) window.socket = io();
+                    if (window.socket && window.socket.emit) {
+                        window.socket.emit('location_update', {
+                            tracking_code: currentTrackingCode,
+                            package_id: currentPackageId,
+                            lat: newLat,
+                            lng: newLng,
+                            location_name: data.location_name,
+                            status: data.status
+                        });
+                    }
+                }
+            } catch (e) { console.warn('Socket emit failed:', e); }
+
+            const modalEl = document.getElementById('locationModal');
+            const inst = bootstrap.Modal.getInstance(modalEl);
+            if (inst) inst.hide();
+            showNotification('Location updated successfully', 'success');
+            setTimeout(() => location.reload(), 1200);
+
+        } catch (err) {
+            showNotification('Update failed: ' + (err.message || err), 'error');
+        }
+    };
+
+    /* ==================== Hold ==================== */
+    window.placeOnHold = function (packageId) {
+        currentPackageId = packageId;
+        const el = document.getElementById('holdPackageId');
+        if (el) el.value = packageId;
+
+        const modalEl = document.getElementById('holdModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+            new bootstrap.Modal(modalEl).show();
+        }
+    };
+
+    window.confirmHold = async function () {
+        const reason = document.getElementById('holdReason')?.value;
+        const customReason = (document.getElementById('customReason')?.value || '').trim();
+        const description = document.getElementById('holdDescription')?.value || '';
+
+        if (!reason) {
+            showNotification('Please select a reason for the hold.', 'warning');
+            return;
+        }
+        const finalReason = reason === 'Other' ? customReason : reason;
+        if (!finalReason) {
+            showNotification('Please provide a custom reason.', 'warning');
+            return;
+        }
+
+        try {
+            const result = await postJSON(`/admin/package/${currentPackageId}/hold`, {
+                reason: finalReason,
+                description: description,
+                notify: document.getElementById('notifyHold')?.checked || false
+            });
+
+            if (!result || !result.success) {
+                showNotification('Could not place on hold: ' + ((result && result.error) || 'unknown'), 'error');
+                return;
+            }
+
+            const inst = bootstrap.Modal.getInstance(document.getElementById('holdModal'));
+            if (inst) inst.hide();
+            showNotification('Package placed on hold', 'warning');
+            setTimeout(() => location.reload(), 1200);
+        } catch (err) {
+            showNotification('Could not place on hold: ' + (err.message || err), 'error');
+        }
+    };
+
+    /* ==================== Release hold ==================== */
+    window.releaseHold = async function (packageId) {
+        if (!confirm('Release this package from hold?')) return;
+
+        try {
+            const result = await postJSON(`/admin/package/${packageId}/release-hold`, {});
+            if (!result || !result.success) {
+                showNotification('Could not release hold: ' + ((result && result.error) || 'unknown'), 'error');
+                return;
+            }
+            showNotification('Hold released successfully', 'success');
+            setTimeout(() => location.reload(), 1200);
+        } catch (err) {
+            showNotification('Could not release hold: ' + (err.message || err), 'error');
+        }
+    };
+
+    /* ==================== Delivery ==================== */
+    window.markDelivered = function (packageId) {
+        currentPackageId = packageId;
+        const el = document.getElementById('deliveryPackageId');
+        if (el) el.value = packageId;
+
+        const modalEl = document.getElementById('deliveryModal');
+        if (!modalEl || typeof bootstrap === 'undefined') return;
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        modalEl.addEventListener('shown.bs.modal', function initOnce() {
+            modalEl.removeEventListener('shown.bs.modal', initOnce);
+            if (deliveryMap || typeof initializeMap !== 'function') return;
+
+            try {
+                deliveryMap = initializeMap('deliveryMap', [-98.5795, 39.8283], 3);
+                if (deliveryMap && deliveryMap.addListener) {
+                    deliveryMap.addListener('click', function (e) {
+                        const lat = e.latLng.lat();
+                        const lng = e.latLng.lng();
+                        if (deliveryMarker && deliveryMarker.setPosition) {
+                            deliveryMarker.setPosition({ lat, lng });
+                        } else if (typeof addMarker === 'function') {
+                            deliveryMarker = addMarker(deliveryMap, [lng, lat], '#16a34a');
+                        }
+                    });
+                }
+            } catch (err) {
+                console.warn('Delivery map init skipped:', err);
+            }
+        });
+    };
+
+    window.confirmDelivery = async function () {
+        const receivedBy = (document.getElementById('receivedBy')?.value || '').trim();
+        if (!receivedBy) {
+            showNotification('Please enter who received the package.', 'warning');
+            return;
+        }
+
+        const data = {
+            received_by: receivedBy,
+            relationship: document.getElementById('relationship')?.value || 'Recipient',
+            notes: document.getElementById('deliveryNotes')?.value || ''
+        };
+
+        if (deliveryMarker && typeof deliveryMarker.getPosition === 'function') {
+            const pos = deliveryMarker.getPosition();
+            if (pos) {
+                data.lat = parseFloat(pos.lat());
+                data.lng = parseFloat(pos.lng());
+            }
+        }
+
+        try {
+            const result = await postJSON(`/admin/package/${currentPackageId}/deliver`, data);
+            if (!result || !result.success) {
+                showNotification('Could not mark delivered: ' + ((result && result.error) || 'unknown'), 'error');
+                return;
+            }
+            const inst = bootstrap.Modal.getInstance(document.getElementById('deliveryModal'));
+            if (inst) inst.hide();
+            showNotification('Package marked as delivered', 'success');
+            setTimeout(() => location.reload(), 1200);
+        } catch (err) {
+            showNotification('Could not mark delivered: ' + (err.message || err), 'error');
+        }
+    };
+
+    /* ==================== Clipboard ==================== */
+    window.copyToClipboard = function (text) {
+        const done = () => showNotification('Tracking code copied to clipboard', 'success');
+        const fail = () => showNotification('Failed to copy tracking code', 'error');
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done).catch(fail);
+            return;
+        }
+
+        // Fallback for insecure contexts
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+            document.execCommand('copy');
+            done();
+        } catch (e) {
+            fail();
+        }
+        document.body.removeChild(ta);
+    };
+
+    /* ==================== Bulk import ==================== */
+    window.bulkImport = function () {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.csv,.xlsx,.xls';
+
+        input.onchange = function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            showNotification('Uploading import file…', 'info');
+
+            fetch('/admin/bulk-import', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.success) {
+                    showNotification(`Imported ${data.imported} packages`, 'success');
+                    if (data.errors && data.errors.length) {
+                        console.warn('Import warnings:', data.errors);
+                    }
+                    setTimeout(() => location.reload(), 1800);
+                } else {
+                    showNotification('Import error: ' + ((data && data.error) || 'unknown'), 'error');
+                }
+            })
+            .catch(err => showNotification('Upload error: ' + err, 'error'));
+        };
+
+        input.click();
+    };
+
+    /* ==================== Wire-up ==================== */
+    document.addEventListener('DOMContentLoaded', function () {
+        /* Hold reason → toggle custom reason input */
+        const holdReason = document.getElementById('holdReason');
+        if (holdReason) {
+            holdReason.addEventListener('change', function () {
+                const div = document.getElementById('customReasonDiv');
+                if (div) div.style.display = this.value === 'Other' ? 'block' : 'none';
+            });
+        }
+
+        /* Bootstrap tooltips */
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+            document.querySelectorAll('[title]').forEach(el => new bootstrap.Tooltip(el));
+        }
+    });
+
+})();
+</script>
+{% endblock %}
